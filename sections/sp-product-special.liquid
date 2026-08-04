@@ -1,0 +1,510 @@
+{% comment %}
+  Product Special Slider Section — Sportify Theme
+  Centered Swiper — active card is larger with a "floating" second image below it.
+  Product data is server-resolved via `resolved: true` on the product field.
+  Access the full ProductCard object from section.resolved.product_slider[index].product_id[0].
+
+  CSS    → assets/css/glamour-pro.css  (search: SP Product Special Slider)
+  JS     → inline below (needs section.id + is_loop + is_autoplay from settings)
+  Schema → theme.json  (slug: sp-product-special)
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign product_slider = section.settings.product_slider | default: empty %}
+{% assign is_loop     = section.settings.is_loop     | default: false %}
+{% assign is_autoplay = section.settings.is_autoplay | default: true %}
+
+{% assign title = section.settings.title %}
+{% if is_rtl and section.settings.title_ar != blank %}
+  {% assign title = section.settings.title_ar %}
+{% endif %}
+
+{% assign sub_title = section.settings.sub_title %}
+{% if is_rtl and section.settings.sub_title_ar != blank %}
+  {% assign sub_title = section.settings.sub_title_ar %}
+{% endif %}
+
+{% assign has_header = false %}
+{% if title != blank or sub_title != blank %}
+  {% assign has_header = true %}
+{% endif %}
+
+<section
+  class="sp-ps-section gl-section"
+  id="section-{{ section.id }}"
+  data-section="sp-product-special"
+  data-is-loop="{{ is_loop }}"
+  data-is-autoplay="{{ is_autoplay }}"
+  style="
+    {% if section.settings.background_top_section != blank %}
+      background-image: url('{{ section.settings.background_top_section }}');
+      background-position: {{ section.settings.section_position | default: 'center' }};
+      background-size: cover;
+      background-repeat: no-repeat;
+    {% endif %}
+    {% if section.settings.margin_switch %}margin: 0 !important; padding: 0 !important;{% endif %}
+    {% unless has_header %}padding-top: 75px;{% endunless %}
+  "
+>
+  <div class="gl-container">
+
+    {% comment %} ─── Header ─── {% endcomment %}
+    {% if has_header %}
+      <div class="sp-ps-header">
+        {% if title != blank %}
+          <h2 class="sp-ps-title">{{ title }}</h2>
+        {% endif %}
+        {% if sub_title != blank %}
+          <p class="sp-ps-subtitle">{{ sub_title }}</p>
+        {% endif %}
+        <span class="sp-ps-line"></span>
+      </div>
+    {% endif %}
+
+    {% comment %} ─── Swiper ─── {% endcomment %}
+    <div class="sp-ps-swiper swiper" id="sp-ps-swiper-{{ section.id }}">
+      <div class="swiper-wrapper">
+
+        {% assign resolved_items = section.resolved.product_slider %}
+
+        {% for item in product_slider %}
+          {% assign r = resolved_items[forloop.index0] %}
+          {% assign prod = r.product_id[0] %}
+
+          {% if prod %}
+            <div class="swiper-slide sp-ps-slide">
+              <a href="{{ prod.url | default: '#' }}" class="sp-ps-card">
+
+                <div class="sp-ps-images">
+                  {% if prod.images.size > 0 %}
+                    <img
+                      class="sp-ps-img--main"
+                      src="{{ prod.images[0].url }}"
+                      alt="{{ prod.name }}"
+                      loading="lazy"
+                      style="object-fit: {{ item.product_image_fit | default: 'cover' }};">
+                  {% else %}
+                    <div class="sp-ps-img-placeholder"></div>
+                  {% endif %}
+
+                  {% if prod.images.size > 1 %}
+                    <img
+                      class="sp-ps-img--thumb"
+                      src="{{ prod.images[1].url }}"
+                      alt="{{ prod.name }}"
+                      loading="lazy"
+                      style="object-fit: {{ item.product_image_fit | default: 'cover' }};">
+                  {% endif %}
+                </div>
+
+                <div class="sp-ps-info">
+                  <h3 class="sp-ps-name" style="color: {{ section.settings.product_name_color | default: '#000000' }};">
+                    {{ prod.name }}
+                  </h3>
+                  <p class="sp-ps-price" style="color: {{ section.settings.product_price_color | default: '#e43a19' }};">
+                    {{ prod.formatted_price | default: prod.price }}
+                  </p>
+                </div>
+
+              </a>
+            </div>
+          {% endif %}
+
+        {% endfor %}
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function () {
+  function initSpProductSpecial() {
+    var sectionEl = document.getElementById('section-{{ section.id }}');
+    var slider    = document.getElementById('sp-ps-swiper-{{ section.id }}');
+    if (!sectionEl || !slider || typeof Swiper === 'undefined') return;
+    if (!slider.querySelector('.swiper-slide')) return;
+
+    var isLoop     = sectionEl.dataset.isLoop     === 'true';
+    var isAutoplay = sectionEl.dataset.isAutoplay === 'true';
+
+    var centeredBounds = !isLoop;
+
+    new Swiper(slider, {
+      loop:                 isLoop,
+      speed:                800,
+      slidesPerView:        1.15,
+      centeredSlides:       true,
+      centeredSlidesBounds: centeredBounds,
+      spaceBetween:         20,
+      watchOverflow:        true,
+      autoplay: isAutoplay ? { delay: 2500, disableOnInteraction: false } : false,
+      breakpoints: {
+        0: {
+          slidesPerView:        1.12,
+          centeredSlides:       true,
+          centeredSlidesBounds: centeredBounds
+        },
+        500: {
+          slidesPerView:        1.5,
+          centeredSlides:       true,
+          centeredSlidesBounds: centeredBounds
+        },
+        768: {
+          slidesPerView:        2,
+          centeredSlides:       true,
+          centeredSlidesBounds: centeredBounds
+        },
+        1024: {
+          slidesPerView:        3,
+          centeredSlides:       true,
+          centeredSlidesBounds: centeredBounds
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSpProductSpecial);
+  } else {
+    initSpProductSpecial();
+  }
+})();
+</script>
+
+<style>
+    /* ============================================
+    SP Product Special Slider — Sportify Theme
+    Add this block to assets/css/glamour-pro.css
+
+    Visual: Centered Swiper where the active (middle) card
+    is larger and shows a second "floating" product image
+    that appears below it, overlapping the card bottom.
+    ============================================ */
+
+    .sp-ps-section {
+      padding-block: 60px;
+      background-size: cover;
+      background-repeat: no-repeat;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .sp-ps-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .sp-ps-title {
+      font-size: clamp(1.5rem, 1.2rem + 1vw, 2.5rem);
+      font-weight: 700;
+      color: var(--gl-heading, #000);
+      font-family: var(--gl-font-heading);
+      margin-bottom: 8px;
+    }
+
+    .sp-ps-subtitle {
+      font-size: clamp(0.9rem, 0.8rem + 0.35vw, 1.1rem);
+      color: var(--gl-text-light, #777);
+      margin-bottom: 12px;
+    }
+
+    .sp-ps-line {
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: var(--gl-primary, #e43a19);
+      margin: 0 auto;
+      border-radius: 99px;
+    }
+
+    /* ── Swiper wrapper ── */
+    .sp-ps-swiper {
+      overflow: hidden;
+      padding-bottom: 8px;
+    }
+
+    /* ── Slide ── */
+    .sp-ps-slide {
+      transition: opacity 0.35s ease;
+      opacity: 1;
+    }
+
+    .sp-ps-slide.swiper-slide-active {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    /* ── Card ── */
+    .sp-ps-card {
+      display: block;
+      text-decoration: none;
+      position: relative;
+    }
+
+    /* ── Images wrapper ── */
+    .sp-ps-images {
+      position: relative;
+      width: 100%;
+      overflow: visible;
+    }
+
+    /* Main image */
+    .sp-ps-img--main {
+      width: 100%;
+      display: block;
+      border-radius: 0;
+      aspect-ratio: 3 / 2;
+      object-fit: cover;
+    }
+
+    /* Second / thumb image — hidden by default, floats below on active slide */
+    .sp-ps-img--thumb {
+      display: none;
+    }
+
+    /* Show thumb only on active slide */
+    .sp-ps-slide.swiper-slide-active .sp-ps-img--thumb {
+      display: none;
+    }
+
+    /* Scale-up main image slightly on active */
+    .sp-ps-slide.swiper-slide-active .sp-ps-img--main {
+      transform: none;
+    }
+
+    /* ── Placeholder when no image ── */
+    .sp-ps-img-placeholder {
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      background: var(--gl-bg-alt, #f0f0f0);
+      border-radius: 0;
+    }
+
+    /* ── Product info ── */
+    .sp-ps-info {
+      margin-top: 14px;
+      text-align: center;
+      padding-top: 0;
+    }
+
+    .sp-ps-name {
+      font-size: clamp(1.05rem, 0.85rem + 0.7vw, 1.65rem);
+      font-weight: 800;
+      font-family: var(--gl-font-heading);
+      margin: 0 0 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sp-ps-price {
+      font-size: clamp(1rem, 0.86rem + 0.45vw, 1.3rem);
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .sp-ps-name .gl-skeleton,
+    .sp-ps-price .gl-skeleton {
+      display: block;
+      height: 1em;
+      max-width: 70%;
+      margin-inline: auto;
+      border-radius: 4px;
+    }
+
+    .sp-ps-price .gl-skeleton {
+      max-width: 34%;
+    }
+
+    /* Non-active slides: hide the info to reduce clutter */
+    .sp-ps-slide:not(.swiper-slide-active) .sp-ps-info {
+      opacity: 1;
+      padding-top: 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .sp-ps-img--thumb {
+        width: 65%;
+        bottom: -50px;
+      }
+      .sp-ps-info {
+        padding-top: 0;
+      }
+      .sp-ps-swiper {
+        padding-bottom: 8px;
+      }
+    }
+
+
+</style>
+
+{% schema %}
+{
+    "slug": "sp-product-special",
+    "name": {
+        "en": "Product Section Special (Sportify)",
+        "ar": "قسم المنتجات المميزة (سبورتفاي)"
+    },
+    "category": "products",
+    "template": "sections/sp-product-special.liquid",
+    "sort_order": 29,
+    "reusable": true,
+    "page_types": [
+        "home",
+        "cms",
+        "custom"
+    ],
+    "settings": [
+        {
+            "type": "image",
+            "id": "background_top_section",
+            "label": "Background Image",
+            "label_ar": "صورة الخلفية",
+            "default": "https://media.zid.store/1cf34273-59ed-45ac-b06d-6aaa51dbb818/d5f6ce1d-eff5-4ffc-abb6-149a82f09c94.webp",
+            "default_ar": "https://media.zid.store/1cf34273-59ed-45ac-b06d-6aaa51dbb818/d5f6ce1d-eff5-4ffc-abb6-149a82f09c94.webp"
+        },
+        {
+            "type": "select",
+            "id": "section_position",
+            "label": "Background Image Alignment",
+            "label_ar": "محاذاة صورة الخلفية",
+            "default": "center",
+            "options": [
+                {
+                    "value": "right",
+                    "label": "Right"
+                },
+                {
+                    "value": "center",
+                    "label": "Center"
+                },
+                {
+                    "value": "left",
+                    "label": "Left"
+                }
+            ]
+        },
+        {
+            "type": "checkbox",
+            "id": "is_autoplay",
+            "label": "Enable Auto Play",
+            "label_ar": "تشغيل تلقائي للسلايدر",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "is_loop",
+            "label": "Enable Slider Loop",
+            "label_ar": "تكرار عرض السلايدر",
+            "default": false
+        },
+        {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "label_ar": "العنوان",
+            "default": "Offers",
+            "default_ar": "العروض"
+        },
+        {
+            "type": "text",
+            "id": "title_ar",
+            "label": "Title (Arabic)",
+            "label_ar": "العنوان (عربي)",
+            "default": "Offers",
+            "default_ar": "العروض"
+        },
+        {
+            "type": "text",
+            "id": "sub_title",
+            "label": "Subtitle",
+            "label_ar": "النص التوضيحي",
+            "default": "Shop the best products that suit you",
+            "default_ar": "تسوق ابرز المنتجات التي تناسبك"
+        },
+        {
+            "type": "text",
+            "id": "sub_title_ar",
+            "label": "Subtitle (Arabic)",
+            "label_ar": "النص التوضيحي (عربي)",
+            "default": "Shop the best products that suit you",
+            "default_ar": "تسوق ابرز المنتجات التي تناسبك"
+        },
+        {
+            "type": "color",
+            "id": "product_name_color",
+            "label": "Product Name Color",
+            "label_ar": "لون اسم المنتج",
+            "default": "#000000",
+            "default_ar": "#000000"
+        },
+        {
+            "type": "color",
+            "id": "product_price_color",
+            "label": "Price Color",
+            "label_ar": "لون السعر",
+            "default": "#e43a19",
+            "default_ar": "#e43a19"
+        },
+        {
+            "type": "repeater",
+            "id": "product_slider",
+            "label": "Select Products",
+            "label_ar": "اختر المنتجات",
+            "item_label": "Product",
+            "item_label_ar": "منتج",
+            "max_items": 12,
+            "default": [],
+            "fields": [
+                {
+                    "type": "product",
+                    "id": "product_id",
+                    "label": "Select Product",
+                    "label_ar": "اختر المنتج",
+                    "multiple": false,
+                    "resolved": true
+                },
+                {
+                    "type": "select",
+                    "id": "product_image_fit",
+                    "label": "Image Fit Mode",
+                    "label_ar": "طريقة عرض الصور",
+                    "default": "cover",
+                    "options": [
+                        {
+                            "value": "cover",
+                            "label": "Cover (Fill)"
+                        },
+                        {
+                            "value": "contain",
+                            "label": "Contain (Full Image)"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "defaults": {
+        "margin_switch": false,
+        "background_top_section": "https://media.zid.store/1cf34273-59ed-45ac-b06d-6aaa51dbb818/d5f6ce1d-eff5-4ffc-abb6-149a82f09c94.webp",
+        "section_position": "center",
+        "is_autoplay": true,
+        "is_loop": false,
+        "title": "Offers",
+        "title_ar": "العروض",
+        "sub_title": "Shop the best products that suit you",
+        "sub_title_ar": "تسوق ابرز المنتجات التي تناسبك",
+        "product_name_color": "#004cff",
+        "product_price_color": "#e43a19",
+        "product_slider": [
+            {
+                "product_id": 160,
+                "product_image_fit": "cover"
+            }
+        ]
+    }
+}
+{% endschema %}

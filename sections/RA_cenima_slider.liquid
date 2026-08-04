@@ -1,0 +1,195 @@
+<link rel="stylesheet" href="{{ 'RA_cenima_slider.css' | asset_url }}">
+
+{% assign c = section.settings %}
+
+{% if request.is_rtl %}
+  {% assign btn_txt = c.btn_txt_ar | default: c.btn_txt_en %}
+{% else %}
+  {% assign btn_txt = c.btn_txt_en | default: c.btn_txt_ar %}
+{% endif %}
+
+<section class="rac-cinema rac-{{ section.id }} {% if c.margin_switch %}rac-cinema--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  <div class="rac__content {% if c.is_switch %}rac__content--reverse{% endif %}" data-mask="{{ c.is_mask | default: false }}">
+    <div class="rac__title-box" style="color: {{ c.text_color | default: '#ffffff' }};">
+      <div id="active-card-title-container" class="rac__active-title"></div>
+      {% if c.is_btn %}
+        <a href="{{ c.btn_url | default: '#' }}" class="rac__btn" style="background-color: {{ c.btn_bg | default: '#ffffff' }}; color: {{ c.btn_color | default: '#000000' }};">
+          <span>{{ btn_txt }}</span>
+          <i class="sicon-arrow-left"></i>
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="rac__slider-box">
+      <!-- Mobile Progress Bar -->
+      <div class="rac__progress-bar rac__progress-bar--mobile">
+        <div class="rac__track">
+          <div class="rac__filler" style="width: 30%;"></div>
+        </div>
+        <div class="rac__page-info">
+          <span class="rac__current-page" style="color: {{ c.text_color | default: '#ffffff' }};">01</span>
+        </div>
+      </div>
+
+      <div class="swiper rac__swiper rac__swiper-{{ section.id }}" dir="{% if c.reverse_scroll_direction %}ltr{% else %}rtl{% endif %}">
+        <div class="swiper-wrapper">
+          {% for card in c.cards %}
+            {% if request.is_rtl %}
+              {% assign card_name = card.card_name_ar | default: card.card_name_en %}
+            {% else %}
+              {% assign card_name = card.card_name_en | default: card.card_name_ar %}
+            {% endif %}
+            {% if card.add_video_url != blank or card.card_img != blank %}
+              <div class="swiper-slide rac__slide" tabindex="0" data-card-name="{{ card_name | escape }}" data-btn-url="{{ card.btn_url | default: '#' }}">
+                <a href="{{ card.btn_url | default: '#' }}" class="rac__card-link">
+                  <div class="rac__card-inner">
+                    {% if card.add_video_instead_of_image and card.add_video_url != blank %}
+                      <video playsinline autoplay muted loop preload="metadata" loading="lazy" class="rac__card-video">
+                        <source src="{{ card.add_video_url }}" type="video/mp4">
+                      </video>
+                    {% elsif card.card_img != blank %}
+                      <img src="{{ card.card_img }}" alt="{{ card_name | escape }}" class="rac__card-img" loading="lazy">
+                    {% endif %}
+                  </div>
+                </a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Desktop Progress Bar -->
+      <div class="rac__progress-bar rac__progress-bar--desktop">
+        <div class="rac__track">
+          <div class="rac__filler" style="width: 30%;"></div>
+        </div>
+        <div class="rac__page-info">
+          <span class="rac__current-page" style="color: {{ c.text_color | default: '#ffffff' }};">01</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sectionEl = document.querySelector(".rac-{{ section.id }}");
+    if (!sectionEl) return;
+
+    const contentEl = sectionEl.querySelector(".rac__content");
+    const swiperContainer = sectionEl.querySelector(".rac__swiper");
+    if (!contentEl || !swiperContainer) return;
+
+    const titleContainer = sectionEl.querySelector("#active-card-title-container");
+    const progressFillers = sectionEl.querySelectorAll(".rac__filler");
+    const pageCounters = sectionEl.querySelectorAll(".rac__current-page");
+
+    // Background video/image layer
+    let bgLayer = document.createElement("div");
+    bgLayer.className = "rac__bg-layer";
+    bgLayer.style.position = "absolute";
+    bgLayer.style.top = "0";
+    bgLayer.style.left = "0";
+    bgLayer.style.width = "100%";
+    bgLayer.style.height = "100%";
+    bgLayer.style.zIndex = "1";
+    bgLayer.style.overflow = "hidden";
+    contentEl.appendChild(bgLayer);
+
+    if (contentEl.getAttribute("data-mask") === "true") {
+      bgLayer.classList.add("has-mask");
+    }
+
+    let mainSwiper = null;
+
+    if (typeof Swiper !== "undefined") {
+      mainSwiper = new Swiper(swiperContainer, {
+        slidesPerView: 3,
+        spaceBetween: 15,
+        loop: true,
+        centeredSlides: true,
+        speed: 800,
+        autoplay: {
+          delay: 4000,
+          disableOnInteraction: false,
+        },
+        breakpoints: {
+          768: {
+            slidesPerView: 3,
+            spaceBetween: 20
+          }
+        },
+        on: {
+          init: function () {
+            updateActiveState(this);
+          },
+          slideChange: function () {
+            updateActiveState(this);
+          }
+        }
+      });
+    }
+
+    function updateActiveState(swiperInstance) {
+      if (!swiperInstance) return;
+      const slides = swiperInstance.slides;
+      const activeIdx = swiperInstance.activeIndex;
+      const activeSlide = slides[activeIdx];
+      if (!activeSlide) return;
+
+      // Update Title
+      const cardName = activeSlide.getAttribute("data-card-name");
+      const btnUrl = activeSlide.getAttribute("data-btn-url");
+
+      if (titleContainer) {
+        titleContainer.innerHTML = "";
+        if (cardName) {
+          let a = document.createElement("a");
+          a.href = btnUrl || "#";
+          a.textContent = cardName;
+          a.className = "rac__title-link";
+          titleContainer.appendChild(a);
+        }
+      }
+
+      // Update Background Layer
+      bgLayer.innerHTML = "";
+      const video = activeSlide.querySelector("video");
+      const img = activeSlide.querySelector("img");
+
+      if (video) {
+        const source = video.querySelector("source");
+        if (source) {
+          let bgVid = document.createElement("video");
+          bgVid.src = source.src;
+          bgVid.autoplay = true;
+          bgVid.loop = true;
+          bgVid.muted = true;
+          bgVid.playsInline = true;
+          bgVid.style.width = "100%";
+          bgVid.style.height = "100%";
+          bgVid.style.objectFit = "cover";
+          bgLayer.appendChild(bgVid);
+        }
+      } else if (img) {
+        let bgImg = document.createElement("div");
+        bgImg.style.backgroundImage = `url("${img.src}")`;
+        bgImg.style.backgroundSize = "cover";
+        bgImg.style.backgroundPosition = "center";
+        bgImg.style.width = "100%";
+        bgImg.style.height = "100%";
+        bgLayer.appendChild(bgImg);
+      }
+
+      // Update Progress & Counter
+      const totalReal = (swiperInstance.realIndex || 0) + 1;
+      const totalSlides = swiperInstance.slides ? (swiperInstance.slides.length - (swiperInstance.loopedSlides * 2 || 0)) : 3;
+      const displayTotal = totalSlides > 0 ? totalSlides : 3;
+      const percent = Math.min(100, Math.max(10, (totalReal / displayTotal) * 100));
+
+      progressFillers.forEach(f => f.style.width = `${percent}%`);
+      const formattedNum = String(totalReal).padStart(2, '0');
+      pageCounters.forEach(c => c.textContent = formattedNum);
+    }
+  });
+</script>

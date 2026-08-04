@@ -1,0 +1,194 @@
+{% assign loader_bg = theme.loader_bg_color | default: '#000000' %}
+{% assign loader_accent = theme.loader_accent_color | default: '#ffffff' %}
+
+<div id="rally-preloader" class="rally-loader">
+  <div class="rally-loader__inner">
+
+    <!-- Car Driving Track Container -->
+    <div class="rally-loader__track-container">
+      <div class="rally-loader__road"></div>
+      
+      <!-- Moving Car Element -->
+      <div class="rally-loader__car-wrap">
+        <svg class="rally-loader__car-svg" viewBox="0 0 100 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Car silhouette path -->
+          <path d="M5 24C8 24 13 24 16 24C18 20 22 13 32 10C42 7 60 7 68 11C74 14 82 20 85 24H95C97.5 24 99 26 99 28C99 30 97.5 31 95 31H88C87 31 85 28 82 28C79 28 77 31 76 31H34C33 31 31 28 28 28C25 28 23 31 22 31H5C2.5 31 1 29 1 27.5C1 26 2.5 24 5 24Z" fill="{{ loader_accent }}" />
+          <!-- Wheels -->
+          <circle cx="28" cy="28" r="4.5" fill="#000000" stroke="{{ loader_accent }}" stroke-width="2" />
+          <circle cx="82" cy="28" r="4.5" fill="#000000" stroke="{{ loader_accent }}" stroke-width="2" />
+          <!-- Headlight Glow -->
+          <polygon points="98,25 115,22 115,30 98,28" fill="url(#headlight-gradient)" opacity="0.8" />
+          <defs>
+            <linearGradient id="headlight-gradient" x1="98" y1="26" x2="115" y2="26" gradientUnits="userSpaceOnUse">
+              <stop stop-color="{{ loader_accent }}" stop-opacity="0.9" />
+              <stop offset="1" stop-color="{{ loader_accent }}" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="rally-loader__speed-trail"></div>
+      </div>
+
+    </div>
+
+    <div class="rally-loader__text">
+      {% if request.is_rtl %}جاري التحميل...{% else %}Loading...{% endif %}
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* Suppress default or old loaders */
+  .gl-page-loader,
+  salla-page-loader,
+  .salla-loader,
+  .s-page-loader {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  #rally-preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #rally-preloader.loaded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .rally-loader__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    width: 90%;
+    max-width: 420px;
+  }
+
+  /* Track & Road Styling */
+  .rally-loader__track-container {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .rally-loader__road {
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, {{ loader_accent }} 50%, transparent 100%);
+    opacity: 0.4;
+  }
+
+  /* Animated Driving Car Wrap */
+  .rally-loader__car-wrap {
+    position: absolute;
+    bottom: 4px;
+    width: 90px;
+    height: 32px;
+    animation: carDrive 2.2s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  }
+
+  .rally-loader__car-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
+  }
+
+  .rally-loader__speed-trail {
+    position: absolute;
+    bottom: 4px;
+    {% if request.is_rtl %}
+      right: 100%;
+      background: linear-gradient(270deg, {{ loader_accent }} 0%, transparent 100%);
+    {% else %}
+      left: 100%;
+      background: linear-gradient(90deg, {{ loader_accent }} 0%, transparent 100%);
+    {% endif %}
+    width: 40px;
+    height: 2px;
+    opacity: 0.6;
+  }
+
+  .rally-loader__text {
+    color: {{ loader_accent }};
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    animation: loaderPulse 1.5s infinite ease-in-out;
+  }
+
+  @keyframes carDrive {
+    0% {
+      {% if request.is_rtl %}
+        right: -100px;
+      {% else %}
+        left: -100px;
+      {% endif %}
+    }
+    50% {
+      {% if request.is_rtl %}
+        right: 45%;
+      {% else %}
+        left: 45%;
+      {% endif %}
+    }
+    100% {
+      {% if request.is_rtl %}
+        right: 100%;
+      {% else %}
+        left: 100%;
+      {% endif %}
+    }
+  }
+
+  @keyframes loaderPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+</style>
+
+<script>
+  (function () {
+    const loaderEl = document.getElementById('rally-preloader');
+    if (!loaderEl) return;
+
+    function hideLoader() {
+      if (!loaderEl.classList.contains('loaded')) {
+        loaderEl.classList.add('loaded');
+      }
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      hideLoader();
+    } else {
+      document.addEventListener('DOMContentLoaded', hideLoader, { once: true });
+      window.addEventListener('load', hideLoader, { once: true });
+    }
+
+    // Safety fallback: maximum 1.2 seconds
+    setTimeout(hideLoader, 1200);
+  })();
+</script>

@@ -1,0 +1,671 @@
+/* ── POLISHED HEADER & MOBILE SIDE MENU STYLES ── */
+
+.top-header {
+  background-color: #000000 !important;
+  color: #FFDBAA !important;
+  padding: 8px 0 !important;
+  font-size: 0.85rem !important;
+  border-bottom: 1px solid rgba(255, 219, 170, 0.15) !important;
+}
+
+.top-header-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.contact-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #FFDBAA !important;
+}
+
+.contact-info span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.contact-info a {
+  color: #FFDBAA !important;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.contact-info a:hover {
+  opacity: 0.85 !important;
+}
+
+.gl-lang-dropdown {
+  position: relative !important;
+  display: inline-block !important;
+}
+
+.gl-lang-dropdown-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 14px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #FFDBAA !important;
+  background: rgba(255, 219, 170, 0.08) !important;
+  border: 1px solid rgba(255, 219, 170, 0.3) !important;
+  border-radius: 20px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.gl-lang-dropdown-toggle:hover {
+  background: rgba(255, 219, 170, 0.2) !important;
+  border-color: #FFDBAA !important;
+  color: #000000 !important;
+}
+
+.gl-lang-dropdown-menu {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  min-width: 110px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  padding: 6px !important;
+  z-index: 1000 !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: all 0.2s ease !important;
+}
+
+[dir="rtl"] .gl-lang-dropdown-menu {
+
+  right: auto !important;
+}
+
+[dir="ltr"] .gl-lang-dropdown-menu {
+  right: 0 !important;
+  left: auto !important;
+}
+
+.gl-lang-dropdown-toggle[aria-expanded="true"] + .gl-lang-dropdown-menu,
+.gl-lang-dropdown:hover .gl-lang-dropdown-menu {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+.gl-lang-dropdown-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.gl-lang-dropdown-item:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.gl-lang-dropdown-item.active {
+  background: #000000 !important;
+  color: #FFDBAA !important;
+}
+
+.gl-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 9999 !important;
+  width: 100% !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.gl-header-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 76px !important;
+  gap: 24px !important;
+}
+
+.gl-logo-img,
+.gl-logo img {
+  max-height: 52px !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+.gl-logo-text {
+  font-family: inherit !important;
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.02em !important;
+}
+
+.gl-nav-list {
+  display: flex !important;
+  align-items: center !important;
+  gap: 20px !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+}
+
+.gl-nav-item {
+  position: relative !important;
+  list-style: none !important;
+}
+
+.gl-nav-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  text-decoration: none !important;
+  padding: 8px 4px !important;
+  position: relative !important;
+  white-space: nowrap !important;
+  transition: color 0.2s ease !important;
+}
+
+.gl-nav-link::after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  width: 0 !important;
+  height: 2.5px !important;
+  background: #000000 !important;
+  border-radius: 2px !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform: translateX(-50%) !important;
+}
+
+.gl-nav-link:hover,
+.gl-nav-link.active {
+  color: #000000 !important;
+}
+
+.gl-nav-link:hover::after,
+.gl-nav-link.active::after {
+  width: 100% !important;
+}
+
+.gl-nav-chevron {
+  transition: transform 0.25s ease !important;
+}
+
+.gl-nav-has-children:hover > .gl-nav-link .gl-nav-chevron {
+  transform: rotate(180deg) !important;
+}
+
+.gl-nav-dropdown {
+  display: none;
+  position: absolute !important;
+  top: 100% !important;
+  min-width: 200px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12) !important;
+  padding: 8px !important;
+  z-index: 100 !important;
+  list-style: none !important;
+  margin: 4px 0 0 0 !important;
+}
+
+[dir="rtl"] .gl-nav-dropdown {
+  right: 0 !important;
+  left: auto !important;
+}
+
+[dir="ltr"] .gl-nav-dropdown {
+  left: 0 !important;
+  right: auto !important;
+}
+
+.gl-nav-has-children:hover > .gl-nav-dropdown {
+  display: block !important;
+}
+
+.gl-nav-dropdown-link {
+  display: block !important;
+  padding: 8px 14px !important;
+  color: #334155 !important;
+  text-decoration: none !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  white-space: nowrap !important;
+  transition: background 0.15s ease, color 0.15s ease !important;
+}
+
+.gl-nav-dropdown-link:hover {
+  background: #f1f5f9 !important;
+  color: #000000 !important;
+}
+
+.gl-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+.gl-header-action-btn,
+.user-dropdown-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  border: none !important;
+  color: #1e293b !important;
+  cursor: pointer !important;
+  position: relative !important;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease !important;
+}
+
+.gl-header-action-btn:hover,
+.user-dropdown-toggle:hover {
+  background-color: #f1f5f9 !important;
+  color: #000000 !important;
+  transform: translateY(-1px) !important;
+}
+
+.gl-header-action-btn svg,
+.user-dropdown-toggle svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.gl-cart-count {
+  position: absolute !important;
+  top: -2px !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  line-height: 18px !important;
+  border-radius: 9999px !important;
+  display: inline-flex;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 4px !important;
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4) !important;
+}
+
+[dir="rtl"] .gl-cart-count {
+  left: -2px !important;
+  right: auto !important;
+}
+
+[dir="ltr"] .gl-cart-count {
+  right: -2px !important;
+  left: auto !important;
+}
+
+.gl-cart-count[style*="display: none"],
+.gl-cart-count[style*="display:none"] {
+  display: none !important;
+}
+
+.user-dropdown-wrapper {
+  position: relative !important;
+  display: inline-block !important;
+}
+
+.user-dropdown-menu {
+  position: absolute !important;
+  z-index: 1000 !important;
+  min-width: 240px !important;
+  top: calc(100% + 8px) !important;
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden !important;
+}
+
+[dir="rtl"] .user-dropdown-menu {
+  left: 0 !important;
+  right: auto !important;
+}
+
+[dir="ltr"] .user-dropdown-menu {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* ── RESPONSIVE MEDIA QUERIES FOR HEADER & MOBILE MENU ── */
+@media (max-width: 991px) {
+  .gl-header-inner {
+    height: 64px !important;
+    gap: 12px !important;
+  }
+
+  .gl-nav {
+    display: none !important;
+  }
+
+  .gl-logo {
+    display: none !important;
+  }
+
+  .mobile-menu-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .gl-menu-toggle {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    width: 26px !important;
+    height: 18px !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+  }
+
+  .gl-menu-toggle span {
+    display: block !important;
+    width: 100% !important;
+    height: 2.5px !important;
+    background: #0f172a !important;
+    border-radius: 2px !important;
+    transition: all 0.25s ease !important;
+  }
+
+  .gl-logo-mobile {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .gl-logo-mobile .gl-logo-img,
+  .gl-logo-mobile img {
+    max-height: 42px !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+
+  .top-header {
+    padding: 6px 0 !important;
+    font-size: 0.78rem !important;
+  }
+
+  .contact-info {
+    font-size: 12px !important;
+    gap: 10px !important;
+  }
+
+  .gl-header-actions {
+    gap: 4px !important;
+  }
+
+  .gl-header-action-btn,
+  .user-dropdown-toggle {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .gl-header-action-btn svg,
+  .user-dropdown-toggle svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .mobile-menu-header,
+  .gl-logo-mobile {
+    display: none !important;
+  }
+
+  .gl-logo {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .gl-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+  }
+
+  .gl-nav-list {
+    gap: 24px !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+/* ── MOBILE SIDE DRAWER MENU (.gl-mobile-menu) ── */
+.gl-mobile-menu {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 320px !important;
+  max-width: 85vw !important;
+  height: 100vh !important;
+  background: #ffffff !important;
+  z-index: 100000 !important;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.2) !important;
+  padding: 24px 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  overflow-y: auto !important;
+}
+
+[dir="rtl"] .gl-mobile-menu {
+  right: 0 !important;
+  left: auto !important;
+  transform: translateX(100%) !important;
+}
+
+[dir="ltr"] .gl-mobile-menu {
+  left: 0 !important;
+  right: auto !important;
+  transform: translateX(-100%) !important;
+}
+
+.gl-mobile-menu.is-active {
+  transform: translateX(0) !important;
+}
+
+.gl-mobile-menu-close {
+  position: absolute !important;
+  top: 20px !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  z-index: 10 !important;
+}
+
+[dir="rtl"] .gl-mobile-menu-close {
+  left: 16px !important;
+  right: auto !important;
+}
+
+[dir="ltr"] .gl-mobile-menu-close {
+  right: 16px !important;
+  left: auto !important;
+}
+
+.gl-mobile-menu-close:hover {
+  background: #e2e8f0 !important;
+  color: #ef4444 !important;
+}
+
+.gl-mobile-menu-nav {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  margin-top: 36px !important;
+}
+
+.gl-mobile-nav-link {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 10px !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.2s ease !important;
+}
+
+.gl-mobile-nav-link:hover,
+.gl-mobile-nav-link.active {
+  color: #000000 !important;
+  background: #f8fafc !important;
+  border-radius: 8px !important;
+}
+
+.gl-mobile-submenu {
+  display: flex !important;
+  flex-direction: column !important;
+  padding-right: 16px !important;
+  background: #f8fafc !important;
+  border-radius: 8px !important;
+  margin: 4px 0 8px 0 !important;
+}
+
+[dir="ltr"] .gl-mobile-submenu {
+  padding-right: 0 !important;
+  padding-left: 16px !important;
+}
+
+.gl-mobile-submenu-link {
+  padding: 10px 12px !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  color: #475569 !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease !important;
+}
+
+.gl-mobile-submenu-link:hover {
+  color: #000000 !important;
+}
+
+/* ── MOBILE MENU BACKDROP OVERLAY ── */
+.gl-mobile-menu-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 99999 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
+}
+
+.gl-mobile-menu-backdrop.is-active {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ── POLISHED STICKY HEADER SCROLL BEHAVIOR ── */
+.top-header {
+  position: relative !important;
+  z-index: 1001 !important;
+}
+
+.gl-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 9999 !important;
+  width: 100% !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease !important;
+}
+
+.gl-header-inner {
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.gl-logo-img,
+.gl-logo img,
+.gl-logo-mobile img {
+  transition: max-height 0.3s ease !important;
+}
+
+.gl-header.is-scrolled {
+  position: sticky !important;
+  top: 0 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(14px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.gl-header.is-scrolled .gl-header-inner {
+  height: 60px !important;
+}
+
+.gl-header.is-scrolled .gl-logo-img,
+.gl-header.is-scrolled .gl-logo img {
+  max-height: 42px !important;
+}
+
+.gl-header.is-scrolled .gl-logo-mobile img {
+  max-height: 38px !important;
+}
+
+/* ── TOAST NOTIFICATIONS STACK POSITIONING & Z-INDEX ── */
+.gl-toast-stack {
+  position: fixed !important;
+  top: 100px !important;
+  z-index: 9999999 !important;
+}
+
+[dir="rtl"] .gl-toast-stack {
+  left: 20px !important;
+  right: auto !important;
+}
+
+[dir="ltr"] .gl-toast-stack {
+  right: 20px !important;
+  left: auto !important;
+}

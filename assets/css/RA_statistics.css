@@ -1,0 +1,175 @@
+/* Section Wrapper */
+.ras-statistics {
+  position: relative;
+  width: 100%;
+  background-size: cover;
+  background-position: bottom;
+  height: 145px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .ras-statistics {
+    height: 252px;
+    margin-bottom: 30px;
+  }
+}
+
+.ras-statistics--no-margin {
+  margin-bottom: 0 !important;
+}
+
+/* Background Overlay */
+.ras__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+}
+
+/* Content Wrapper */
+.ras__wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ras__wrapper--full {
+  width: 100%;
+}
+
+/* Cards Layout */
+.ras__cards {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .ras__cards {
+    justify-content: space-between;
+    padding: 0 48px;
+  }
+}
+
+/* Individual Card */
+.ras__card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+/* Icons */
+.ras__icon-box {
+  display: flex;
+  align-items: center;
+}
+
+.ras__icon-box--desktop {
+  display: none;
+}
+
+.ras__icon-box--mobile {
+  display: flex;
+  margin-left: 4px;
+}
+
+[dir="ltr"] .ras__icon-box--mobile {
+  margin-left: 0;
+  margin-right: 4px;
+}
+
+@media (min-width: 640px) {
+  .ras__icon-box--desktop {
+    display: block;
+  }
+  .ras__icon-box--mobile {
+    display: none;
+  }
+}
+
+.ras__icon-font {
+  font-size: 20px;
+}
+
+@media (min-width: 768px) {
+  .ras__icon-font {
+    font-size: 30px;
+  }
+}
+
+.ras__icon-img {
+  width: 28px;
+  height: 18px;
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .ras__icon-img {
+    width: 56px;
+    height: 32px;
+  }
+}
+
+/* Details & Counter */
+.ras__details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ras__counter-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  direction: ltr;
+}
+
+.ras__counter {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .ras__counter {
+    font-size: 36px;
+  }
+}
+
+.ras__plus {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (min-width: 768px) {
+  .ras__plus {
+    font-size: 36px;
+  }
+}
+
+.ras__description {
+  font-size: 11px;
+  font-weight: 500;
+  margin: 4px 0 0 0;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .ras__description {
+    font-size: 16px;
+  }
+}

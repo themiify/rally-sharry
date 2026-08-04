@@ -1,0 +1,277 @@
+/* Section Wrapper */
+.sf-main-banner {
+  padding: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  position: relative;
+  margin-bottom: 30px;
+  height: 430px;     
+}
+
+@media (min-width: 768px) {
+  .sf-main-banner {
+    margin-bottom: 30px;
+    height: 733px;
+  }
+}
+
+.sf-main-banner--no-margin {
+  margin-bottom: 0 !important;
+}
+
+.sf__container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+/* Bottom Navigation Buttons */
+.sf__buttons {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+}
+
+.sf__button-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 50%;
+  padding-left: 20px;
+}
+
+@media (min-width: 640px) {
+  .sf__button-wrapper {
+    padding-left: 0;
+  }
+}
+
+[dir="rtl"] .sf__button-wrapper--secondary {
+  border-right: none !important;
+  border-left: 1px solid currentColor;
+}
+
+.sf__button-first,
+.sf__button-second {
+  padding: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .sf__button-first {
+    padding: 16px 160px 16px 16px;
+    font-size: 16px;
+  }
+  
+  .sf__button-second {
+    padding: 16px 24px;
+    font-size: 16px;
+  }
+}
+
+.sf__icon {
+  font-size: 16px;
+  color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .sf__icon {
+    font-size: 24px;
+    margin-left: 5%;
+  }
+}
+
+/* Slider Wrap & Swiper */
+.sf__slider-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.sf__swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.sf__slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Custom Tabs */
+.sf__tabs {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  position: absolute;
+  top: 34%;
+  left: 3%;
+  z-index: 2;
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .sf__tabs {
+    top: 31%;
+    left: 10%;
+  }
+}
+
+.sf__tab-item {
+  padding: 8px 4px 8px 4px;
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .sf__tab-item {
+    padding: 8px 33px 8px 8px;
+    font-size: 20px;
+  }
+}
+
+.sf__tab-item--active {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Slide Content Overlay */
+.sf__content {
+  max-width: 200px;
+  text-align: right;
+  position: absolute;
+  top: 13%;
+  right: 12px;
+  z-index: 2;
+}
+
+@media (min-width: 768px) {
+  .sf__content {
+    max-width: 500px;
+    width: 50%;
+    margin-bottom: 32px;
+    top: 30%;
+    right: 10%;
+  }
+}
+
+.sf__title {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 40px !important;
+  margin: 0 0 8px 0;
+}
+
+@media (min-width: 640px) {
+  .sf__title {
+    padding-bottom: 32px;
+  }
+}
+
+@media (min-width: 768px) {
+  .sf__title {
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.2 !important;
+  }
+}
+
+.sf__subtitle {
+  font-size: 10px;
+  font-weight: 400;
+  margin: 0 0 8px 0;
+}
+
+@media (min-width: 768px) {
+  .sf__subtitle {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+}
+
+.sf__btn {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 4px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  gap: 8px;
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.sf__btn:hover {
+  opacity: 1;
+}
+
+@media (min-width: 768px) {
+  .sf__btn {
+    padding: 8px 24px;
+    font-size: 16px;
+  }
+}
+
+.sf__btn-icon {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  .sf__btn-icon {
+    font-size: 24px;
+  }
+}
+
+/* Media & Images */
+.sf__media {
+  width: 100%;
+  height: 430px;
+}
+
+@media (min-width: 768px) {
+  .sf__media {
+    height: 733px;
+  }
+}
+
+.sf__picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sf__img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+@media (min-width: 640px) {
+  .sf__img {
+    object-fit: cover;
+  }
+}
+
+.sf__pagination,
+.sf__prev,
+.sf__next {
+  display: none;
+}

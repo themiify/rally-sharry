@@ -1,0 +1,75 @@
+{% comment %}
+  Not Found Section — Glamour PRO v2.4.5
+  Designed for PageType 404 when ThemeMarketplace has an active 404 PageLayout.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+
+{% assign heading = section.settings.heading | default: 'Oops! This beauty page is missing.' %}
+{% assign heading_ar = section.settings.heading_ar | default: 'عفواً! صفحة الجمال هذه غير موجودة.' %}
+{% assign subtitle = section.settings.subtitle
+  | default: 'The product may have moved, or the link needs a little touch-up.'
+%}
+{% assign subtitle_ar = section.settings.subtitle_ar
+  | default: 'قد يكون المنتج قد انتقل أو أن الرابط يحتاج إلى تحديث بسيط.'
+%}
+
+{% assign primary_text = section.settings.primary_button_text | default: 'Back to Home' %}
+{% assign primary_text_ar = section.settings.primary_button_text_ar | default: 'العودة للرئيسية' %}
+{% assign primary_url = section.settings.primary_button_url | default: '/' %}
+
+{% assign secondary_text = section.settings.secondary_button_text | default: 'Browse Products' %}
+{% assign secondary_text_ar = section.settings.secondary_button_text_ar | default: 'تصفح المنتجات' %}
+{% assign secondary_url = section.settings.secondary_button_url | default: '/search?new=1&sort=created_at-desc' %}
+
+{% assign status_code = section.settings.status_code | default: '404' %}
+
+{% assign visual_image = section.settings.image %}
+{% if is_rtl and section.settings.image_ar != blank %}
+  {% assign visual_image = section.settings.image_ar %}
+{% endif %}
+
+<section
+  class="gl-section gl-404"
+  style="{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %}{% if pad %}padding: {{ pad.top | default: 72 }}px {{ pad.right | default: 0 }}px {{ pad.bottom | default: 72 }}px {{ pad.left | default: 0 }}px;{% endif %}"
+>
+  <div class="gl-container">
+    <div class="gl-404__card {% if is_rtl %}gl-404__card--rtl{% endif %}">
+      <div class="gl-404__content">
+        <h1 class="gl-404__title">
+          {% if is_rtl %}{{ heading_ar | default: heading }}{% else %}{{ heading }}{% endif %}
+        </h1>
+        <p class="gl-404__subtitle">
+          {% if is_rtl %}{{ subtitle_ar | default: subtitle }}{% else %}{{ subtitle }}{% endif %}
+        </p>
+
+        <div class="gl-404__actions">
+          <a href="{{ primary_url }}" class="gl-btn gl-btn-primary">
+            {%- if is_rtl %}{{ primary_text_ar | default: primary_text }}{% else %}{{ primary_text }}{% endif -%}
+          </a>
+          <a href="{{ secondary_url }}" class="gl-btn gl-btn-outline">
+            {%- if is_rtl %}{{ secondary_text_ar | default: secondary_text }}{% else %}{{ secondary_text }}{% endif -%}
+          </a>
+        </div>
+      </div>
+
+      <div class="gl-404__visual" aria-hidden="true">
+        {% if visual_image != blank %}
+          <img src="{{ visual_image }}" alt="" class="gl-404__image" loading="lazy">
+        {% else %}
+          <div class="gl-404__shape">
+            <p
+              style="
+                font-size: 50px;
+                color: var(--gl-subheading);
+                font-weight: 600;
+              "
+            >
+              {{ status_code }}
+            </p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

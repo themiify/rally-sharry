@@ -1,0 +1,205 @@
+{% comment %}
+  Footer Section — Glamour Theme v2.1
+  Main site footer with links, branding, social media, and copyright.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign show_social = section.settings.show_social  %}
+{% assign show_payments = section.settings.show_payment_icons  %}
+{% assign footer_menu = section.menu %}
+
+{% if footer_menu == blank %}
+  {% assign footer_menu = menus.footer %}
+{% endif %}
+{% assign copyright_text = section.settings.copyright  %}
+{% assign copyright_text_ar = section.settings.copyright_ar  %}
+
+<footer class="gl-footer">
+  <div class="gl-container">
+    <div class="gl-footer-grid">
+      <!-- Column 1: Brand Info -->
+      <div class="gl-footer-brand">
+        <a href="/" class="gl-footer-logo" style="display: flex;align-items: center;">
+          {% assign dark_logo = theme.store_logo_dark | default: theme.store_logo %}
+          {% assign store_title = section.settings.store_name %}
+          {% if is_rtl %}
+            {% assign store_title = section.settings.store_name_ar | default: theme.store_name_ar %}
+            {% if store_title == blank %}
+              {% assign store_title = section.settings.store_name | default: theme.store_name | default: shop.name %}
+            {% endif %}
+          {% else %}
+            {% assign store_title = section.settings.store_name | default: theme.store_name | default: shop.name %}
+          {% endif %}
+          {% assign store_title = store_title | remove: ' [Demo]' | remove: '[Demo]' %}
+
+          {% if dark_logo != blank %}
+            <img src="{{ dark_logo }}" alt="{{ store_title }}" style="width :106px ;height: 70px; object-fit: contain;">
+            <span style="font-size:1.5rem;font-weight:700;color:var(--gl-primary);font-family:var(--gl-font-heading);">{{- store_title -}}</span>
+          {% else %}
+            <span style="font-size:1.5rem;font-weight:700;color:#fff;font-family:var(--gl-font-heading);">{{- store_title -}}</span>
+          {% endif %}
+        </a>
+
+        <p class="footer-description" >
+          {% if is_rtl %}
+            {{ theme.store_tagline_ar | default: 'وجهتك المفضلة لأرقى منتجات التجميل والعناية بالبشرة.' }}
+          {% else %}
+            {{ theme.store_tagline | default: 'Your destination for premium beauty and skincare products.' }}
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- Columns 2+: Footer Menu (dynamic, driven by menus.footer handle) -->
+      {% for column in footer_menu %}
+        <div>
+          {% if column.children.size > 0 %}
+            <h4 class="menus_title" >{{ column.title }}</h4>
+            <ul class="gl-footer-links">
+              {% for item in column.children %}
+                <li>
+                  <a href="{{ item.url }}"{% if item.new_tab %} target="_blank" rel="noopener"{% endif %}>
+                    {{- item.title -}}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <h4>
+              <a href="{{ column.url }}"{% if column.new_tab %} target="_blank" rel="noopener"{% endif %}
+                 class="gl-footer-standalone-link">
+                {{- column.title -}}
+              </a>
+            </h4>
+          {% endif %}
+        </div>
+      {% else %}
+        <!-- Fallback: no footer menu configured yet -->
+        <div>
+          <h4>{% if is_rtl %}روابط مهمة{% else %}Quick Links{% endif %}</h4>
+          <ul class="gl-footer-links">
+            <li>
+              <a href="/page/about-us">
+                {%- if is_rtl %}من نحن{% else %}About Us{% endif -%}
+              </a>
+            </li>
+            <li>
+              <a href="/page/contact-us">
+                {%- if is_rtl %}تواصل معنا{% else %}Contact Us{% endif -%}
+              </a>
+            </li>
+            <li>
+              <a href="/page/privacy-policy">
+                {%- if is_rtl %}سياسة الخصوصية{% else %}Privacy Policy{% endif -%}
+              </a>
+            </li>
+            <li>
+              <a href="/page/terms-conditions">
+                {%- if is_rtl %}الشروط والأحكام{% else %}Terms & Conditions{% endif -%}
+              </a>
+            </li>
+            <li>
+              <a href="/page/return-policy">
+                {%- if is_rtl %}سياسة الاسترجاع{% else %}Return Policy{% endif -%}
+              </a>
+            </li>
+          </ul>
+        </div>
+      {% endfor %}
+      <div>
+           {% if show_social %}
+            <h4 class="menus_title" >{%- if is_rtl %}تابعنا على{% else %}Follow us on{% endif -%}</h4>
+          <div class="gl-footer-social">
+            {% assign wa_url = theme.social_whatsapp | default: section.settings.social_whatsapp %}
+            {% if wa_url != blank or theme.social_whatsapp == blank %}
+              <a href="{{ wa_url | default: '#' }}" target="_blank" rel="noopener" aria-label="WhatsApp">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.012 2c-5.506 0-9.989 4.478-9.989 9.984 0 1.76.459 3.474 1.33 4.982l-1.413 5.16 5.283-1.385a9.96 9.96 0 004.789 1.227h.004c5.506 0 9.99-4.478 9.99-9.984s-4.483-9.984-9.994-9.984zm5.82 14.172c-.246.694-1.225 1.27-1.706 1.344-.45.068-1.037.121-3.344-.834-2.73-1.129-4.522-3.87-4.66-4.053-.135-.183-1.112-1.479-1.112-2.822 0-1.343.704-2.003.954-2.26.246-.255.539-.319.72-.319.18 0 .36.002.518.01.171.008.403-.065.63.477.245.586.83 2.03.903 2.176.074.148.12.323.023.518-.098.194-.148.318-.293.487-.145.17-.305.38-.436.51-.144.144-.294.3-.127.587.167.286.744 1.229 1.597 1.99 1.096.977 2.02 1.28 2.308 1.424.288.144.455.12.625-.074.17-.194.726-.846.92-1.135.195-.29.388-.242.648-.145.26.097 1.644.774 1.927.915.283.142.472.213.541.332.069.119.069.692-.177 1.386z"/>
+                </svg>
+              </a>
+            {% endif %}
+            {% assign snap_url = theme.social_snapchat %}
+            {% if snap_url != blank or theme.social_snapchat == blank %}
+              <a href="{{ snap_url | default: '#' }}" target="_blank" rel="noopener" aria-label="Snapchat">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2c-3.14 0-5.485 2.274-5.485 5.568 0 .97.238 2.035.438 2.802-.452.12-.924.316-1.251.606-.411.365-.589.873-.39 1.378.225.568.847.886 1.488 1.031-.19.645-.63 1.258-1.572 1.528-.415.118-.767.248-1.026.541-.355.402-.303.967.11 1.298.665.534 1.77.72 2.684.72 1.222 0 2.146-.356 2.766-.889.378.261 1.253.918 2.24.918s1.862-.657 2.24-.918c.62.533 1.544.889 2.766.889.914 0 2.019-.186 2.684-.72.413-.331.465-.896.11-1.298-.259-.293-.611-.423-1.026-.541-.942-.27-1.382-.883-1.572-1.528.641-.145 1.263-.463 1.488-1.031.199-.505.021-1.013-.39-1.378-.327-.29-.799-.486-1.251-.606.2-.767.438-1.832.438-2.802C17.486 4.274 15.14 2 12 2z"/>
+                </svg>
+              </a>
+            {% endif %}
+            {% assign insta_url = theme.social_instagram %}
+            {% if insta_url != blank or theme.social_instagram == blank %}
+              <a href="{{ insta_url | default: '#' }}" target="_blank" rel="noopener" aria-label="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+            {% endif %}
+            {% assign tw_url = theme.social_twitter %}
+            {% if tw_url != blank or theme.social_twitter == blank %}
+              <a href="{{ tw_url | default: '#' }}" target="_blank" rel="noopener" aria-label="Twitter">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M23.954 4.569c-.885.389-1.83.654-2.825.775 1.014-.611 1.794-1.574 2.163-2.723-.951.555-2.005.959-3.127 1.184-.896-.959-2.173-1.559-3.591-1.559-2.717 0-4.92 2.203-4.92 4.917 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.722-.666 1.561-.666 2.475 0 1.71.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.18 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"/>
+                </svg>
+              </a>
+            {% endif %}
+            {% assign fb_url = theme.social_facebook %}
+            {% if fb_url != blank or theme.social_facebook == blank %}
+              <a href="{{ fb_url | default: '#' }}" target="_blank" rel="noopener" aria-label="Facebook">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                </svg>
+              </a>
+            {% endif %}
+            {% if theme.social_tiktok != blank %}
+              <a href="{{ theme.social_tiktok }}" target="_blank" rel="noopener" aria-label="TikTok">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a8 8 0 0 1-5-1.5z"></path>
+                </svg>
+              </a>
+            {% endif %}
+            {% if theme.social_youtube != blank %}
+              <a href="{{ theme.social_youtube }}" target="_blank" rel="noopener" aria-label="YouTube">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"></path>
+                  <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"></polygon>
+                </svg>
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <!-- Bottom Bar -->
+  <div class="gl-footer-bottom">
+    <div class="gl-container gl-footer-bottom-wrapper">
+      <span class="footer-copy-right" >
+        {% if is_rtl %} {{ copyright_text_ar }}{% else %}{{ copyright_text }}{% endif %}
+      </span>
+  
+      {% if show_payments %}
+        <div class="gl-footer-payment">
+          <svg
+            viewBox="0 0 38 24"
+            width="38"
+            height="24"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-labelledby="pi-visa"
+          >
+            <title id="pi-visa">Visa</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><path d="M28.3 10.1H28c-.4 1-.7 1.5-1 3h1.9c-.3-1.5-.3-2.2-.6-3zm2.9 5.9h-1.7c-.1 0-.1 0-.2-.1l-.2-.9-.1-.2h-2.4c-.1 0-.2 0-.2.2l-.3.9c0 .1-.1.1-.1.1h-2.1l.2-.5L27 8.7c0-.5.3-.7.8-.7h1.5c.1 0 .2 0 .2.2l1.4 6.5c.1.4.2.7.2 1.1.1.1.1.1.1.2z" fill="#142688"></path>
+          </svg>
+          <svg
+            viewBox="0 0 38 24"
+            width="38"
+            height="24"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-labelledby="pi-master"
+          >
+            <title id="pi-master">Mastercard</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><circle fill="#EB001B" cx="15" cy="12" r="7"></circle><circle fill="#F79E1B" cx="23" cy="12" r="7"></circle><path fill="#FF5F00" d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.2 3-3.3 3-5.7z"></path>
+          </svg>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</footer>

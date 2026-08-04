@@ -1,0 +1,65 @@
+<link rel="stylesheet" href="{{ 'RA_about_us.css' | asset_url }}">
+
+{% assign c = section.settings %}
+
+{% if request.is_rtl %}
+  {% assign main_tittle = c.main_tittle_ar | default: c.main_tittle_en %}
+  {% assign discription = c.discription_ar | default: c.discription_en %}
+{% else %}
+  {% assign main_tittle = c.main_tittle_en | default: c.main_tittle_ar %}
+  {% assign discription = c.discription_en | default: c.discription_ar %}
+{% endif %}
+
+{% assign words = discription | split: ' ' %}
+
+<section class="sfa-about-us sf-{{ section.id }} {% if c.margin_switch %}sfa-about-us--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  <div class="sfa__container gl-container">
+    <div class="sfa__title-wrap">
+      <h2 class="sfa__title" style="color: {{ c.tittle_color | default: '#000000' }};">
+        {{ main_tittle }}
+      </h2>
+    </div>
+
+    <div class="sfa__content fade-container">
+      <p class="sfa__paragraph">
+        <span class="sfa__first-words" style="color: {{ c.description_color | default: '#000000' }};">
+          {{ words[0] }} {{ words[1] }}
+        </span>
+        {% for word in words %}
+          {% if forloop.index > 2 %}
+            {% assign delay = forloop.index0 | minus: 2 | times: 100 %}
+            <span class="fade-word sfa__word" style="color: {{ c.description_color | default: '#000000' }}; transition-delay: {{ delay }}ms;">
+              {{ word }}&nbsp;
+            </span>
+          {% endif %}
+        {% endfor %}
+      </p>
+
+      <div class="sfa__border-v"></div>
+      <div class="sfa__border-h"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sectionEl = document.querySelector(".sf-{{ section.id }}");
+    if (!sectionEl) return;
+    const container = sectionEl.querySelector(".fade-container");
+    if (!container) return;
+    const words = container.querySelectorAll(".fade-word");
+
+    container.addEventListener("mouseenter", function () {
+      words.forEach(function (word, i) {
+        word.style.transitionDelay = `${i * 100}ms`;
+      });
+    });
+
+    container.addEventListener("mouseleave", function () {
+      const total = words.length;
+      words.forEach(function (word, i) {
+        word.style.transitionDelay = `${(total - i - 1) * 100}ms`;
+      });
+    });
+  });
+</script>

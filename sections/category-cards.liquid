@@ -1,0 +1,96 @@
+{% comment %}
+  Category Cards Section — Glamour Theme v2.1
+  Displays a grid of categories with images and product counts.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign limit = section.settings.max_categories | default: 6 %}
+{% assign layout = section.settings.layout | default: 'grid' %}
+{% assign title = section.settings.heading | default: 'Shop by Category' %}
+{% assign title_ar = section.settings.heading_ar | default: 'تسوقي حسب الفئة' %}
+{% assign subtitle = section.settings.subtitle | default: 'Choose from our curated collections' %}
+{% assign subtitle_ar = section.settings.subtitle_ar | default: 'اختاري من مجموعاتنا المتنوعة' %}
+{% assign categories_layout_style = '' %}
+{% assign card_style = '' %}
+
+{% if layout == 'carousel' %}
+  {% assign categories_layout_style = 'display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,1fr);overflow-x:auto;gap:1.5rem;padding-bottom:0.5rem;' %}
+{% elsif layout == 'masonry' %}
+  {% assign categories_layout_style = 'column-count:3;column-gap:1rem;' %}
+  {% assign card_style = 'display:block;margin-bottom:1rem;break-inside:avoid;' %}
+{% endif %}
+
+<section
+  class="gl-section gl-categories-section"
+  style="{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.heading_font_size > 0 %}--section-heading-size: {{ section.settings.heading_font_size }}px;{% endif %}{% if section.settings.body_font_size > 0 %}--section-body-size: {{ section.settings.body_font_size }}px;{% endif %}{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %}{% if pad %}padding: {{ pad.top | default: 60 }}px {{ pad.right | default: 0 }}px {{ pad.bottom | default: 60 }}px {{ pad.left | default: 0 }}px;{% endif %}"
+>
+  <div class="gl-container">
+    <div class="gl-section-header">
+      <h2>
+        {% if is_rtl %}{{ title_ar }}{% else %}{{ title }}{% endif %}
+      </h2>
+      {% if subtitle != blank or subtitle_ar != blank %}
+        <p>
+          {% if is_rtl %}{{ subtitle_ar }}{% else %}{{ subtitle }}{% endif %}
+        </p>
+      {% endif %}
+    </div>
+
+    {% if categories.size > 0 %}
+      <div class="gl-categories-grid" style="{{ categories_layout_style }}">
+        {% for category in categories limit: limit %}
+          <a href="{{ category.url }}" class="gl-category-card" style="{{ card_style }}">
+            <div class="gl-category-card-image">
+              {% if category.image %}
+                <img src="{{ category.image }}" alt="{{ category.name }}" loading="lazy">
+              {% else %}
+                <div
+                  style="width:100%;height:100%;background: linear-gradient(135deg, var(--gl-secondary), var(--gl-primary-light));"
+                ></div>
+              {% endif %}
+            </div>
+            <div class="gl-category-card-overlay"></div>
+            <div class="gl-category-card-content">
+              <h3>{{ category.name }}</h3>
+              <span>
+                {{- category.products_count }}
+                {% if is_rtl %}منتج{% else %}Products{% endif -%}
+              </span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Preview placeholder -->
+      <div class="gl-categories-grid" style="{{ categories_layout_style }}">
+        {% for i in (1..3) %}
+          <div class="gl-category-card" style="{{ card_style }}">
+            <div class="gl-category-card-image">
+              <div
+                style="width:100%;height:100%;background: linear-gradient(135deg, var(--gl-secondary), var(--gl-primary-light));"
+              ></div>
+            </div>
+            <div class="gl-category-card-overlay"></div>
+            <div class="gl-category-card-content">
+              <h3>
+                {% if is_rtl %}فئة {{ i }}{% else %}Category {{ i }}{% endif %}
+              </h3>
+              <span>
+                {{- i | plus: 10 }}
+                {% if is_rtl %}منتج{% else %}Products{% endif -%}
+              </span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if section.settings.view_all_url != blank %}
+      <div style="text-align: center; margin-top: 2rem;">
+        <a href="{{ section.settings.view_all_url }}" class="gl-btn gl-btn-outline">
+          {% if is_rtl %}جميع الفئات{% else %}All Categories{% endif %}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>

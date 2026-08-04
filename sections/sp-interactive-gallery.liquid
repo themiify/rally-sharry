@@ -1,0 +1,658 @@
+{% comment %}
+  Interactive Gallery Section — Sportify Theme
+  Mixed grid: product cards (via render) + custom banner cards.
+  5 items: item 2 is tall (spans 2 rows).
+
+  IMPORTANT — how products work in Sharry vs Zid:
+  Zid:   item.product gives full object (images, price, url…) — rendered in Liquid directly.
+  Sharry: only product IDs are available inside a repeater field.
+          Full card HTML is fetched via JS (product_card_api_url) and hydrated client-side.
+          So each product slot renders a loading skeleton → JS fills it in.
+
+  CSS    → assets/css/glamour-pro.css  (search: SP Interactive Gallery)
+  JS     → assets/js/sp-interactive-gallery.js
+  Schema → theme.json  (slug: sp-interactive-gallery)
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+
+{% assign animation = '' %}
+{% if section.settings.animation_enable %}
+  {% if section.settings.animation_type == 'random' %}
+    {% assign animation = 'fade-up' %}
+  {% else %}
+    {% assign animation = section.settings.animation_type %}
+  {% endif %}
+{% endif %}
+
+<section
+  class="sp-ig-section gl-section"
+  id="section-{{ section.id }}"
+  data-section="sp-interactive-gallery"
+  data-add-to-cart-url="{{ api_routes.cart_store }}"
+  data-wishlist-url="{{ api_routes.wishlist_store }}"
+  style="{% if section.settings.margin_switch %}margin: 0 !important; padding: 0 !important;{% endif %}"
+>
+  <div class="gl-container">
+    <div class="sp-ig-grid">
+      {% for item in section.settings.banner_products %}
+        {% assign main_text = item.main_text %}
+        {% if is_rtl and item.main_text_ar != blank %}
+          {% assign main_text = item.main_text_ar %}
+        {% endif %}
+
+        {% assign sub_text = item.sub_text %}
+        {% if is_rtl and item.sub_text_ar != blank %}
+          {% assign sub_text = item.sub_text_ar %}
+        {% endif %}
+
+        {% assign btn_text = item.btn_text %}
+        {% if is_rtl and item.btn_text_ar != blank %}
+          {% assign btn_text = item.btn_text_ar %}
+        {% endif %}
+
+        <div
+          class="sp-ig-item {% if forloop.index == 2 %}sp-ig-item--tall{% endif %}"
+          {% if section.settings.animation_enable and animation != blank %}
+            data-aos="{{ animation }}"
+            data-aos-duration="{{ section.settings.animation_duration | default: 1200 }}"
+            data-aos-delay="{{ forloop.index0 | times: 100 }}"
+          {% endif %}
+        >
+          {% comment %} ─── Product Card ─── {% endcomment %}
+          {% unless item.add_banner %}
+            {% if item.product_id != blank %}
+              {% render 'product-card',
+                product_card_id: item.product_id,
+                product_card_api_url: api_routes.product_card_html,
+                product_card_orientation: 'vertical',
+                product_card_actions: 'view,addToCart,wishlist,compare',
+                theme: theme,
+                shop: shop
+              %}
+            {% else %}
+              {% comment %} Placeholder when no product selected {% endcomment %}
+              <div
+                class="gl-product-card"
+                style="background: {{ section.settings.background_color_card | default: '#ffffff' }};"
+              >
+                <div class="gl-product-card-image">
+                  <div class="gl-product-placeholder"></div>
+                </div>
+                <div class="gl-product-card-body">
+                  <div class="gl-skeleton gl-skeleton-title"></div>
+                  <div class="gl-skeleton gl-skeleton-description"></div>
+                </div>
+              </div>
+            {% endif %}
+          {% endunless %}
+
+          {% comment %} ─── Banner Card ─── {% endcomment %}
+          {% if item.add_banner %}
+            <div class="sp-ig-banner" style="background: {{ item.layout_color | default: '#111f4d' }};">
+              {% if main_text != blank %}
+                <h2 class="sp-ig-banner__title" style="color: {{ item.main_text_color | default: '#ffffff' }};">
+                  {{ main_text }}
+                </h2>
+              {% endif %}
+              {% if sub_text != blank %}
+                <p class="sp-ig-banner__subtitle" style="color: {{ item.sub_text_color | default: '#ffffff' }};">
+                  {{ sub_text }}
+                </p>
+              {% endif %}
+              {% if btn_text != blank %}
+                <a href="{{ item.btn_url | default: '#' }}">
+                  <button
+                    class="sp-ig-banner__btn"
+                    style="
+                      background-color: {% if item.background_transparent %}transparent{% else %}{{ item.btn_color | default: 'transparent' }}{% endif %};
+                      border: 1px solid {{ item.btn_border_color | default: '#ffffff' }};
+                      color: {{ item.btn_text_color | default: '#ffffff' }};
+                    "
+                  >
+                    {{ btn_text }}
+                  </button>
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+    "slug": "sp-interactive-gallery",
+    "name": {
+        "en": "Interactive Gallery (Sportify)",
+        "ar": "بانرات تفاعلية (سبورتفاي)"
+    },
+    "category": "hero",
+    "template": "sections/sp-interactive-gallery.liquid",
+    "sort_order": 23,
+    "reusable": true,
+    "page_types": [
+        "home",
+        "cms",
+        "custom"
+    ],
+    "settings": [
+        {
+            "type": "color",
+            "id": "background_color_card",
+            "label": "Product Card Background Color",
+            "label_ar": "لون كارت المنتج",
+            "default": "#ffffff"
+        },
+        {
+            "type": "color",
+            "id": "product_name_color",
+            "label": "Product Name Color",
+            "label_ar": "لون اسم المنتج",
+            "default": "#0c1944"
+        },
+        {
+            "type": "image",
+            "id": "item_image",
+            "label": "Cell Image",
+            "label_ar": "صورة الخلية"
+        },
+        {
+            "type": "url",
+            "id": "item_url",
+            "label": "Cell Link URL",
+            "label_ar": "رابط الخلية",
+            "default": "#",
+            "default_ar": "#"
+        },
+        {
+            "type": "color",
+            "id": "price_color",
+            "label": "Price Color",
+            "label_ar": "لون السعر",
+            "default": "#e43a19"
+        },
+        {
+            "type": "checkbox",
+            "id": "full_link",
+            "label": "Hide Product Description on Mobile",
+            "label_ar": "إخفاء وصف المنتج في الجوال",
+            "default": false
+        },
+        {
+            "type": "repeater",
+            "id": "banner_products",
+            "label": "Products & Banners",
+            "label_ar": "المنتجات والبانرات",
+            "item_label": "Item",
+            "item_label_ar": "عنصر",
+            "max_items": 5,
+            "default": [
+                {
+                    "add_banner": true,
+                    "layout_color": "#111f4d",
+                    "main_text": "Ready to Stand Out",
+                    "main_text_ar": "استعــــــــد للتميـــــز",
+                    "main_text_color": "#ffffff",
+                    "sub_text": "Elevate your performance with sportswear designed for athletes",
+                    "sub_text_ar": "ارتقِ بأدائك مع ملابس مصممة خصيصًا للرياضيين",
+                    "sub_text_color": "#ffffff",
+                    "btn_text": "Shop Now",
+                    "btn_text_ar": "تسوق الآن",
+                    "btn_url": "/collections/all",
+                    "btn_text_color": "#ffffff",
+                    "btn_color": "transparent",
+                    "btn_border_color": "#ffffff",
+                    "background_transparent": true
+                },
+                {
+                    "add_banner": false,
+                    "layout_color": "#111f4d",
+                    "main_text": "Ready to Stand Out",
+                    "main_text_ar": "استعــــــــد للتميـــــز",
+                    "main_text_color": "#ffffff",
+                    "sub_text": "Elevate your performance with sportswear designed for athletes",
+                    "sub_text_ar": "ارتقِ بأدائك مع ملابس مصممة خصيصًا للرياضيين",
+                    "sub_text_color": "#ffffff",
+                    "btn_text": "Shop Now",
+                    "btn_text_ar": "تسوق الآن",
+                    "btn_url": "/collections/all",
+                    "btn_text_color": "#ffffff",
+                    "btn_color": "transparent",
+                    "btn_border_color": "#ffffff",
+                    "background_transparent": true
+                },
+                {
+                    "add_banner": false,
+                    "layout_color": "#111f4d",
+                    "main_text": "Ready to Stand Out",
+                    "main_text_ar": "استعــــــــد للتميـــــز",
+                    "main_text_color": "#ffffff",
+                    "sub_text": "Elevate your performance with sportswear designed for athletes",
+                    "sub_text_ar": "ارتقِ بأدائك مع ملابس مصممة خصيصًا للرياضيين",
+                    "sub_text_color": "#ffffff",
+                    "btn_text": "Shop Now",
+                    "btn_text_ar": "تسوق الآن",
+                    "btn_url": "/collections/all",
+                    "btn_text_color": "#ffffff",
+                    "btn_color": "transparent",
+                    "btn_border_color": "#ffffff",
+                    "background_transparent": true
+                },
+                {
+                    "add_banner": false,
+                    "layout_color": "#111f4d",
+                    "main_text": "Ready to Stand Out",
+                    "main_text_ar": "استعــــــــد للتميـــــز",
+                    "main_text_color": "#ffffff",
+                    "sub_text": "Elevate your performance with sportswear designed for athletes",
+                    "sub_text_ar": "ارتقِ بأدائك مع ملابس مصممة خصيصًا للرياضيين",
+                    "sub_text_color": "#ffffff",
+                    "btn_text": "Shop Now",
+                    "btn_text_ar": "تسوق الآن",
+                    "btn_url": "/collections/all",
+                    "btn_text_color": "#ffffff",
+                    "btn_color": "transparent",
+                    "btn_border_color": "#ffffff",
+                    "background_transparent": true
+                },
+                {
+                    "add_banner": true,
+                    "layout_color": "#e43a19",
+                    "main_text": "Ready for the Challenge",
+                    "main_text_ar": "استعــد للتحـــــــــدي",
+                    "main_text_color": "#ffffff",
+                    "sub_text": "Elevate your performance with sportswear designed for athletes",
+                    "sub_text_ar": "ارتقِ بأدائك مع ملابس مصممة خصيصًا للرياضيين",
+                    "sub_text_color": "#ffffff",
+                    "btn_text": "Shop Now",
+                    "btn_text_ar": "تسوق الآن",
+                    "btn_url": "/collections/all",
+                    "btn_text_color": "#ffffff",
+                    "btn_color": "transparent",
+                    "btn_border_color": "#ffffff",
+                    "background_transparent": true
+                }
+            ],
+            "fields": [
+                {
+                    "type": "product",
+                    "id": "product_id",
+                    "label": "Featured Product",
+                    "label_ar": "المنتج المميز",
+                    "multiple": false
+                },
+                {
+                    "type": "checkbox",
+                    "id": "add_banner",
+                    "label": "Add Banner Instead of Product",
+                    "label_ar": "استخدام بانر مخصص مكان المنتج",
+                    "default": false
+                },
+                {
+                    "type": "color",
+                    "id": "layout_color",
+                    "label": "Banner Background Color",
+                    "label_ar": "لون خلفية البانر",
+                    "default": "#111f4d"
+                },
+                {
+                    "type": "text",
+                    "id": "main_text",
+                    "label": "Main Heading",
+                    "label_ar": "العنوان الرئيسي",
+                    "default": "Ready to Stand Out"
+                },
+                {
+                    "type": "text",
+                    "id": "main_text_ar",
+                    "label": "Main Heading (Arabic)",
+                    "label_ar": "العنوان الرئيسي (عربي)",
+                    "default": "Ready to Stand Out"
+                },
+                {
+                    "type": "color",
+                    "id": "main_text_color",
+                    "label": "Main Heading Color",
+                    "label_ar": "لون العنوان الرئيسي",
+                    "default": "#ffffff"
+                },
+                {
+                    "type": "text",
+                    "id": "sub_text",
+                    "label": "Subheading",
+                    "label_ar": "العنوان الفرعي",
+                    "default": ""
+                },
+                {
+                    "type": "text",
+                    "id": "sub_text_ar",
+                    "label": "Subheading (Arabic)",
+                    "label_ar": "العنوان الفرعي (عربي)",
+                    "default": ""
+                },
+                {
+                    "type": "color",
+                    "id": "sub_text_color",
+                    "label": "Subheading Color",
+                    "label_ar": "لون العنوان الفرعي",
+                    "default": "#ffffff"
+                },
+                {
+                    "type": "text",
+                    "id": "btn_text",
+                    "label": "Button Text",
+                    "label_ar": "نص الزر",
+                    "default": "Shop Now"
+                },
+                {
+                    "type": "text",
+                    "id": "btn_text_ar",
+                    "label": "Button Text (Arabic)",
+                    "label_ar": "نص الزر (عربي)",
+                    "default": "Shop Now"
+                },
+                {
+                    "type": "url",
+                    "id": "btn_url",
+                    "label": "Button URL",
+                    "label_ar": "رابط الزر",
+                    "default": "/collections/all"
+                },
+                {
+                    "type": "color",
+                    "id": "btn_text_color",
+                    "label": "Button Text Color",
+                    "label_ar": "لون نص الزر",
+                    "default": "#ffffff"
+                },
+                {
+                    "type": "checkbox",
+                    "id": "background_transparent",
+                    "label": "Transparent Button",
+                    "label_ar": "جعل خلفية الزر شفافة",
+                    "default": true
+                },
+                {
+                    "type": "color",
+                    "id": "btn_color",
+                    "label": "Button Background Color",
+                    "label_ar": "لون خلفية الزر",
+                    "default": "transparent"
+                },
+                {
+                    "type": "color",
+                    "id": "btn_border_color",
+                    "label": "Button Border Color",
+                    "label_ar": "لون حدود الزر",
+                    "default": "#ffffff"
+                }
+            ]
+        }
+    ],
+    "defaults": {
+        "background_color_card": "#ffffff",
+        "product_name_color": "#0c1944",
+        "item_image": "",
+        "item_url": "#",
+        "price_color": "#e43a19",
+        "full_link": false,
+        "banner_products": [
+            {
+                "product_id": 161,
+                "add_banner": true,
+                "layout_color": "#111f4d",
+                "main_text": "Ready to Stand Out",
+                "main_text_ar": "استعــــــــد للتميـــــز",
+                "main_text_color": "#ffffff",
+                "sub_text": "Elevate your performance with sportswear designed for athletes",
+                "sub_text_ar": "ارتقِ بأدائك مع ملابس مصممة خصيصًا للرياضيين",
+                "sub_text_color": "#ffffff",
+                "btn_text": "Shop Now",
+                "btn_text_ar": "تسوق الآن",
+                "btn_url": "/collections/all",
+                "btn_text_color": "#ffffff",
+                "background_transparent": true,
+                "btn_color": "#000000",
+                "btn_border_color": "#ffffff"
+            },
+            {
+                "product_id": 162,
+                "add_banner": false,
+                "layout_color": "#111f4d",
+                "main_text": "Ready to Stand Out",
+                "main_text_ar": "Ready to Stand Out",
+                "main_text_color": "#ffffff",
+                "sub_text": "",
+                "sub_text_ar": "",
+                "sub_text_color": "#ffffff",
+                "btn_text": "Shop Now",
+                "btn_text_ar": "Shop Now",
+                "btn_url": "/collections/all",
+                "btn_text_color": "#ffffff",
+                "background_transparent": true,
+                "btn_color": "#000000",
+                "btn_border_color": "#ffffff"
+            }
+        ]
+    }
+}
+{% endschema %}
+
+
+
+<style>
+  /* ============================================
+   SP Interactive Gallery — Sportify Theme
+   ============================================ */
+
+.sp-ig-section {
+  padding-block: 40px;
+}
+
+/* ── 5-cell CSS Grid ─────────────────────────
+   Layout:
+   [1]      [2 tall]  [3]
+   [4]      [2 tall]  [5]
+   ─────────────────────────────────────────── */
+.sp-ig-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+
+.sp-ig-item:nth-child(2) {
+  grid-row: span 2;
+}
+
+/* ── Grid Cell ── */
+.sp-ig-item {
+  border-radius: var(--gl-radius, 12px);
+  overflow: hidden;
+  position: relative;
+  min-height: 220px;
+}
+
+/* ── Product Card inside cell — image fills the cell ── */
+.sp-ig-item .gl-product-card {
+  height: 100%;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--gl-radius, 12px);
+  overflow: hidden;
+  box-shadow: var(--gl-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.06));
+  position: relative;
+}
+
+.sp-ig-item .gl-product-card-image {
+  flex: 1;
+  min-height: 180px;
+  overflow: hidden;
+}
+
+.sp-ig-item .gl-product-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.sp-ig-item:hover .gl-product-card-image img {
+  transform: scale(1.04);
+}
+
+/* Tall item (index 2) — bigger image */
+.sp-ig-item--tall .gl-product-card-image {
+  min-height: 380px;
+}
+
+.sp-ig-item--tall .gl-product-card {
+  min-height: 100%;
+}
+
+/* ── Direct Image Link (item_image field) ── */
+.sp-ig-image-link {
+  display: block;
+  height: 100%;
+  min-height: 220px;
+  overflow: hidden;
+  border-radius: var(--gl-radius, 12px);
+}
+
+.sp-ig-image-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.sp-ig-item:hover .sp-ig-image-link img {
+  transform: scale(1.04);
+}
+
+.sp-ig-item--tall .sp-ig-image-link {
+  min-height: 100%;
+}
+
+.sp-ig-placeholder {
+  background: #f5f5f5;
+}
+
+/* ── Loading skeleton ── */
+.sp-ig-item .gl-product-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  background: #f0f0f0;
+  border-radius: var(--gl-radius, 12px);
+  animation: sp-ig-shimmer 1.5s infinite linear;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes sp-ig-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Banner Card ── */
+.sp-ig-banner {
+  height: 100%;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 28px 24px;
+  border-radius: var(--gl-radius, 12px);
+  gap: 12px;
+}
+
+[dir="rtl"] .sp-ig-banner {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.sp-ig-item--tall .sp-ig-banner {
+  min-height: 100%;
+}
+
+.sp-ig-banner__title {
+  font-size: clamp(1.3rem, 1rem + 1.2vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1.3;
+  font-family: var(--gl-font-heading, 'Cairo', sans-serif);
+  margin: 0;
+}
+
+.sp-ig-banner__subtitle {
+  font-size: clamp(0.85rem, 0.78rem + 0.3vw, 1rem);
+  line-height: 1.7;
+  opacity: 0.88;
+  margin: 0;
+  font-family: var(--gl-font-body, 'Cairo', sans-serif);
+}
+
+.sp-ig-banner__btn {
+  margin-top: 8px;
+  padding: 9px 26px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  font-family: var(--gl-font-body, 'Cairo', sans-serif);
+  letter-spacing: 0.02em;
+}
+
+.sp-ig-banner__btn:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+}
+
+/* ── Responsive ── */
+@media (max-width: 992px) {
+  .sp-ig-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .sp-ig-item:nth-child(2) {
+    grid-row: span 1;
+  }
+
+  .sp-ig-item--tall .gl-product-card-image {
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 576px) {
+  .sp-ig-section {
+    padding-block: 24px;
+  }
+
+  .sp-ig-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sp-ig-item {
+    min-height: 200px;
+  }
+
+  .sp-ig-item--tall .gl-product-card-image {
+    min-height: 200px;
+  }
+
+  .sp-ig-banner {
+    min-height: 200px;
+    padding: 22px 20px;
+  }
+}
+</style>

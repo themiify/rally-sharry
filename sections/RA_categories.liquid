@@ -1,0 +1,90 @@
+<link rel="stylesheet" href="{{ 'RA_categories.css' | asset_url }}">
+
+{% assign c = section.settings %}
+
+<section class="sf-categories sf-{{ section.id }} {% if c.margin_switch %}sf-categories--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  <div class="sfc__container gl-container">
+    <div class="sfc__wrapper">
+      {% if c.slider_option %}
+        <div class="swiper sfc__swiper sfc__swiper-{{ section.id }}">
+          <div class="swiper-wrapper">
+            {% for item in c.all_categories %}
+              {% if request.is_rtl %}
+                {% assign cat_name = item.categ_name_ar | default: item.categ_name_en %}
+              {% else %}
+                {% assign cat_name = item.categ_name_en | default: item.categ_name_ar %}
+              {% endif %}
+              <div class="swiper-slide sfc__slide">
+                <a href="{{ item.categ_url | default: '#' }}" class="sfc__card">
+                  {% assign mod = forloop.index | modulo: 2 %}
+                  <div class="sfc__image-box {% if mod == 0 %}sfc__image-box--even{% else %}sfc__image-box--odd{% endif %}">
+                    <img src="{{ item.categ_img }}" alt="{{ cat_name | escape }}" class="sfc__img" loading="lazy">
+                  </div>
+                  {% if cat_name != blank %}
+                    <h3 class="sfc__name" style="color: {{ c.title_color | default: '#000000' }};">
+                      {{ cat_name }}
+                    </h3>
+                  {% endif %}
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-pagination sfc__pagination"></div>
+        </div>
+      {% else %}
+        <div class="sfc__grid">
+          {% for item in c.all_categories %}
+            {% if request.is_rtl %}
+              {% assign cat_name = item.categ_name_ar | default: item.categ_name_en %}
+            {% else %}
+              {% assign cat_name = item.categ_name_en | default: item.categ_name_ar %}
+            {% endif %}
+            <a href="{{ item.categ_url | default: '#' }}" class="sfc__card">
+              {% assign mod = forloop.index | modulo: 2 %}
+              <div class="sfc__image-box {% if mod == 0 %}sfc__image-box--even{% else %}sfc__image-box--odd{% endif %}">
+                <img src="{{ item.categ_img }}" alt="{{ cat_name | escape }}" class="sfc__img" loading="lazy">
+              </div>
+              {% if cat_name != blank %}
+                <h3 class="sfc__name" style="color: {{ c.title_color | default: '#000000' }};">
+                  {{ cat_name }}
+                </h3>
+              {% endif %}
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% if c.slider_option %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const sectionEl = document.querySelector('.sf-{{ section.id }}');
+      if (!sectionEl) return;
+      const swiperContainer = sectionEl.querySelector('.sfc__swiper');
+
+      if (swiperContainer && typeof Swiper !== 'undefined') {
+        new Swiper(swiperContainer, {
+          slidesPerView: 2,
+          spaceBetween: 15,
+          speed: 800,
+          pagination: {
+            el: sectionEl.querySelector('.sfc__pagination'),
+            clickable: true,
+          },
+          breakpoints: {
+            767: {
+              slidesPerView: 3,
+              spaceBetween: 20
+            },
+            1125: {
+              slidesPerView: 4,
+              spaceBetween: 20
+            }
+          }
+        });
+      }
+    });
+  </script>
+{% endif %}

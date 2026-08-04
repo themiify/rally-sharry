@@ -1,0 +1,56 @@
+{% comment %}
+Newsletter Section — Glamour Theme v2.1
+A bold section to capture email subscriptions.
+{% endcomment %}
+{% comment %} <link rel="stylesheet" href="../assets/css/G-Newsletter.css"> {% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+
+<section id="newsletter-{{ section.id }}" class="gl-section newsletter"
+  style="{% if section.settings.show_image %} background: url({{ section.settings.bg_image }}) no-repeat center center; background-size: cover; {% else %} background: {{ section.settings.section_bg_color }}; {% endif %}">
+  <div class="gl-container">
+    <div class="newsletter-wrapper">
+      <div class="main-text">
+        <img src="{{section.settings.image_icon}}" alt="dskfjhdsa" width="65" height="65">
+      <div>
+          <h2>
+            {% if is_rtl %}{{ section.settings.heading_ar }}{% else %}{{ section.settings.heading }}{% endif %}
+          </h2>
+
+          <p>
+            {% if is_rtl %}{{ section.settings.subtitle_ar }}{% else %}{{ section.settings.subtitle }}{% endif %}
+          </p>
+        </div>
+      </div>
+      <div class="form-wrapper">
+          <p class="form-text" >  {% if is_rtl %} يمكنك إلغاء الاشتراك في أي لحظة {% else %} You can unsubscribe at any time {% endif %} </p>
+
+        <form class="gl-newsletter-form" action="/subscribe" method="POST">
+          <input type="email" name="subscriber_email" class="gl-input"
+            placeholder="{% if is_rtl %}أدخلي بريدك الإلكتروني{% else %}Enter your email address{% endif %}" required>
+          <button type="submit" class="form-btn">
+            <p>
+            {% if is_rtl %} إشتراك {% else %} subscription {% endif %}
+            </p>
+          </button>
+        </form>
+      </div>
+
+      <div class="apps">
+        <p class="apps-text" >
+        {% if is_rtl %} تطبيقات الجوال {% else %} Mobile applications {% endif %}
+        </p>
+
+        <div class="app-store">
+          {% for item in section.settings.apps %}
+            {% if item.logo != blank %}
+            <a href="{{ item.app_url }}">
+              <img src="{{ item.logo }}" alt="{{ item.title }}" width="134" height="42">
+            </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

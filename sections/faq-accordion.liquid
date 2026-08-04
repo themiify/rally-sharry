@@ -1,0 +1,188 @@
+{% comment %}
+FAQ Accordion Section — Glamour Theme v2.1
+Expandable FAQ with smooth animations driven by dynamic settings.
+{% endcomment %}
+
+
+{% assign is_rtl = request.is_rtl %}
+
+<section id="faq-{{ section.id }}" class="gl-section gl-faq-section"
+  style="background-color: {{ section.settings.bg_color }};{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.heading_font_size > 0 %}--section-heading-size: {{ section.settings.heading_font_size }}px;{% endif %}{% if section.settings.body_font_size > 0 %}--section-body-size: {{ section.settings.body_font_size }}px;{% endif %}{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %} ">
+  <div class="gl-container">
+    <div class="Faq-header">
+
+     {% include 'G-Header-section', 
+         main_title_en: section.settings.main_title_en, 
+         main_title_ar: section.settings.main_title_ar, 
+         title_bg: section.settings.title_bg, 
+         main_title_color: section.settings.main_title_color
+         is_rtl: is_rtl
+          %} 
+
+      {% if section.settings.subtitle_ar != blank or section.settings.subtitle != blank %}
+        <p style="color: {{  section.settings.sub_title_color }};" class="subtitle">
+          {% if is_rtl %}{{ section.settings.subtitle_ar }}{% else %}{{ section.settings.subtitle }}{% endif %}
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="faqs-wrapper" >
+        {% for item in section.settings.faqs %}
+    <div class="faq-item">
+      <button class="question" type="button" aria-expanded="false" aria-controls="faq-answer-{{ forloop.index }}">
+        <span style="color: {{section.settings.question_color}};" class="question-text"> {% if is_rtl %} {{ item.faq_question_ar }} {% else %} {{ item.faq_question }} {%
+          endif %} </span>
+        <span class="question-icon" aria-hidden="true">+</span>
+      </button>
+      <div class="answer" id="faq-answer-{{ forloop.index }}" aria-hidden="true">
+        <div class="faq-content-inner">
+          <p style="color: {{section.settings.answer_color}};" > {% if is_rtl %} {{ item.faq_answer_ar }} {% else %} {{ item.faq_answer }} {% endif %} </p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    </div>
+
+  </div>
+  </section>
+
+<style>
+  .subtitle {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+    .faqs-wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem 4rem;
+      margin-top: 2rem;
+      }
+    @media screen and (max-width: 768px) {
+      .faqs-wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+    .faq-item {
+      border: 1px solid var(--gl-border);
+      border-radius: var(--gl-radius);
+    }
+
+    .faq-item:hover {
+      border-color: var(--gl-primary);
+    }
+    
+    .faq-item.active {
+      border-color:transparent;
+    }
+
+
+    .question {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: left;
+      transition: background-color var(--gl-transition-fast);
+    }
+
+    [dir="rtl"] .question {
+      text-align: right;
+    }
+
+    .question-text {
+      flex: 1;
+    }
+
+    .question-icon {
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+      color: var(--gl-subheading);
+      background-color: var(--gl-primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-family: unset;
+    }
+
+    .answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+
+    .faq-item.active .answer {
+      max-height: 500px;
+    }
+
+    .faq-content-inner {
+      padding: 1.25rem 1.5rem;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.7;
+       opacity: 0.8;
+    }
+  </style>
+
+  <script>
+    (function () {
+      if (!window.__faqDelegationAdded) {
+        document.addEventListener('click', function (e) {
+          var toggle = e.target.closest('.question');
+          if (!toggle) return;
+          e.preventDefault();
+          var item = toggle.parentElement;
+          var content = toggle.nextElementSibling;
+          var icon = toggle.querySelector('.question-icon');
+          var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+          // Close all other items and reset their icons
+          var allItems = document.querySelectorAll('.faq-item');
+          allItems.forEach(function (otherItem) {
+            if (otherItem !== item) {
+              otherItem.classList.remove('active');
+              var otherToggle = otherItem.querySelector('.question');
+              var otherIcon = otherItem.querySelector('.question-icon');
+              var otherContent = otherItem.querySelector('.answer');
+
+              if (otherToggle) {
+                otherToggle.setAttribute('aria-expanded', 'false');
+              }
+              if (otherContent) {
+                otherContent.setAttribute('aria-hidden', 'true');
+              }
+              if (otherIcon) {
+                otherIcon.textContent = '+';
+              }
+            }
+          });
+
+          // Toggle current item
+          item.classList.toggle('active');
+
+          // Update accessibility attributes
+          toggle.setAttribute('aria-expanded', !isExpanded);
+          if (content) {
+            content.setAttribute('aria-hidden', isExpanded);
+          }
+
+          // Update icon
+          if (icon) {
+            icon.textContent = isExpanded ? '+' : '-';
+          }
+        });
+        window.__faqDelegationAdded = true;
+      }
+    })();
+  </script>

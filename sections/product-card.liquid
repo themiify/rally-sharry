@@ -1,0 +1,192 @@
+{% assign product_card = product_card_item %}
+{% assign product_card_orientation = product_card_orientation | default: 'vertical' %}
+{% if product_card_orientation != 'horizontal' %}
+  {% assign product_card_orientation = 'vertical' %}
+{% endif %}
+
+{% if product_card == blank and product_card_loading != true and product_card_id == blank %}
+  {% assign is_demo_card = true %}
+{% endif %}
+
+{% if product_card != blank or is_demo_card %}
+  {% assign product_card_image = product_card.image %}
+  {% if product_card_image == blank and product_card.base_image and product_card.base_image.medium_image_url != blank %}
+    {% assign product_card_image = product_card.base_image.medium_image_url %}
+  {% endif %}
+  {% if product_card_image == blank and product_card.base_image and product_card.base_image.url != blank %}
+    {% assign product_card_image = product_card.base_image.url %}
+  {% endif %}
+  {% if product_card_image == blank and is_demo_card %}
+    {% assign product_card_image = 'https://cdn.salla.sa/form-builder/oUpcRrUsoIlorJH4wtZG5cUmG6sp5rkER7bBEcVn.png' %}
+  {% endif %}
+
+  <div class="gl-product-card gl-product-card-custom {% if product_card_orientation == 'horizontal' %}gl-product-card-horizontal-custom{% else %}gl-product-card-vertical-custom{% endif %}">
+    <!-- Product Image -->
+    <div class="gl-product-card-image">
+      <a href="{{ product_card.url | default: '#' }}">
+        {% if product_card_image != blank %}
+          <img src="{{ product_card_image }}" alt="{{ product_card.name | default: 'سيارة بورش 911' | escape }}" loading="lazy">
+        {% else %}
+          <div class="gl-product-placeholder"></div>
+        {% endif %}
+      </a>
+
+      <!-- Hover Action Icons (Wishlist, Quick View, Compare) -->
+      <div class="gl-product-card-hover-icons">
+        <button
+          class="gl-hover-icon-btn"
+          type="button"
+          data-gl-action="wishlist-toggle"
+          data-product-id="{{ product_card.id }}"
+          data-wishlist-url="{{ product_card.actions.wishlist_url | default: api_routes.wishlist_store | default: '/api/customers/account/wishlist' }}"
+          data-wishlist-index-url="{{ product_card.actions.wishlist_index_url | default: api_routes.wishlist_index | default: '/api/customers/account/wishlist' }}"
+          data-login-url="{{ product_card.actions.login_url | default: api_routes.customer_login | default: '/customer/login' }}"
+          data-active-label="{{ translations.product.remove_from_wishlist | default: 'Remove from Wishlist' }}"
+          data-inactive-label="{{ translations.product.add_to_wishlist | default: 'Add to Wishlist' }}"
+          aria-label="{{ translations.product.add_to_wishlist | default: 'Add to Wishlist' }}"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+
+        <button
+          class="gl-hover-icon-btn"
+          type="button"
+          data-gl-action="quick-view"
+          data-product-id="{{ product_card.id }}"
+          data-product-name="{{ product_card.name | escape }}"
+          data-product-url="{{ product_card.url | default: '#' }}"
+          data-product-image="{{ product_card_image }}"
+          data-product-price="{{ product_card.formatted_price }}"
+          data-product-special-price="{% if product_card.special_price %}{{ product_card.formatted_regular_price }}{% endif %}"
+          data-product-sku="{{ product_card.sku }}"
+          data-product-stock="{% if product_card.in_stock != false %}in-stock{% else %}out-of-stock{% endif %}"
+          data-product-rating="{{ product_card.avg_rating | default: 5 }}"
+          data-product-reviews="{{ product_card.reviews_count | default: 0 }}"
+          data-product-description="{{ product_card.description_text | escape }}"
+          data-product-short-description="{{ short_desc | escape }}"
+          data-product-category-name="{% if product_card.category %}{{ product_card.category.name | escape }}{% endif %}"
+          data-product-add-to-cart-url="{{ product_card.actions.add_to_cart_url | default: api_routes.cart_store | default: '/api/checkout/cart' }}"
+          aria-label="{{ translations.product.quick_view | default: 'Quick View' }}"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+
+        <button
+          class="gl-hover-icon-btn"
+          type="button"
+          data-gl-action="compare-toggle"
+          data-product-id="{{ product_card.id }}"
+          data-compare-url="{{ product_card.actions.compare_url | default: api_routes.compare_store | default: '/api/compare' }}"
+          data-compare-index-url="{{ product_card.actions.compare_index_url | default: api_routes.compare_index | default: '/api/compare' }}"
+          data-compare-destroy-url="{{ product_card.actions.compare_destroy_url | default: api_routes.compare_destroy | default: '/api/compare' }}"
+          data-added-message="{{ translations.product.add_to_compare | default: 'Add to Compare' }}"
+          data-removed-message="{{ translations.product.remove_from_compare | default: 'Remove from Compare' }}"
+          aria-label="{{ translations.product.add_to_compare | default: 'Add to Compare' }}"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Product Details Body -->
+    <div class="gl-product-card-body">
+      <!-- Sub-Header Row: Category Tag & Star Rating -->
+      <div class="gl-product-card-sub-header">
+        <span class="gl-product-card-tag">
+          {% if product_card.category and product_card.category.name != blank %}
+            {{ product_card.category.name }}
+          {% else %}
+            بيع
+          {% endif %}
+        </span>
+
+        <div class="gl-product-card-rating">
+          {% assign rating = product_card.avg_rating | default: 5 %}
+          <span class="count">{{ rating }}</span>
+          <span class="star">
+            <svg viewBox="0 0 24 24" width="14" height="14">
+              <path fill="#f5a623" d="M12 17.27L18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21z"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <!-- Product Title -->
+      <h3 class="gl-product-card-title">
+        <a href="{{ product_card.url | default: '#' }}">{{ product_card.name | default: 'سيارة بورش 911' }}</a>
+      </h3>
+
+      <!-- Short Description -->
+      {% assign short_desc = product_card.short_description_text | default: product_card.subtitle | default: 'سيارة بورش 911 موديل 1995 لونها ابيض و من الداخل لون اسود' %}
+      {% if short_desc != blank %}
+        <p class="gl-product-card-short-desc">
+          {{ short_desc | truncate: 80 }}
+        </p>
+      {% endif %}
+
+      <!-- Price Row -->
+      <div class="gl-product-card-price">
+        {% if product_card.special_price or is_demo_card %}
+          <span class="original">{{ product_card.formatted_regular_price | default: '2,500,000 $' }}</span>
+        {% endif %}
+        <span class="current">{{ product_card.formatted_price | default: '2,000,000 $' }}</span>
+      </div>
+
+
+
+    
+
+      <!-- Action Button -->
+      <div class="gl-product-card-action">
+        {% if product_card.is_available or product_card.in_stock or product_card.in_stock == nil %}
+          <a href="{{ product_card.url | default: '#' }}" class="gl-product-card-btn">
+            <span>احصل الان</span>
+            <i class="sicon-arrow-left"></i>
+          </a>
+        {% else %}
+          <a href="{{ product_card.url | default: '#' }}" class="gl-product-card-btn gl-product-card-btn--disabled">
+            <span>نفذت الكمية</span>
+            <i class="sicon-arrow-left"></i>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% elsif product_card_loading %}
+  <div class="gl-product-card gl-product-card-vertical-custom gl-product-card--loading">
+    <div class="gl-product-card-image">
+      <div class="gl-product-placeholder"></div>
+    </div>
+    <div class="gl-product-card-body">
+      <div class="gl-skeleton gl-skeleton-title"></div>
+      <div class="gl-skeleton gl-skeleton-price"></div>
+      <div class="gl-skeleton gl-skeleton-button"></div>
+    </div>
+  </div>
+
+{% elsif product_card_id != blank %}
+  <div
+    class="gl-product-card gl-product-card-vertical-custom gl-product-card--loading"
+    data-gl-hydrate-product-id="{{ product_card_id }}"
+    data-product-cards-url="{{ product_card_api_url }}"
+    data-product-card-orientation="{{ product_card_orientation }}"
+  >
+    <div class="gl-product-card-image">
+      <div class="gl-product-placeholder"></div>
+    </div>
+    <div class="gl-product-card-body">
+      <div class="gl-skeleton gl-skeleton-title"></div>
+      <div class="gl-skeleton gl-skeleton-price"></div>
+    </div>
+  </div>
+{% endif %}

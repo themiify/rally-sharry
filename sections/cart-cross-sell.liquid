@@ -1,0 +1,56 @@
+{% comment %} Glamour Theme — Cart Cross-Sell Section (API-driven) {% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign product_card_orientation = section.settings.product_card_orientation | default: 'vertical' %}
+{% if product_card_orientation != 'horizontal' %}
+  {% assign product_card_orientation = 'vertical' %}
+{% endif %}
+{% assign product_card_actions = section.settings.product_card_actions | default: 'view,addToCart,wishlist,compare' %}
+
+<section class="gl-section" id="gl-cross-sell"
+  data-api-cross-sell="{{ api_routes.cart_cross_sell }}"
+  data-api-product-card-html="{{ api_routes.product_card_html }}"
+  data-api-cart-store="{{ api_routes.cart_store }}"
+  data-product-card-orientation="{{ product_card_orientation }}"
+  data-product-card-actions="{{ product_card_actions }}"
+  style="display:none;"
+>
+  <div class="gl-container">
+    <div class="gl-section-header">
+      <h2>
+        {% if is_rtl %}
+          {{ section.settings.heading_ar | default: 'قد يعجبكِ أيضاً' }}
+        {% else %}
+          {{ section.settings.heading | default: 'You May Also Like' }}
+        {% endif %}
+      </h2>
+      {% if section.settings.subtitle != blank or section.settings.subtitle_ar != blank %}
+        <p>
+          {% if is_rtl %}
+            {{ section.settings.subtitle_ar }}
+          {% else %}
+            {{ section.settings.subtitle }}
+          {% endif %}
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Loading state -->
+    <div id="gl-cross-sell-loading" style="text-align:center;padding:2rem;">
+      <div class="gl-spinner"></div>
+    </div>
+
+    <!-- Products grid (populated by JS) -->
+    <div id="gl-cross-sell-grid" class="gl-products-grid" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- Cross-sell i18n strings for JS -->
+<script type="application/json" id="gl-cross-sell-i18n">
+{
+  "add_to_cart": "{% if request.is_rtl %}أضيفي للسلة{% else %}Add to Cart{% endif %}",
+  "added": "{% if request.is_rtl %}تمت الإضافة{% else %}Added!{% endif %}",
+  "error": "{% if request.is_rtl %}تعذرت الإضافة{% else %}Could not add{% endif %}",
+  "sale": "{% if request.is_rtl %}تخفيض{% else %}Sale{% endif %}"
+}
+</script>

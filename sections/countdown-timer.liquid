@@ -1,0 +1,125 @@
+{% comment %}
+  Countdown Timer Section — Glamour Theme v2.1
+  Displays a sale countdown with bilingual AR/EN support.
+  JS uses immediate execution (no DOMContentLoaded) for iframe compatibility.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign heading = section.settings.heading %}
+{% assign heading_ar = section.settings.heading_ar %}
+{% assign subtitle = section.settings.subtitle %}
+{% assign subtitle_ar = section.settings.subtitle_ar %}
+{% assign end_date = section.settings.end_date | default: '2026-03-31 23:59' %}
+{% assign cta_text = section.settings.cta_text | default: 'Shop Sale' %}
+{% assign cta_text_ar = section.settings.cta_text_ar | default: 'تسوقي العروض' %}
+{% assign cta_url = section.settings.cta_url | default: '/collections/sale' %}
+{% assign bg_image = section.settings.bg_image %}
+{% assign text_color = section.settings.text_color | default: '#FFFFFF' %}
+{% if is_rtl and section.settings.bg_image_ar != blank %}
+  {% assign bg_image = section.settings.bg_image_ar %}
+{% endif %}
+
+<section
+  id="countdown-{{ section.id }}"
+  class="gl-section gl-countdown-section {% if bg_image != blank %}has-bg{% endif %}"
+  style="{% if bg_image != blank %}background-image: url('{{ bg_image }}'); background-size: cover; background-position: center;{% else %}background-color: {{ section.settings.bg_color | default: '#1A1A2E' }};{% endif %}color: {{ text_color }};{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.heading_font_size > 0 %}--section-heading-size: {{ section.settings.heading_font_size }}px;{% endif %}{% if section.settings.body_font_size > 0 %}--section-body-size: {{ section.settings.body_font_size }}px;{% endif %}{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %} "
+>
+  {% if bg_image != blank %}
+    <div class="gl-countdown-overlay"></div>
+  {% endif %}
+
+  <div class="gl-container">
+    <div class="gl-countdown">
+      <div class="gl-countdown-content">
+        {% if is_rtl %}
+          {% if heading_ar != blank %}
+            <h2 class="gl-countdown-heading">{{ heading_ar }}</h2>
+          {% endif %}
+          {% if subtitle_ar != blank %}
+            <p class="gl-countdown-subtitle">{{ subtitle_ar }}</p>
+          {% endif %}
+        {% else %}
+          {% if heading != blank %}
+            <h2 class="gl-countdown-heading">{{ heading }}</h2>
+          {% endif %}
+          {% if subtitle != blank %}
+            <p class="gl-countdown-subtitle">{{ subtitle }}</p>
+          {% endif %}
+        {% endif %}
+
+        <div
+          class="gl-countdown-timer"
+          data-end="{{ end_date }}"
+          aria-label="{% if is_rtl %}العد التنازلي للعرض{% else %}Sale Countdown{% endif %}"
+        >
+          <div class="gl-countdown-unit">
+            <span class="gl-countdown-number" data-days>00</span>
+            <span class="gl-countdown-label">
+              {%- if is_rtl %}يوم{% else %}Days{% endif -%}
+            </span>
+          </div>
+          <span class="gl-countdown-sep" aria-hidden="true">:</span>
+          <div class="gl-countdown-unit">
+            <span class="gl-countdown-number" data-hours>00</span>
+            <span class="gl-countdown-label">
+              {%- if is_rtl %}ساعة{% else %}Hours{% endif -%}
+            </span>
+          </div>
+          <span class="gl-countdown-sep" aria-hidden="true">:</span>
+          <div class="gl-countdown-unit">
+            <span class="gl-countdown-number" data-minutes>00</span>
+            <span class="gl-countdown-label">
+              {%- if is_rtl %}دقيقة{% else %}Min{% endif -%}
+            </span>
+          </div>
+          <span class="gl-countdown-sep" aria-hidden="true">:</span>
+          <div class="gl-countdown-unit">
+            <span class="gl-countdown-number" data-seconds>00</span>
+            <span class="gl-countdown-label">
+              {%- if is_rtl %}ثانية{% else %}Sec{% endif -%}
+            </span>
+          </div>
+        </div>
+
+        {% if cta_url != blank %}
+          <div class="gl-countdown-actions">
+            <a href="{{ cta_url }}" class="gl-btn gl-btn-primary">
+              {% if is_rtl %}{{ cta_text_ar }}{% else %}{{ cta_text }}{% endif %}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var timer = document.querySelector('.gl-countdown-timer');
+      if (!timer) return;
+      var end = new Date(timer.dataset.end).getTime();
+
+      function update() {
+        var now = Date.now();
+        var diff = Math.max(0, end - now);
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor((diff % 86400000) / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+
+        var dEl = timer.querySelector('[data-days]');
+        var hEl = timer.querySelector('[data-hours]');
+        var mEl = timer.querySelector('[data-minutes]');
+        var sEl = timer.querySelector('[data-seconds]');
+        if (dEl) dEl.textContent = String(d).padStart(2, '0');
+        if (hEl) hEl.textContent = String(h).padStart(2, '0');
+        if (mEl) mEl.textContent = String(m).padStart(2, '0');
+        if (sEl) sEl.textContent = String(s).padStart(2, '0');
+
+        if (diff > 0) {
+          setTimeout(update, 1000);
+        }
+      }
+      update();
+    })();
+  </script>
+</section>

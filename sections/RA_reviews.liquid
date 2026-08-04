@@ -1,0 +1,130 @@
+<link rel="stylesheet" href="{{ 'RA_reviews.css' | asset_url }}">
+
+{% assign c = section.settings %}
+{% assign name_color = c.cust_color | default: '#000000' %}
+{% assign comment_color = c.description_color | default: '#000000' %}
+{% assign job_color = c.job_tittle_color | default: '#616161' %}
+
+{% if request.is_rtl %}
+  {% assign title_text = c.reviews_title_ar | default: c.reviews_title_en %}
+{% else %}
+  {% assign title_text = c.reviews_title_en | default: c.reviews_title_ar %}
+{% endif %}
+
+<section class="rar-reviews rar-{{ section.id }} gl-container {% if c.margin_switch %}rar-reviews--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  {% if title_text != blank %}
+    <h2 class="rar__title">
+      {{ title_text }}
+    </h2>
+  {% endif %}
+
+  <div class="rar__slider-container">
+    <div class="swiper rar-swiper">
+      <div class="swiper-wrapper">
+        {% for item in c.customer %}
+          {% if request.is_rtl %}
+            {% assign cus_name = item.name_cus_ar | default: item.name_cus_en %}
+            {% assign cus_comment = item.des_ar | default: item.des_en %}
+            {% assign cus_job = item.job_ar | default: item.job_en %}
+          {% else %}
+            {% assign cus_name = item.name_cus_en | default: item.name_cus_ar %}
+            {% assign cus_comment = item.des_en | default: item.des_ar %}
+            {% assign cus_job = item.job_en | default: item.job_ar %}
+          {% endif %}
+
+          <div class="swiper-slide rar__slide">
+            <div class="rar__card">
+              <!-- Rating Stars -->
+              <div class="rar__rating">
+                {% assign rating = item.number_of_ratting | default: 5 %}
+                {% assign item_idx = forloop.index %}
+                {% for i in (1..5) %}
+                  <span class="star">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <defs>
+                        <linearGradient id="grad-{{ section.id }}-{{ item_idx }}-{{ i }}">
+                          <stop offset="{% if rating >= i %}100%{% elsif rating > i-1 %}{{ rating | minus: i | plus: 1 | times: 100 }}%{% else %}0%{% endif %}" stop-color="#f5a623"/>
+                          <stop offset="0%" stop-color="#ddd"/>
+                        </linearGradient>
+                      </defs>
+                      <path fill="url(#grad-{{ section.id }}-{{ item_idx }}-{{ i }})"
+                        d="M12 17.27L18.18 21 16.54 13.97 
+                           22 9.24 14.81 8.63 
+                           12 2 9.19 8.63 
+                           2 9.24 7.46 13.97 
+                           5.82 21z"/>
+                    </svg>
+                  </span>
+                {% endfor %}
+              </div>
+
+              <!-- Comment -->
+              {% if cus_comment != blank %}
+                <p class="rar__comment" style="color: {{ comment_color }};">
+                  "{{ cus_comment }}"
+                </p>
+              {% endif %}
+
+              <!-- Customer Profile Info -->
+              <div class="rar__profile">
+                {% if item.img_person != blank %}
+                  <div class="rar__avatar-wrap">
+                    <img src="{{ item.img_person }}" alt="{{ cus_name | escape }}" class="rar__avatar" loading="lazy">
+                  </div>
+                {% endif %}
+
+                <div class="rar__meta">
+                  {% if cus_name != blank %}
+                    <h3 class="rar__name" style="color: {{ name_color }};">{{ cus_name }}</h3>
+                  {% endif %}
+
+                  {% if cus_job != blank %}
+                    <p class="rar__job" style="color: {{ job_color }};">{{ cus_job }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <!-- Pagination -->
+      <div class="swiper-pagination rar-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionEl = document.querySelector('.rar-{{ section.id }}');
+    if (!sectionEl) return;
+
+    const swiperEl = sectionEl.querySelector('.rar-swiper');
+    if (!swiperEl) return;
+
+    const isAutoplay = {{ c.is_outoplay | json }};
+
+    new Swiper(swiperEl, {
+      slidesPerView: 1,
+      spaceBetween: 20,
+      loop: true,
+      autoplay: isAutoplay ? {
+        delay: 4000,
+        disableOnInteraction: false,
+      } : false,
+      pagination: {
+        el: sectionEl.querySelector('.rar-pagination'),
+        clickable: true,
+      },
+      breakpoints: {
+        640: {
+          slidesPerView: 2,
+          spaceBetween: 20,
+        },
+        1024: {
+          slidesPerView: 3,
+          spaceBetween: 24,
+        }
+      }
+    });
+  });
+</script>

@@ -1,0 +1,212 @@
+<link rel="stylesheet" href="{{ 'RA_product_taps.css' | asset_url }}">
+
+{% assign c = section.settings %}
+{% assign categories_list = section.resolved.all_category_fix %}
+{% if categories_list == blank or categories_list.size == 0 %}
+  {% assign categories_list = c.all_category_fix %}
+{% endif %}
+{% if categories_list == blank or categories_list.size == 0 %}
+  {% assign categories_list = categories %}
+{% endif %}
+
+<section class="RA_product_taps RA_product_taps-{{ section.id }} {% if c.margin_switch %}mb-0{% else %}mb-10{% endif %}"
+         style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  <div class="gl-container container">
+
+    <!-- Tab Buttons Navigation Header -->
+    <div class="s-tabs-header flex gap-3 overflow-x-auto border-b border-gray-200 mb-6 pb-2">
+      {% for item in categories_list %}
+        <button type="button" 
+                class="s-tabs-header-item ra-tab-btn {% if forloop.first %}active{% endif %}" 
+                data-target="tab-panel-{{ section.id }}-{{ forloop.index }}">
+          <span class="whitespace-nowrap font-bold text-base px-4 py-2 cursor-pointer">{{ item.name | default: item.title }}</span>
+        </button>
+      {% endfor %}
+    </div>
+
+    <!-- Tab Content Panels -->
+    <div class="s-tabs-content">
+      {% for item in categories_list %}
+        {% assign cat_id = item.id | default: item.category_id %}
+        {% assign cat_products = item.products | default: item.product_items | default: item.items %}
+        {% if cat_products == blank or cat_products.size == 0 %}
+          {% assign cat_products = collections.featured.products | default: collections.trending.products | default: products %}
+        {% endif %}
+        
+        {% assign tab_offset = forloop.index0 | times: 2 %}
+        {% assign cat_products_tab = cat_products | slice: tab_offset, 6 %}
+        {% if cat_products_tab == blank or cat_products_tab.size == 0 %}
+          {% assign cat_products_tab = cat_products %}
+        {% endif %}
+
+        <div class="ra-tab-panel {% if forloop.first %}block{% else %}hidden{% endif %}" 
+             id="tab-panel-{{ section.id }}-{{ forloop.index }}"
+             data-category-id="{{ cat_id }}"
+             style="{% if forloop.first %}display: block;{% else %}display: none;{% endif %}">
+          
+          <div class="ra-panel-body" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch; width: 100%;">
+            
+            <!-- Right Column: Horizontal Products List Column (Desktop) -->
+            <div class="ra-products-col div1 sm:block hidden" style="width: 32%; min-width: 280px; max-height: 420px; overflow-y: auto; flex: 0 0 32%;">
+              <div class="s-products-list-horizontal-cards" style="display: flex; flex-direction: column; gap: 8px;">
+                {% if cat_products_tab != blank and cat_products_tab.size > 0 %}
+                  {% for prod in cat_products_tab limit: 6 %}
+                    {% assign p_img = prod.image | default: prod.base_image.medium_image_url | default: prod.base_image.url %}
+                    {% assign p_url = prod.url | default: prod.url_key | default: '#' %}
+                    <div class="s-product-card-entry {% if forloop.first %}active{% endif %}"
+                         data-image-src="{{ p_img }}"
+                         data-product-url="{{ p_url }}"
+                         style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px; cursor: pointer; background: #ffffff;">
+                      <div class="s-product-card-image" style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
+                        <a href="{{ p_url }}">
+                          <img src="{{ p_img }}" alt="{{ prod.name | escape }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                        </a>
+                      </div>
+                      <div class="s-product-card-content" style="flex: 1; padding-inline-start: 12px; display: flex; flex-direction: column; gap: 4px;">
+                        <h4 class="s-product-card-title" style="font-size: 14px; font-weight: 700; color: #111827; margin: 0;">
+                          <a href="{{ p_url }}"style="color:var(--gl-primary)">{{ prod.name }}</a>
+                        </h4>
+                        <span class="s-product-card-price" style="font-size: 14px; font-weight: 800; color: #000000;">
+                          {{ prod.formatted_price | default: prod.price }}
+                        </span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Mobile Horizontal Products Slider (Visible ONLY on Mobile <640px) -->
+            <div class="ra-mobile-slider-wrap sm:hidden block w-full mb-2">
+              <div class="ra-mobile-slider flex gap-3 overflow-x-auto pb-2" style="display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                {% if cat_products_tab != blank and cat_products_tab.size > 0 %}
+                  {% for prod in cat_products_tab limit: 6 %}
+                    {% assign p_img = prod.image | default: prod.base_image.medium_image_url | default: prod.base_image.url %}
+                    {% assign p_url = prod.url | default: prod.url_key | default: '#' %}
+                    <div class="s-product-card-entry ra-mobile-card-item {% if forloop.first %}active{% endif %}"
+                         data-image-src="{{ p_img }}"
+                         data-product-url="{{ p_url }}"
+                         style="flex: 0 0 135px; width: 135px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 8px; background: #ffffff; cursor: pointer;">
+                      <div class="s-product-card-image" style="width: 100%; height: 95px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
+                        <img src="{{ p_img }}" alt="{{ prod.name | escape }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                      </div>
+                      <div class="s-product-card-content" style="width: 100%; display: flex; flex-direction: column; gap: 2px;">
+                        <h4 class="s-product-card-title" style="font-size: 12px; font-weight: 700; color: #111827; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                          {{ prod.name }}
+                        </h4>
+                        <span class="s-product-card-price" style="font-size: 12px; font-weight: 800; color: #000000;">
+                          {{ prod.formatted_price | default: prod.price }}
+                        </span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Left Column / Main Preview Image Box -->
+            <div class="ra-preview-col image" style="border-radius: 16px; overflow: hidden; background: #f3f4f6; position: relative;">
+              {% assign first_prod = cat_products_tab.first %}
+              {% if first_prod %}
+                {% assign f_img = first_prod.image | default: first_prod.base_image.medium_image_url | default: first_prod.base_image.url %}
+                {% assign f_url = first_prod.url | default: first_prod.url_key | default: '#' %}
+                <a href="{{ f_url }}" style="display: block; width: 100%; height: 100%;">
+                  <img src="{{ f_img }}" style="width: 100%; height: 100%; object-fit: cover;" alt="{{ first_prod.name | escape }}">
+                </a>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var root = document.querySelector(".RA_product_taps-{{ section.id }}");
+  if (!root) return;
+
+  function initPanelPreview(panel) {
+    if (!panel) return;
+    var firstCard = panel.querySelector(".s-product-card-entry.active") || panel.querySelector(".s-product-card-entry");
+    if (!firstCard) return;
+
+    var imgSrc = firstCard.getAttribute("data-image-src");
+    var prodUrl = firstCard.getAttribute("data-product-url") || "#";
+    var imageDiv = panel.querySelector(".image");
+
+    if (imgSrc && prodUrl && imageDiv) {
+      imageDiv.innerHTML = '<a href="' + prodUrl + '" style="display: block; width: 100%; height: 100%;"><img src="' + imgSrc + '" style="width: 100%; height: 100%; object-fit: cover;" /></a>';
+      panel.querySelectorAll(".s-product-card-entry").forEach(function(el) { el.classList.remove("active"); });
+      firstCard.classList.add("active");
+    }
+  }
+
+  // Tabs Switching Listener
+  var tabBtns = root.querySelectorAll(".ra-tab-btn");
+  var tabPanels = root.querySelectorAll(".ra-tab-panel");
+
+  tabPanels.forEach(function(p, idx) {
+    if (idx === 0) {
+      p.classList.remove("hidden");
+      p.classList.add("block");
+      p.style.display = "block";
+      initPanelPreview(p);
+    } else {
+      p.classList.remove("block");
+      p.classList.add("hidden");
+      p.style.display = "none";
+    }
+  });
+
+  tabBtns.forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var targetId = this.getAttribute("data-target");
+      
+      tabBtns.forEach(function(b) { b.classList.remove("active"); });
+      tabPanels.forEach(function(p) { 
+        p.classList.remove("block");
+        p.classList.add("hidden"); 
+        p.style.display = "none";
+      });
+
+      this.classList.add("active");
+      var activePanel = root.querySelector("#" + targetId);
+      if (activePanel) {
+        activePanel.classList.remove("hidden");
+        activePanel.classList.add("block");
+        activePanel.style.display = "block";
+        initPanelPreview(activePanel);
+      }
+    });
+  });
+
+  // Product Selection Listener inside panels (both desktop entries & mobile slider items)
+  root.addEventListener("click", function (e) {
+    var card = e.target.closest(".s-product-card-entry");
+    if (!card) return;
+
+    var imgSrc = card.getAttribute("data-image-src");
+    var prodUrl = card.getAttribute("data-product-url") || "#";
+
+    if (imgSrc && prodUrl) {
+      var panel = card.closest(".ra-tab-panel");
+      var imageDiv = panel ? panel.querySelector(".image") : null;
+      
+      if (imageDiv) {
+        imageDiv.innerHTML = '<a href="' + prodUrl + '" style="display: block; width: 100%; height: 100%;"><img src="' + imgSrc + '" style="width: 100%; height: 100%; object-fit: cover;" /></a>';
+      }
+
+      if (panel) {
+        panel.querySelectorAll(".s-product-card-entry").forEach(function(el) {
+          el.classList.remove("active");
+        });
+      }
+      card.classList.add("active");
+    }
+  });
+});
+</script>

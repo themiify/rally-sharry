@@ -1,0 +1,109 @@
+<link rel="stylesheet" href="{{ 'RA_faq.css' | asset_url }}">
+
+{% assign c = section.settings %}
+{% assign q_back = c.question_back_color | default: '#ffffff' %}
+{% assign q_color = c.fqa_q_color | default: '#000000' %}
+{% assign a_color = c.fqa_a_color | default: '#000000' %}
+
+{% if request.is_rtl %}
+  {% assign title_text = c.faq_title_ar | default: c.faq_title_en %}
+{% else %}
+  {% assign title_text = c.faq_title_en | default: c.faq_title_ar %}
+{% endif %}
+
+<section class="rafaq-section rafaq-{{ section.id }} gl-container {% if c.margin_switch %}rafaq-section--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  {% if title_text != blank %}
+    <h2 class="rafaq__title">
+      {{ title_text }}
+    </h2>
+  {% endif %}
+
+  <div class="rafaq__grid">
+    {% for item in c.ques_collection %}
+      {% if request.is_rtl %}
+        {% assign question_text = item.fqa_question_ar | default: item.fqa_question_en %}
+        {% assign answer_text = item.fqa_answer_ar | default: item.fqa_answer_en %}
+      {% else %}
+        {% assign question_text = item.fqa_question_en | default: item.fqa_question_ar %}
+        {% assign answer_text = item.fqa_answer_en | default: item.fqa_answer_ar %}
+      {% endif %}
+
+      {% assign num = forloop.index %}
+
+      <div class="rafaq__item">
+        <!-- FAQ Header -->
+        <button 
+          type="button" 
+          class="rafaq__header {% if forloop.first %}rafaq__header--open{% endif %}"
+          style="background-color: {{ q_back }};"
+          aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}"
+          data-target="faq-answer-{{ section.id }}-{{ num }}">
+
+          <span class="rafaq__number" style="color: {{ q_color }};">
+            0{{ num }}
+          </span>
+
+          <span class="rafaq__question" style="color: {{ q_color }};">
+            {{ question_text }}
+          </span>
+
+          <span class="rafaq__icon {% if forloop.first %}rafaq__icon--rotate{% endif %}" style="color: {{ q_color }};">
+            <i class="sicon-arrow-up"></i>
+          </span>
+        </button>
+
+        <!-- FAQ Answer Content -->
+        <div 
+          id="faq-answer-{{ section.id }}-{{ num }}" 
+          class="rafaq__content"
+          style="{% if forloop.first %}max-height: 500px;{% else %}max-height: 0px;{% endif %}">
+          <div class="rafaq__answer" style="color: {{ a_color }}; {% if forloop.first %}background-color: {{ q_back }};{% endif %}">
+            {{ answer_text }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionEl = document.querySelector('.rafaq-{{ section.id }}');
+    if (!sectionEl) return;
+
+    const headers = sectionEl.querySelectorAll('.rafaq__header');
+
+    headers.forEach(header => {
+      header.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-target');
+        const content = sectionEl.querySelector('#' + targetId);
+        const icon = this.querySelector('.rafaq__icon');
+        const answer = content ? content.querySelector('.rafaq__answer') : null;
+        const isOpen = this.classList.contains('rafaq__header--open');
+
+        // Close all headers and contents
+        headers.forEach(h => {
+          h.classList.remove('rafaq__header--open');
+          h.setAttribute('aria-expanded', 'false');
+          const ic = h.querySelector('.rafaq__icon');
+          if (ic) ic.classList.remove('rafaq__icon--rotate');
+        });
+
+        sectionEl.querySelectorAll('.rafaq__content').forEach(c => {
+          c.style.maxHeight = '0px';
+          const ans = c.querySelector('.rafaq__answer');
+          if (ans) ans.style.backgroundColor = '';
+        });
+
+        // Open clicked accordion item if it wasn't open
+        if (!isOpen && content) {
+          this.classList.add('rafaq__header--open');
+          this.setAttribute('aria-expanded', 'true');
+          if (icon) icon.classList.add('rafaq__icon--rotate');
+          content.style.maxHeight = content.scrollHeight + 'px';
+          if (answer) answer.style.backgroundColor = "{{ q_back }}";
+        }
+      });
+    });
+  });
+</script>

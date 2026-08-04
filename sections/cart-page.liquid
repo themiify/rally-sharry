@@ -1,0 +1,73 @@
+{% comment %} Glamour Theme — Cart Page Section (API-driven) {% endcomment %}
+
+{% assign t_cart_title = translations.cart_page.shopping_cart | default: 'Shopping Cart' %}
+{% assign t_loading = translations.cart_page.loading | default: 'Loading cart...' %}
+{% assign t_empty_cart = translations.cart_page.empty_cart | default: 'Your cart is empty' %}
+{% assign t_empty_cart_desc = translations.cart_page.empty_cart_desc | default: 'Discover our amazing products' %}
+{% assign t_shop_now = translations.general.shop_now | default: 'Shop Now' %}
+
+<section
+  class="gl-section"
+  id="gl-cart-page"
+  data-api-cart="{{ api_routes.cart_index }}"
+  data-api-cart-update="{{ api_routes.cart_update }}"
+  data-api-cart-destroy="{{ api_routes.cart_destroy }}"
+  data-api-coupon-apply="{{ api_routes.coupon_apply }}"
+  data-api-coupon-remove="{{ api_routes.coupon_remove }}"
+>
+  <div class="gl-container cart-page">
+   {% comment %}  <h1 style="font-size: 2rem; margin-bottom: 2rem;">{{ t_cart_title }}</h1> {% endcomment %}
+
+    <!-- Loading state -->
+    <div id="gl-cart-loading" style="text-align:center;padding:3rem;">
+      <div class="gl-spinner"></div>
+      <p style="margin-top:1rem;color:var(--gl-text-light);">{{ t_loading }}</p>
+    </div>
+
+    <!-- Cart content (populated by JS) -->
+    <div id="gl-cart-content" style="display:none;"></div>
+
+    <!-- Empty cart state -->
+    <div id="gl-cart-empty"  style="display:none;text-align:center;padding:3rem;">
+      <p style="font-size:4rem;margin-bottom:1rem;">🛒</p>
+      <h2 style="margin-bottom:0.5rem;">
+        {% if section.settings.empty_cart_message != blank and request.is_rtl == false %}
+          {{ section.settings.empty_cart_message }}
+        {% elsif section.settings.empty_cart_message_ar != blank and request.is_rtl %}
+          {{ section.settings.empty_cart_message_ar }}
+        {% else %}
+          {{ t_empty_cart }}
+        {% endif %}
+      </h2>
+      <p style="color:var(--gl-text-light);margin-bottom:2rem;">{{ t_empty_cart_desc }}</p>
+      <a href="/search?new=1&sort=created_at-desc" class="gl-btn btn-search">{{ t_shop_now }}</a>
+    </div>
+  </div>
+</section>
+
+<!-- Cart i18n strings for JS -->
+<script type="application/json" id="gl-cart-i18n">
+  {
+    "product": "{{ translations.cart_page.product              | default: 'Product' }}",
+    "price": "{{ translations.cart_page.price                | default: 'Price' }}",
+    "qty": "{{ translations.cart_page.qty                  | default: 'Qty' }}",
+    "total": "{{ translations.cart_page.total                | default: 'Total' }}",
+    "order_summary": "{{ translations.cart_page.order_summary        | default: 'Order Summary' }}",
+    "subtotal": "{{ translations.cart_page.subtotal             | default: 'Subtotal' }}",
+    "discount": "{{ translations.cart_page.discount             | default: 'Discount' }}",
+    "tax": "{{ translations.cart_page.tax                  | default: 'Tax' }}",
+    "shipping": "{{ translations.cart_page.shipping             | default: 'Shipping' }}",
+    "grand_total": "{{ translations.cart_page.grand_total          | default: 'Grand Total' }}",
+    "proceed_checkout": "{{ translations.cart_page.proceed_to_checkout  | default: 'Proceed to Checkout' }}",
+    "continue_shopping": "{{ translations.cart_page.continue_shopping    | default: 'Continue Shopping' }}",
+    "coupon_placeholder": "{{ translations.cart_page.coupon_placeholder   | default: 'Enter coupon code' }}",
+    "apply": "{{ translations.cart_page.apply                | default: 'Apply' }}",
+    "remove": "{{ translations.cart_page.remove               | default: 'Remove' }}",
+    "remove_item": "{{ translations.cart_page.remove               | default: 'Remove' }}",
+    "update_error": "{{ translations.cart_page.update_error         | default: 'Unable to update cart' }}",
+    "remove_error": "{{ translations.cart_page.remove_error         | default: 'Unable to remove item' }}",
+    "shipping_at_checkout": "{{ translations.cart_page.shipping_at_checkout | default: 'Calculated at checkout' }}",
+    "show_coupon": "{% if section.settings.show_coupon          != false %}true{% else %}false{% endif %}",
+    "show_options": "{% if section.settings.show_product_options != false %}true{% else %}false{% endif %}"
+  }
+</script>

@@ -1,0 +1,1629 @@
+{% comment %}
+  Product Detail Section — Glamour Theme v2.1
+  Main product page including gallery, info, compare/wishlist actions, and type-specific forms.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign items = section.settings.payment_items %}
+{% assign show_sku = section.settings.show_sku %}
+{% assign show_stock = section.settings.show_stock %}
+{% assign show_share = section.settings.show_share %}
+{% if section.settings.show_tabs != false -%}
+  {%- assign show_tabs = true -%}
+{%- else -%}
+  {%- assign show_tabs = false -%}
+{%- endif %}
+{% if section.settings.show_related != false -%}
+  {%- assign show_related = true -%}
+{%- else -%}
+  {%- assign show_related = false -%}
+{%- endif %}
+{% if section.settings.show_up_sell != false -%}
+  {%- assign show_up_sell = true -%}
+{%- else -%}
+  {%- assign show_up_sell = false -%}
+{%- endif %}
+{% assign related_count = section.settings.related_count | default: 4 %}
+{% assign primary_image = product.base_image.url | default: product.image %}
+{% assign related_items = product.related_products | default: related_products %}
+{% assign up_sell_items = product.up_sell_products | default: up_sell_products %}
+{% assign sold_out_label = translations.product.sold_out | default: 'Sold Out' %}
+{% assign sale_label = translations.product.sale | default: 'Sale' %}
+{% assign reviews_label = translations.product.reviews | default: 'Reviews' %}
+{% assign sku_label = translations.product.sku | default: 'SKU' %}
+{% assign availability_label = translations.product.availability | default: 'Availability' %}
+{% assign in_stock_label = translations.product.in_stock | default: 'In Stock' %}
+{% assign out_of_stock_label = translations.product.out_of_stock | default: 'Out of Stock' %}
+{% assign location_label = translations.product.location | default: 'Location' %}
+{% assign select_option_label = translations.product.select_option | default: 'Select' %}
+{% assign required_label = translations.product.required | default: 'Required' %}
+{% assign grouped_products_label = translations.product.grouped_products | default: 'Grouped Products' %}
+{% assign bundle_options_label = translations.product.bundle_options | default: 'Bundle Options' %}
+{% assign downloadable_links_label = translations.product.downloadable_links | default: 'Downloadable Links' %}
+{% assign sample_label = translations.product.sample | default: 'Sample' %}
+{% assign samples_label = translations.product.samples | default: 'Samples' %}
+{% assign booking_label = translations.product.booking | default: 'Booking' %}
+{% assign loading_label = translations.product.loading | default: 'Loading...' %}
+{% assign no_slots_available_label = translations.product.no_slots_available | default: 'No slots available' %}
+{% assign booking_load_error_label = translations.product.booking_load_error
+  | default: 'Unable to load booking slots.'
+%}
+{% assign select_date_label = translations.product.select_date | default: 'Select Date' %}
+{% assign select_slot_label = translations.product.select_slot | default: 'Select Slot' %}
+{% assign guests_label = translations.product.guests | default: 'Guests' %}
+{% assign daily_basis_label = translations.product.daily_basis | default: 'Daily Basis' %}
+{% assign hourly_basis_label = translations.product.hourly_basis | default: 'Hourly Basis' %}
+{% assign from_label = translations.product.from | default: 'From' %}
+{% assign to_label = translations.product.to | default: 'To' %}
+{% assign select_time_label = translations.product.select_time | default: 'Select Time' %}
+{% assign decrease_quantity_label = translations.product.decrease_quantity | default: 'Decrease quantity' %}
+{% assign increase_quantity_label = translations.product.increase_quantity | default: 'Increase quantity' %}
+{% assign quantity_label = translations.product.quantity | default: 'Quantity' %}
+{% assign add_to_cart_label = translations.product.add_to_cart | default: 'Add to Cart' %}
+{% assign buy_now_label = translations.product.buy_now | default: 'Buy Now' %}
+{% assign add_to_wishlist_label = translations.product.add_to_wishlist | default: 'Add to Wishlist' %}
+{% assign remove_from_wishlist_label = translations.product.remove_from_wishlist | default: 'Remove from Wishlist' %}
+{% assign add_to_compare_label = translations.product.add_to_compare | default: 'Add to Compare' %}
+{% assign remove_from_compare_label = translations.product.remove_from_compare | default: 'Remove from Compare' %}
+{% assign compare_added_label = translations.product.compare_added | default: 'Product added to compare.' %}
+{% assign compare_removed_label = translations.product.compare_removed | default: 'Product removed from compare.' %}
+{% assign already_in_compare_label = translations.product.already_in_compare
+  | default: 'Product is already in compare.'
+%}
+{% assign share_label = translations.product.share | default: 'Share' %}
+{% assign add_wishlist_label = translations.product.add_to_wishlist | default: 'Add to Wishlist' %}
+{% assign description_label = translations.product.description | default: 'Description' %}
+{% assign additional_info_label = translations.product.additional_info | default: 'Additional Info' %}
+{% assign no_reviews_label = translations.product.no_reviews | default: 'No reviews yet. Be the first!' %}
+{% assign related_products_label = translations.product.related_products | default: 'Related Products' %}
+{% assign up_sell_products_label = translations.product.you_may_also_like | default: 'You May Also Like' %}
+{% assign preview_product_label = translations.product.preview_product | default: 'Product' %}
+{% assign notes_label = translations.product.notes | default: 'Notes' %}
+{% assign price_from_label = translations.product.price_from | default: 'Starting at' %}
+{% assign select_above_option_label = translations.product.select_above_option | default: 'Select above option first' %}
+{% assign total_label = translations.product.total | default: 'Total' %}
+{% assign options_total_label = translations.product.options_total | default: 'Options Total' %}
+
+<section
+  style="{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.heading_font_size > 0 %}--section-heading-size: {{ section.settings.heading_font_size }}px;{% endif %}{% if section.settings.body_font_size > 0 %}--section-body-size: {{ section.settings.body_font_size }}px;{% endif %}{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %} "
+  class="product-single"
+>
+  <div class="gl-container">
+    <div class="product-detail">
+      <div class="gl-product-gallery {% if product.images.size > 1 %}has-multiple-images{% endif %}">
+        <div class="gl-product-gallery-main" >
+          {% if primary_image != blank %}
+            <img src="{{ primary_image }}" alt="{{ product.name }}" id="glMainProductImage">
+            <button type="button" class="gl-gallery-zoom-btn" id="glZoomBtn" aria-label="zoom">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 8C13.2652 7.99994 13.5195 7.89455 13.707 7.707L18 3.414V6C18 6.26522 18.1054 6.51957 18.2929 6.70711C18.4804 6.89464 18.7348 7 19 7C19.2652 7 19.5196 6.89464 19.7071 6.70711C19.8946 6.51957 20 6.26522 20 6V1C20 0.734784 19.8946 0.48043 19.7071 0.292893C19.5196 0.105357 19.2652 0 19 0H14C13.7348 0 13.4804 0.105357 13.2929 0.292893C13.1054 0.48043 13 0.734784 13 1C13 1.26522 13.1054 1.51957 13.2929 1.70711C13.4804 1.89464 13.7348 2 14 2H16.586L12.293 6.293C12.1532 6.43285 12.058 6.61102 12.0194 6.80497C11.9808 6.99892 12.0007 7.19995 12.0763 7.38265C12.152 7.56535 12.2801 7.72152 12.4445 7.8314C12.609 7.94129 12.8022 7.99996 13 8ZM1 20H6C6.26522 20 6.51957 19.8946 6.70711 19.7071C6.89464 19.5196 7 19.2652 7 19C7 18.7348 6.89464 18.4804 6.70711 18.2929C6.51957 18.1054 6.26522 18 6 18H3.414L7.707 13.707C7.88916 13.5184 7.98995 13.2658 7.98767 13.0036C7.9854 12.7414 7.88023 12.4906 7.69482 12.3052C7.50941 12.1198 7.2586 12.0146 6.9964 12.0123C6.7342 12.01 6.4816 12.1108 6.293 12.293L2 16.586V14C2 13.7348 1.89464 13.4804 1.70711 13.2929C1.51957 13.1054 1.26522 13 1 13C0.734784 13 0.48043 13.1054 0.292893 13.2929C0.105357 13.4804 0 13.7348 0 14V19C0 19.2652 0.105357 19.5196 0.292893 19.7071C0.48043 19.8946 0.734784 20 1 20Z" fill="var(--gl-primary)"/>
+              </svg>
+            </button>
+          {% else %}
+            <img
+              src="https://azzrk.dev.gosharry.com/themes/shop/default/build/assets/medium-product-placeholder-INODB-G2.webp"
+              alt="{{ product.name }}"
+              style="width:100%;height:100%;object-fit:cover;"
+            >
+          {% endif %}
+
+          {% if product.special_price %}
+            <span
+              class="gl-badge gl-badge-hot"
+              style="position:absolute;top:1rem;{% if is_rtl %}left:1rem;{% else %}right:1rem;{% endif %}"
+            >
+              {{- sale_label -}}
+            </span>
+          {% endif %}
+          {% if product.compare_enabled %}
+            <button
+              style="position:absolute;top:1.2rem;{% if is_rtl %}right:1.5rem;{% else %}left:1.5rem;{% endif %} ; background: #FAEFF0; padding: 4px; border-radius: 50%;"
+              type="button"
+              class=""
+              aria-label="{{ add_to_compare_label }}"
+              data-gl-action="compare-toggle"
+              data-product-id="{{ product.id }}"
+              data-compare-url="{{ product.actions.compare_url }}"
+              data-compare-index-url="{{ product.actions.compare_index_url }}"
+              data-compare-destroy-url="{{ product.actions.compare_destroy_url }}"
+              data-active-label="{{ remove_from_compare_label }}"
+              data-inactive-label="{{ add_to_compare_label }}"
+              data-added-message="{{ compare_added_label }}"
+              data-removed-message="{{ compare_removed_label }}"
+              data-duplicate-message="{{ already_in_compare_label }}"
+              aria-pressed="false"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 3H5a2 2 0 0 0-2 2v5"></path><path d="M14 21h5a2 2 0 0 0 2-2v-5"></path><path d="M21 10V5a2 2 0 0 0-2-2h-5"></path><path d="M3 14v5a2 2 0 0 0 2 2h5"></path><path d="M8 12h8"></path><path d="M12 8l4 4-4 4"></path>
+              </svg>
+            </button>
+          {% endif %}
+        </div>
+
+        {% if product.images.size > 1 %}
+          <div class="gl-product-gallery-thumbs">
+            {% for img in product.images %}
+              <img
+                src="{{ img.small_url }}"
+                alt="{{ product.name }}"
+                loading="lazy"
+                data-full="{{ img.url }}"
+                {% if forloop.first %}
+                  class="active"
+                {% endif %}
+              >
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="product-info">
+        <h1>{{ product.name }}</h1>
+
+        <div class="product-meta">
+          <div class="product-meta-detail">
+            {% if show_stock %}
+              <span>
+                {{ availability_label }}:
+                <strong class="product-stock {% if product.in_stock %}out-of-stock{% else %}out-of-stock{% endif %}">
+                  {% if product.in_stock %}
+                    {{ in_stock_label }}
+                  {% else %}
+                    {{ out_of_stock_label }}
+                  {% endif %}
+                </strong>
+              </span>
+            {% endif %}
+            {% if show_sku and product.sku != blank %}
+              <span>
+                {{- sku_label }}: <strong>{{ product.sku }}</strong></span
+              >
+            {% endif %}
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            
+       <div class="gl-product-card-rating">
+            {% assign rating = product.avg_rating %}
+
+            {% for i in (1..5) %}
+              <span class="star">
+                <svg viewBox="0 0 24 24">
+                  <defs>
+                    <linearGradient id="grad-{{ i }}">
+                      <stop offset="{% if rating >= i %}100%{% elsif rating > i-1 %}{{ rating | minus: i | plus: 1 | times: 100 }}%{% else %}0%{% endif %}" stop-color="#f5a623"/>
+                      <stop offset="0%" stop-color="#ddd"/>
+                    </linearGradient>
+                  </defs>
+                  <path fill="url(#grad-{{ i }})"
+                    d="M12 17.27L18.18 21 16.54 13.97 
+                      22 9.24 14.81 8.63 
+                      12 2 9.19 8.63 
+                      2 9.24 7.46 13.97 
+                      5.82 21z"/>
+                </svg>
+              </span>
+            {% endfor %}
+
+            <span class="count">({{ product.reviews_count }})</span>
+        </div>
+         
+
+            <div style="display: flex; gap: 10px;">
+              {% if show_share and product.url != blank %}
+                <div class="product-share">
+                  <span
+                    class="share-label share-trigger"
+                    style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px;"
+                  >
+                    {{ share_label }}
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      style="transition: transform 0.3s ease;"
+                    >
+                      <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                  </span>
+                  <div class="share-dropdown">
+                    <a
+                      href="https://www.facebook.com/sharer/sharer.php?u={{ product.url }}"
+                      target="_blank"
+                      rel="noopener"
+                      aria-label="Facebook"
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                      </svg>
+                      <span>Facebook</span>
+                    </a>
+                    <a
+                      href="https://twitter.com/intent/tweet?url={{ product.url }}&text={{ product.name }}"
+                      target="_blank"
+                      rel="noopener"
+                      aria-label="Twitter"
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M4 4l11.73 15h5L9 4H4zm13.15 13L6.35 6H5.25l10.8 11h1.1z"></path>
+                      </svg>
+                      <span>Twitter</span>
+                    </a>
+                    <a
+                      href="https://wa.me/?text={{ product.name }}%20{{ product.url }}"
+                      target="_blank"
+                      rel="noopener"
+                      aria-label="WhatsApp"
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                      </svg>
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+              {% if product.wishlist_enabled %}
+                <button
+                  type="button"
+                  class="add-to-wishlistt"
+                  style="background: none; display: flex; align-items: center; gap: 0.5rem; opacity: 0.8;"
+                  aria-label="{{ add_to_wishlist_label }}"
+                  data-gl-action="wishlist-toggle"
+                  data-product-id="{{ product.id }}"
+                  data-wishlist-url="{{ product.actions.wishlist_url }}"
+                  data-wishlist-index-url="{{ product.actions.wishlist_index_url }}"
+                  data-login-url="{{ product.actions.login_url }}"
+                  data-active-label="{{ remove_from_wishlist_label }}"
+                  data-inactive-label="{{ add_to_wishlist_label }}"
+                  aria-pressed="false"
+                >
+                  {{ add_wishlist_label }}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if product.short_description != blank %}
+          <div class="short_description">
+            {{ product.short_description }}
+            <p class="read-more-btn" onclick="scrollToDescription()">
+              {{ translations.product.read_more | default: 'Read More' }}
+            </p>
+          </div>
+        {% endif %}
+
+        {% if product.booking and product.booking.show_location and product.booking.location != blank %}
+          <p style="margin-bottom:1rem;color:var(--gl-subheading-light);">
+            {{ location_label }}: {{ product.booking.location }}
+          </p>
+        {% endif %}
+
+        <form
+          action="{{ product.add_to_cart_url }}"
+          method="POST"
+          enctype="multipart/form-data"
+          data-gl-action="add-to-cart"
+        >
+          <input type="hidden" name="_token" value="{{ csrf_token }}">
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <input type="hidden" name="selected_configurable_option" id="gl-selected-configurable-option" value="">
+
+          {% if product.configurable_json != blank %}
+            <script type="application/json" id="gl-configurable-config">
+              {{ product.configurable_json }}
+            </script>
+          {% endif %}
+
+          {% if product.configurable_json != blank %}
+            <div
+              class="gl-product-variants"
+              style="display:grid;gap:1rem;margin-bottom:1.5rem;"
+              data-select-label="{{ select_option_label | default: 'Select' }}"
+              data-select-above-label="{{ select_above_option_label | default: 'Select above option first' }}"
+            >
+              <!-- JS populates cascading attribute selectors -->
+            </div>
+          {% endif %}
+
+          {% if product.grouped_products.size > 0 %}
+            <div
+              class="gl-grouped-products"
+              style="display:grid;gap:1rem;margin-bottom:1.5rem;"
+              data-grouped-currency="{{ shop.currency | default: 'SAR' }}"
+            >
+              <h3 style="font-size:1rem;">{{ grouped_products_label }}</h3>
+              {% for grouped_product in product.grouped_products %}
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:1rem;align-items:center;padding:1rem;border:1px solid var(--gl-border);border-radius:18px;">
+                  <div>
+                    <a
+                      href="{{ grouped_product.url }}"
+                      style="font-weight:600;color:var(--gl-heading);text-decoration:none;"
+                    >
+                      {{- grouped_product.name -}}
+                    </a>
+                    <div style="color:var(--gl-subheading-light);font-size:0.9rem;">
+                      {{ grouped_product.formatted_price }}
+                    </div>
+                  </div>
+                  <span class="gl-product-stock {% if grouped_product.in_stock %}in-stock{% else %}out-of-stock{% endif %}">
+                    {% if grouped_product.in_stock %}
+                      {{ in_stock_label }}
+                    {% else %}
+                      {{ out_of_stock_label }}
+                    {% endif %}
+                  </span>
+                  <input
+                    type="number"
+                    name="qty[{{ grouped_product.associated_product_id }}]"
+                    value="{{ grouped_product.default_qty | default: 0 }}"
+                    min="0"
+                    class="gl-select"
+                    style="width:90px;"
+                    data-grouped-qty
+                    data-grouped-price="{{ grouped_product.price }}"
+                  >
+                </div>
+              {% endfor %}
+
+              <div
+                class="gl-grouped-total"
+                style="display:flex;justify-content:space-between;padding:1rem;background:var(--gl-bg-alt);border-radius:18px;font-weight:600;"
+              >
+                <span>{{ total_label | default: 'Total' }}</span>
+                <span data-grouped-total-value>0.00 {{ shop.currency | default: 'SAR' }}</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.bundle and product.bundle.options.size > 0 %}
+            <div
+              class="gl-bundle-options"
+              style="display:grid;gap:1rem;margin-bottom:1.5rem;"
+              data-bundle-currency="{{ shop.currency | default: 'SAR' }}"
+            >
+              <h3 style="font-size:1rem;">{{ bundle_options_label }}</h3>
+              {% for option in product.bundle.options %}
+                <div
+                  style="display:grid;gap:0.75rem;padding:1rem;border:1px solid var(--gl-border);border-radius:18px;"
+                  data-bundle-option-id="{{ option.id }}"
+                >
+                  <div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;">
+                    <strong>{{ option.label }}</strong>
+                    {% if option.is_required -%}
+                      <span style="font-size:0.8rem;color:var(--gl-subheading-light);">{{ required_label }}</span>
+                    {%- endif %}
+                  </div>
+
+                  {% if option.type == 'select' %}
+                    <select
+                      name="bundle_options[{{ option.id }}][]"
+                      class="gl-select"
+                      {% if option.is_required %}
+                        required
+                      {% endif %}
+                      data-bundle-input
+                    >
+                      <option value="" data-price="0">{{ select_option_label }}</option>
+                      {% for bundle_product in option.products %}
+                        <option
+                          value="{{ bundle_product.product_id }}"
+                          data-price="{{ bundle_product.price.final.price | default: 0 }}"
+                          {% if bundle_product.is_default %}
+                            selected
+                          {% endif %}
+                        >
+                          {{ bundle_product.name -}}
+                          {%- if bundle_product.price.final.formatted_price != blank %}
+                            (+{{ bundle_product.price.final.formatted_price }})
+                          {%- endif %}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  {% elsif option.type == 'radio' %}
+                    <div style="display:grid;gap:0.5rem;">
+                      {% for bundle_product in option.products %}
+                        <label style="display:flex;gap:0.5rem;align-items:center;">
+                          <input
+                            type="radio"
+                            name="bundle_options[{{ option.id }}][]"
+                            value="{{ bundle_product.product_id }}"
+                            data-price="{{ bundle_product.price.final.price | default: 0 }}"
+                            data-bundle-input
+                            {% if option.is_required %}
+                              required
+                            {% endif %}
+                            {% if bundle_product.is_default %}
+                              checked
+                            {% endif %}
+                          >
+                          <span>
+                            {{- bundle_product.name -}}
+                            {%- if bundle_product.price.final.formatted_price != blank %}
+                              (+{{ bundle_product.price.final.formatted_price }})
+                            {%- endif -%}
+                          </span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  {% elsif option.type == 'checkbox' %}
+                    <div style="display:grid;gap:0.5rem;">
+                      {% for bundle_product in option.products %}
+                        <label style="display:flex;gap:0.5rem;align-items:center;">
+                          <input
+                            type="checkbox"
+                            name="bundle_options[{{ option.id }}][]"
+                            value="{{ bundle_product.product_id }}"
+                            data-price="{{ bundle_product.price.final.price | default: 0 }}"
+                            data-bundle-input
+                            {% if bundle_product.is_default %}
+                              checked
+                            {% endif %}
+                          >
+                          <span>
+                            {{- bundle_product.name -}}
+                            {%- if bundle_product.price.final.formatted_price != blank %}
+                              (+{{ bundle_product.price.final.formatted_price }})
+                            {%- endif -%}
+                          </span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <select
+                      name="bundle_options[{{ option.id }}][]"
+                      class="gl-select"
+                      multiple
+                      {% if option.is_required %}
+                        required
+                      {% endif %}
+                      data-bundle-input
+                    >
+                      {% for bundle_product in option.products %}
+                        <option
+                          value="{{ bundle_product.product_id }}"
+                          data-price="{{ bundle_product.price.final.price | default: 0 }}"
+                          {% if bundle_product.is_default %}
+                            selected
+                          {% endif %}
+                        >
+                          {{ bundle_product.name -}}
+                          {%- if bundle_product.price.final.formatted_price != blank %}
+                            (+{{ bundle_product.price.final.formatted_price }})
+                          {%- endif %}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  {% endif %}
+
+                  <label style="display:flex;align-items:center;gap:0.5rem;">
+                    <span style="font-size:0.85rem;color:var(--gl-subheading-light);">
+                      {{- quantity_label | default: 'Qty' }}:</span
+                    >
+                    <input
+                      type="number"
+                      name="bundle_option_qty[{{ option.id }}]"
+                      value="1"
+                      min="1"
+                      class="gl-select"
+                      style="width:80px;"
+                      data-bundle-qty
+                    >
+                  </label>
+                </div>
+              {% endfor %}
+
+              <div
+                class="gl-bundle-total"
+                style="display:flex;justify-content:space-between;padding:1rem;background:var(--gl-bg-alt);border-radius:18px;font-weight:600;"
+              >
+                <span>{{ total_label | default: 'Total' }}</span>
+                <span data-bundle-total-value>{{ product.formatted_price }}</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.downloadable %}
+            <div style="display:grid;gap:1rem;margin-bottom:1.5rem;">
+              {% if product.downloadable.links.size > 0 %}
+                <div style="display:grid;gap:0.75rem;">
+                  <h3 style="font-size:1rem;">{{ downloadable_links_label }}</h3>
+                  {% for link in product.downloadable.links %}
+                    <label style="display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:1rem;border:1px solid var(--gl-border);border-radius:18px;">
+                      <span style="display:flex;gap:0.75rem;align-items:center;">
+                        <input type="checkbox" name="links[]" value="{{ link.id }}">
+                        <span>{{ link.title }}</span>
+                      </span>
+                      <span style="display:flex;gap:0.75rem;align-items:center;">
+                        <strong>{{ link.formatted_price }}</strong>
+                        {% if link.has_sample and link.sample_url != blank %}
+                          <a href="{{ link.sample_url }}" style="font-size:0.85rem;color:var(--gl-primary);">
+                            {{- sample_label -}}
+                          </a>
+                        {% endif %}
+                      </span>
+                    </label>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              {% if product.downloadable.samples.size > 0 %}
+                <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;">
+                  <strong>{{ samples_label }}</strong>
+                  {% for sample in product.downloadable.samples %}
+                    <a href="{{ sample.download_url }}" class="gl-btn gl-btn-outline">{{ sample.title }}</a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {% if product.booking %}
+            <div style="display:grid;gap:1rem;margin-bottom:1.5rem;">
+              <h3 style="font-size:1rem;">{{ booking_label }}</h3>
+
+              {% if product.booking.type == 'default'
+                or product.booking.type == 'appointment'
+                or product.booking.type == 'table'
+              %}
+                <div
+                  data-booking-slot-root
+                  data-booking-slots-url="{{ product.booking.slot_api_url }}"
+                  data-loading-label="{{ loading_label }}"
+                  data-empty-label="{{ no_slots_available_label }}"
+                  data-error-label="{{ booking_load_error_label }}"
+                  style="display:grid;gap:0.75rem;"
+                >
+                  {% if product.booking.today_slots_text != blank %}
+                    <p style="color:var(--gl-subheading-light);margin:0;">{{ product.booking.today_slots_text }}</p>
+                  {% endif %}
+
+                  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;">
+                    <label style="display:grid;gap:0.4rem;">
+                      <span>{{ select_date_label }}</span>
+                      <input
+                        type="date"
+                        name="booking[date]"
+                        data-booking-date-input
+                        class="gl-select"
+                        required
+                        {% if product.booking.available_from != blank %}
+                          min="{{ product.booking.available_from }}"
+                        {% endif %}
+                        {% if product.booking.available_to != blank %}
+                          max="{{ product.booking.available_to }}"
+                        {% endif %}
+                      >
+                    </label>
+                    <label style="display:grid;gap:0.4rem;">
+                      <span>{{ select_slot_label }}</span>
+                      <select name="booking[slot]" data-booking-slot-select class="gl-select" required>
+                        <option value="">{{ select_slot_label }}</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  {% if product.booking.type == 'table' and product.booking.table_slot.guest_limit > 0 %}
+                    <label style="display:grid;gap:0.4rem;max-width:180px;">
+                      <span>{{ guests_label }}</span>
+                      <input
+                        type="number"
+                        name="booking[guests]"
+                        value="1"
+                        min="1"
+                        max="{{ product.booking.table_slot.guest_limit }}"
+                        class="gl-select"
+                        required
+                      >
+                    </label>
+                  {% endif %}
+
+                  {% if product.booking.type == 'table' %}
+                    <label style="display:grid;gap:0.4rem;">
+                      <span>{{ notes_label }}</span>
+                      <textarea name="booking[note]" rows="3" class="gl-select" required></textarea>
+                    </label>
+                  {% endif %}
+                </div>
+              {% elsif product.booking.type == 'event' %}
+                <div style="display:grid;gap:0.75rem;">
+                  {% if product.booking.event_date != blank %}
+                    <p style="margin:0;color:var(--gl-subheading-light);">{{ product.booking.event_date }}</p>
+                  {% endif %}
+                  {% for ticket in product.booking.tickets %}
+                    <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:center;padding:1rem;border:1px solid var(--gl-border);border-radius:18px;">
+                      <div>
+                        <strong>{{ ticket.name }}</strong>
+                        {% if ticket.description != blank %}
+                          <p style="margin:0.35rem 0 0;color:var(--gl-subheading-light);">{{ ticket.description }}</p>
+                        {% endif %}
+                      </div>
+                      <div style="display:flex;gap:0.75rem;align-items:center;">
+                        <span>{{ ticket.formatted_price_text | default: ticket.formatted_price }}</span>
+                        <input
+                          type="number"
+                          name="booking[qty][{{ ticket.id }}]"
+                          value="0"
+                          min="0"
+                          max="{{ ticket.qty }}"
+                          class="gl-select"
+                          style="width:90px;"
+                        >
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% elsif product.booking.type == 'rental' %}
+                <div
+                  data-booking-slot-root
+                  data-booking-mode="rental"
+                  data-booking-slots-url="{{ product.booking.slot_api_url }}"
+                  data-loading-label="{{ loading_label }}"
+                  data-empty-label="{{ no_slots_available_label }}"
+                  data-error-label="{{ booking_load_error_label }}"
+                  data-select-time-label="{{ select_time_label }}"
+                  style="display:grid;gap:0.75rem;"
+                >
+                  {% if product.booking.rental_slot.renting_type == 'daily_hourly' %}
+                    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                      <label style="display:flex;gap:0.5rem;align-items:center;">
+                        <input type="radio" name="booking[renting_type]" value="daily" data-booking-renting-type>
+                        <span>{{ daily_basis_label }}</span>
+                      </label>
+                      <label style="display:flex;gap:0.5rem;align-items:center;">
+                        <input
+                          type="radio"
+                          name="booking[renting_type]"
+                          value="hourly"
+                          data-booking-renting-type
+                          checked
+                        >
+                        <span>{{ hourly_basis_label }}</span>
+                      </label>
+                    </div>
+                  {% else %}
+                    <input
+                      type="hidden"
+                      name="booking[renting_type]"
+                      value="{{ product.booking.rental_slot.renting_type }}"
+                    >
+                  {% endif %}
+
+                  <div
+                    data-booking-rental-hourly-fields
+                    {% if product.booking.rental_slot.renting_type == 'daily' %}
+                      hidden
+                    {% endif %}
+                    style="display:grid;gap:0.75rem;"
+                  >
+                    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;">
+                      <label style="display:grid;gap:0.4rem;">
+                        <span>{{ select_date_label }}</span>
+                        <input type="date" name="booking[date]" data-booking-rental-date class="gl-select">
+                      </label>
+                      <label style="display:grid;gap:0.4rem;">
+                        <span>{{ select_slot_label }}</span>
+                        <select name="booking[slot]" data-booking-rental-slot-select class="gl-select">
+                          <option value="">{{ select_slot_label }}</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;">
+                      <label style="display:grid;gap:0.4rem;">
+                        <span>{{ from_label }}</span>
+                        <select name="booking[slot][from]" data-booking-rental-from class="gl-select">
+                          <option value="">{{ select_time_label }}</option>
+                        </select>
+                      </label>
+                      <label style="display:grid;gap:0.4rem;">
+                        <span>{{ to_label }}</span>
+                        <select name="booking[slot][to]" data-booking-rental-to class="gl-select">
+                          <option value="">{{ select_time_label }}</option>
+                        </select>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div
+                    data-booking-rental-daily-fields
+                    {% if product.booking.rental_slot.renting_type != 'daily' %}
+                      hidden
+                    {% endif %}
+                    style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;"
+                  >
+                    <label style="display:grid;gap:0.4rem;">
+                      <span>{{ from_label }}</span>
+                      <input type="date" name="booking[date_from]" class="gl-select">
+                    </label>
+                    <label style="display:grid;gap:0.4rem;">
+                      <span>{{ to_label }}</span>
+                      <input type="date" name="booking[date_to]" class="gl-select">
+                    </label>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {% if product.customizable_options.size > 0 %}
+            <div
+              class="gl-product-custom-options"
+              style="display:grid;gap:1rem;margin-bottom:1.5rem;"
+              data-custom-currency="{{ shop.currency | default: 'SAR' }}"
+            >
+              {% for option in product.customizable_options %}
+                <div
+                  style="display:grid;gap:0.5rem;"
+                  data-gl-required-option="{% if option.is_required %}1{% else %}0{% endif %}"
+                  data-gl-option-label="{{ option.label }}"
+                >
+                  <label style="font-weight:600;color:var(--gl-heading);">{{ option.label }}</label>
+
+                  {% if option.type == 'textarea' %}
+                    <textarea
+                      name="customizable_options[{{ option.id }}][]"
+                      rows="4"
+                      {% if option.is_required %}
+                        required
+                      {% endif -%}
+                    ></textarea>
+                  {% elsif option.type == 'text' %}
+                    <input
+                      type="text"
+                      name="customizable_options[{{ option.id }}][]"
+                      {% if option.is_required %}
+                        required
+                      {% endif %}
+                    >
+                  {% elsif option.type == 'file' %}
+                    <input
+                      type="file"
+                      name="customizable_options[{{ option.id }}][]"
+                      {% if option.is_required %}
+                        required
+                      {% endif %}
+                    >
+                  {% elsif option.type == 'select' %}
+                    <select
+                      name="customizable_options[{{ option.id }}][]"
+                      {% if option.is_required %}
+                        required
+                      {% endif %}
+                      data-custom-input
+                    >
+                      <option value="" data-price="0">{{ select_option_label }}</option>
+                      {% for item in option.items %}
+                        <option value="{{ item.id }}" data-price="{{ item.price | default: 0 }}">
+                          {{ item.label -}}
+                          {%- if item.formatted_price != blank %} (+{{ item.formatted_price }}){% endif %}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  {% elsif option.type == 'multiselect' %}
+                    <select
+                      name="customizable_options[{{ option.id }}][]"
+                      multiple
+                      {% if option.is_required %}
+                        required
+                      {% endif %}
+                      data-custom-input
+                    >
+                      {% for item in option.items %}
+                        <option value="{{ item.id }}" data-price="{{ item.price | default: 0 }}">
+                          {{ item.label -}}
+                          {%- if item.formatted_price != blank %} (+{{ item.formatted_price }}){% endif %}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  {% elsif option.type == 'checkbox' %}
+                    <div style="display:grid;gap:0.35rem;">
+                      {% for item in option.items %}
+                        <label style="display:flex;gap:0.5rem;align-items:center;">
+                          <input
+                            type="checkbox"
+                            name="customizable_options[{{ option.id }}][]"
+                            value="{{ item.id }}"
+                            data-price="{{ item.price | default: 0 }}"
+                            data-custom-input
+                          >
+                          <span>
+                            {{- item.label -}}
+                            {%- if item.formatted_price != blank %} (+{{ item.formatted_price }}){% endif -%}
+                          </span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  {% elsif option.type == 'radio' %}
+                    <div style="display:grid;gap:0.35rem;">
+                      {% for item in option.items %}
+                        <label style="display:flex;gap:0.5rem;align-items:center;">
+                          <input
+                            type="radio"
+                            name="customizable_options[{{ option.id }}][]"
+                            value="{{ item.id }}"
+                            data-price="{{ item.price | default: 0 }}"
+                            data-custom-input
+                            {% if option.is_required %}
+                              required
+                            {% endif %}
+                          >
+                          <span>
+                            {{- item.label -}}
+                            {%- if item.formatted_price != blank %} (+{{ item.formatted_price }}){% endif -%}
+                          </span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+
+              <div
+                class="gl-custom-total"
+                style="display:flex;justify-content:space-between;padding:1rem;background:var(--gl-bg-alt);border-radius:18px;font-weight:600;"
+              >
+                <span>{{ options_total_label | default: 'Options Total' }}</span>
+                <span data-custom-total-value>0.00 {{ shop.currency | default: 'SAR' }}</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="qty-price">
+            <div>
+              {% if product.show_quantity_box %}
+                <span class="label-qty">{{ quantity_label | default: 'Qty' }}</span>
+                <div class="gl-product-quantity">
+                  <button type="button" aria-label="{{ decrease_quantity_label }}" data-qty-minus>−</button>
+                  <input type="number" name="quantity" value="1" min="1" max="99" aria-label="{{ quantity_label }}">
+                  <button type="button" aria-label="{{ increase_quantity_label }}" data-qty-plus>+</button>
+                </div>
+              {% else %}
+                <input type="hidden" name="quantity" value="1">
+              {% endif %}
+            </div>
+
+            <div class="gl-product-info-price">
+              {% if product.configurable_json != blank %}
+                <span class="price-label" style="font-size:0.85rem;color:var(--gl-subheading-light);">
+                  {{- price_from_label | default: 'Starting at' -}}
+                </span>
+              {% endif %}
+              <span class="current">{{ product.formatted_price }}</span>
+              {% if product.special_price %}
+                <span class="original">{{ product.formatted_regular_price }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="gl-product-add-to-cart">
+            {% comment %} {% if product.buy_now_enabled and product.in_stock %} {% endcomment %}
+              <button type="button" class="gl-btn  btn-buy" data-gl-action="buy-now">{{ buy_now_label }}</button>
+            {% comment %} {% endif %} {% endcomment %}
+
+            <button
+              type="submit"
+              class="gl-btn  btn-addCart "
+              {% unless product.in_stock %}
+                disabled
+              {% endunless %}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              {% if product.in_stock %}
+                {{ add_to_cart_label }}
+              {% else %}
+                {{ sold_out_label }}
+              {% endif %}
+            </button>
+
+            {% comment %}
+              {% if product.wishlist_enabled %}
+                  <button
+                    type="button"
+                    class="gl-btn gl-btn-outline"
+                    aria-label="{{ add_to_wishlist_label }}"
+                    data-gl-action="wishlist-toggle"
+                    data-product-id="{{ product.id }}"
+                    data-wishlist-url="{{ product.actions.wishlist_url }}"
+                    data-wishlist-index-url="{{ product.actions.wishlist_index_url }}"
+                    data-login-url="{{ product.actions.login_url }}"
+                    data-active-label="{{ remove_from_wishlist_label }}"
+                    data-inactive-label="{{ add_to_wishlist_label }}"
+                    aria-pressed="false"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                  </button>
+                {% endif %}
+
+              {% if product.compare_enabled %}
+                <button
+                  type="button"
+                  class="gl-btn gl-btn-outline"
+                  aria-label="{{ add_to_compare_label }}"
+                  data-gl-action="compare-toggle"
+                  data-product-id="{{ product.id }}"
+                  data-compare-url="{{ product.actions.compare_url }}"
+                  data-compare-index-url="{{ product.actions.compare_index_url }}"
+                  data-compare-destroy-url="{{ product.actions.compare_destroy_url }}"
+                  data-active-label="{{ remove_from_compare_label }}"
+                  data-inactive-label="{{ add_to_compare_label }}"
+                  data-added-message="{{ compare_added_label }}"
+                  data-removed-message="{{ compare_removed_label }}"
+                  data-duplicate-message="{{ already_in_compare_label }}"
+                  aria-pressed="false"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 3H5a2 2 0 0 0-2 2v5"></path><path d="M14 21h5a2 2 0 0 0 2-2v-5"></path><path d="M21 10V5a2 2 0 0 0-2-2h-5"></path><path d="M3 14v5a2 2 0 0 0 2 2h5"></path><path d="M8 12h8"></path><path d="M12 8l4 4-4 4"></path>
+                  </svg>
+                </button>
+              {% endif %}
+            {% endcomment %}
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    {% if show_tabs %}
+      <div class="gl-product-tabs">
+        <div class="gl-product-tabs-nav" role="tablist">
+          <button type="button" class="active" id="tab-desc-btn" aria-selected="true" aria-controls="tab-desc-panel">
+            {{ description_label }}
+          </button>
+          {% if product.additional_info.size > 0 %}
+            <button type="button" id="tab-info-btn" aria-selected="false" aria-controls="tab-info-panel">
+              {{ additional_info_label }}
+            </button>
+          {% endif %}
+          <button type="button" id="tab-reviews-btn" aria-selected="false" aria-controls="tab-reviews-panel">
+            {{ reviews_label }} ({{ product.reviews_count }})
+          </button>
+        </div>
+
+        <div class="gl-product-tab-content" id="tab-desc-panel" role="tabpanel" aria-labelledby="tab-desc-btn">
+          {{ product.description }}
+        </div>
+
+        {% if product.additional_info.size > 0 %}
+          <div class="gl-product-tab-content" id="tab-info-panel" role="tabpanel" aria-labelledby="tab-info-btn" hidden>
+            <table class="gl-info-table">
+              <tbody>
+                {% for info in product.additional_info %}
+                  <tr class="gl-info-row">
+                    <th class="gl-info-label">{{ info.label }}</th>
+                    <td class="gl-info-value">{{ info.value }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+
+        <div
+          class="gl-product-tab-content"
+          id="tab-reviews-panel"
+          role="tabpanel"
+          aria-labelledby="tab-reviews-btn"
+          hidden
+        >
+          <div id="product-reviews">
+            {% if product.reviews.size > 0 %}
+              {% for review in product.reviews %}
+                <div style="padding:1.5rem 0;border-bottom:1px solid var(--gl-border);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                    <h5 style="font-weight:600;color:var(--gl-heading);">{{ review.name }}</h5>
+                    <div class="gl-stars">
+                      {% for i in (1..5) %}
+                        {% if i <= review.rating %}
+                          <span class="gl-star filled">★</span>
+                        {% else %}
+                          <span class="gl-star">☆</span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <p style="color:var(--gl-subheading);line-height:1.6;">{{ review.comment }}</p>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p style="color:var(--gl-subheading-light);text-align:center;padding:2rem;">{{ no_reviews_label }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div style="display:grid;gap:2rem;margin-top:2rem;">
+        <div>
+          <h3 style="margin-bottom:1rem;">{{ description_label }}</h3>
+          {{ product.description }}
+        </div>
+
+        {% if product.additional_info.size > 0 %}
+          <div>
+            <h3 style="margin-bottom:1rem;">{{ additional_info_label }}</h3>
+            <table style="width:100%;border-collapse:collapse;">
+              <tbody>
+                {% for info in product.additional_info %}
+                  <tr style="border-bottom:1px solid var(--gl-border);">
+                    <th style="padding:0.75rem 1rem;text-align:{% if is_rtl %}right{% else %}left{% endif %};font-weight:600;width:40%;">
+                      {{ info.label }}
+                    </th>
+                    <td style="padding:0.75rem 1rem;">{{ info.value }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+
+        <div id="product-reviews">
+          <h3 style="margin-bottom:1rem;">{{ reviews_label }} ({{ product.reviews_count }})</h3>
+          {% if product.reviews.size > 0 %}
+            {% for review in product.reviews %}
+              <div style="padding:1.5rem 0;border-bottom:1px solid var(--gl-border);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                  <h5 style="font-weight:600;color:var(--gl-heading);">{{ review.name }}</h5>
+                  <div class="gl-stars">
+                    {% for i in (1..5) %}
+                      {% if i <= review.rating %}
+                        <span class="gl-star filled">★</span>
+                      {% else %}
+                        <span class="gl-star">☆</span>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <p style="color:var(--gl-subheading);line-height:1.6;">{{ review.comment }}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p style="color:var(--gl-subheading-light);text-align:center;padding:2rem;">{{ no_reviews_label }}</p>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- ── SINGLE PRODUCT BOOKING FORM & LOCATIONS SECTION ── -->
+    {% assign show_singleform = section.settings.show_singleform %}
+    {% if show_singleform == nil %}
+      {% assign show_singleform = theme.show_singleform %}
+    {% endif %}
+    {% if show_singleform == nil %}
+      {% assign show_singleform = theme.settings.show_singleform %}
+    {% endif %}
+    {% if show_singleform == nil %}
+      {% assign show_singleform = true %}
+    {% endif %}
+
+    {% if show_singleform %}
+      {% assign form_title = section.settings.form_main_title | default: theme.form_main_title | default: theme.settings.form_main_title | default: 'احجز موعدك' %}
+      {% assign form_sheet_url = section.settings.link_google_sheet | default: theme.link_google_sheet | default: theme.settings.link_google_sheet | default: 'https://sheetdb.io/api/v1/d48ieq7n70kqa' %}
+      {% assign days_start = section.settings.days_work_start | default: theme.days_work_start | default: theme.settings.days_work_start | default: 'saturday' %}
+      {% assign days_end = section.settings.days_work_end | default: theme.days_work_end | default: theme.settings.days_work_end | default: 'thursday' %}
+      {% assign hours_start = section.settings.hours_work_start | default: theme.hours_work_start | default: theme.settings.hours_work_start | default: '9:00 صباحًا' %}
+      {% assign hours_end = section.settings.hours_work_end | default: theme.hours_work_end | default: theme.settings.hours_work_end | default: '9:00 مساءً' %}
+
+      {% assign show_locations_side = section.settings.show_location_with_form %}
+      {% if show_locations_side == nil %}
+        {% assign show_locations_side = theme.show_location_with_form %}
+      {% endif %}
+      {% if show_locations_side == nil %}
+        {% assign show_locations_side = theme.settings.show_location_with_form %}
+      {% endif %}
+
+      <div class="ra-booking-section" id="raBookingSection" style="margin-top: 3.5rem; margin-bottom: 3.5rem;">
+        <div class="ra-booking-grid {% if show_locations_side %}has-locations-side{% endif %}" id="raBookingGrid">
+          
+          {% if show_locations_side %}
+            <!-- Locations / Map Column (Left side in LTR / Right side in RTL - matching Figma) -->
+            <div class="ra-booking-locations-col" id="raBookingLocationsCol">
+              {% render 'RA_locations', theme: theme, section: section %}
+            </div>
+          {% endif %}
+
+          <!-- Booking Form Column (Matching Figma) -->
+          <div class="ra-booking-form-col" id="raBookingFormCol" {% unless show_locations_side %}style="max-width: 780px; margin: 0 auto; width: 100%;"{% endunless %}>
+            {% if form_title != blank %}
+          
+           
+                <h2 class="ral__title">
+        {{ form_title }}
+      </h2>
+            {% endif %}
+
+            <form id="form-handler" class="ra-booking-form" action="{{ form_sheet_url }}" method="POST">
+              <div class="ra-booking-form-grid">
+                <div class="ra-form-field">
+                  <label class="ra-field-label">{% if is_rtl %}الاسم{% else %}Name{% endif %}</label>
+                  <input type="text" name="name" required placeholder="{% if is_rtl %}ادخل اسمك{% else %}Enter your name{% endif %}" class="ra-field-input">
+                </div>
+                <div class="ra-form-field">
+                  <label class="ra-field-label">{% if is_rtl %}اسم العائلة{% else %}Family Name{% endif %}</label>
+                  <input type="text" name="family_name" placeholder="{% if is_rtl %}ادخل اسم عائلتك{% else %}Enter family name{% endif %}" class="ra-field-input">
+                </div>
+                <div class="ra-form-field">
+                  <label class="ra-field-label">{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</label>
+                  <input type="email" name="email" required placeholder="{% if is_rtl %}ادخل بريدك الإلكتروني{% else %}Enter your email{% endif %}" class="ra-field-input">
+                </div>
+                <div class="ra-form-field">
+                  <label class="ra-field-label">{% if is_rtl %}رقم الهاتف{% else %}Phone Number{% endif %}</label>
+                  <input type="tel" name="phone" required placeholder="{% if is_rtl %}ادخل رقم هاتفك{% else %}Enter phone number{% endif %}" class="ra-field-input">
+                </div>
+                <div class="ra-form-field">
+                  <label class="ra-field-label">{% if is_rtl %}العمر{% else %}Age{% endif %}</label>
+                  <input type="number" name="age" placeholder="{% if is_rtl %}ادخل عمرك{% else %}Enter your age{% endif %}" class="ra-field-input">
+                </div>
+                <div class="ra-form-field">
+                  <label class="ra-field-label">{% if is_rtl %}البلد{% else %}Country{% endif %}</label>
+                  <input type="text" name="country" required placeholder="{% if is_rtl %}ادخل اسم بلدك{% else %}Enter country{% endif %}" class="ra-field-input">
+                </div>
+                <div class="ra-form-field">
+                  <label class="ra-field-label">{% if is_rtl %}اليوم{% else %}Day{% endif %}</label>
+                  <select name="day" required class="ra-field-select">
+                    <option value="">{% if is_rtl %}اختر اليوم{% else %}Select Day{% endif %}</option>
+                    {% if is_rtl %}
+                      <option value="السبت">السبت</option>
+                      <option value="الأحد">الأحد</option>
+                      <option value="الاثنين">الاثنين</option>
+                      <option value="الثلاثاء">الثلاثاء</option>
+                      <option value="الأربعاء">الأربعاء</option>
+                      <option value="الخميس">الخميس</option>
+                      <option value="الجمعة">الجمعة</option>
+                    {% else %}
+                      <option value="Saturday">Saturday</option>
+                      <option value="Sunday">Sunday</option>
+                      <option value="Monday">Monday</option>
+                      <option value="Tuesday">Tuesday</option>
+                      <option value="Wednesday">Wednesday</option>
+                      <option value="Thursday">Thursday</option>
+                      <option value="Friday">Friday</option>
+                    {% endif %}
+                  </select>
+                </div>  
+                <div class="ra-form-field">
+                  <label class="ra-field-label">{% if is_rtl %}الساعة{% else %}Hour{% endif %}</label>
+                  <select name="hour" required class="ra-field-select">
+                    <option value="">{% if is_rtl %}اختر الساعة{% else %}Select Hour{% endif %}</option>
+                    {% if is_rtl %}
+                      <option value="8:00 صباحًا">8:00 صباحًا</option>
+                      <option value="9:00 صباحًا">9:00 صباحًا</option>
+                      <option value="10:00 صباحًا">10:00 صباحًا</option>
+                      <option value="11:00 صباحًا">11:00 صباحًا</option>
+                      <option value="12:00 مساءً">12:00 مساءً</option>
+                      <option value="1:00 مساءً">1:00 مساءً</option>
+                      <option value="2:00 مساءً">2:00 مساءً</option>
+                      <option value="3:00 مساءً">3:00 مساءً</option>
+                      <option value="4:00 مساءً">4:00 مساءً</option>
+                      <option value="5:00 مساءً">5:00 مساءً</option>
+                      <option value="6:00 مساءً">6:00 مساءً</option>
+                      <option value="7:00 مساءً">7:00 مساءً</option>
+                      <option value="8:00 مساءً">8:00 مساءً</option>
+                      <option value="9:00 مساءً">9:00 مساءً</option>
+                      <option value="10:00 مساءً">10:00 مساءً</option>
+                      <option value="11:00 مساءً">11:00 مساءً</option>
+                    {% else %}
+                      <option value="8:00 AM">8:00 AM</option>
+                      <option value="9:00 AM">9:00 AM</option>
+                      <option value="10:00 AM">10:00 AM</option>
+                      <option value="11:00 AM">11:00 AM</option>
+                      <option value="12:00 PM">12:00 PM</option>
+                      <option value="1:00 PM">1:00 PM</option>
+                      <option value="2:00 PM">2:00 PM</option>
+                      <option value="3:00 PM">3:00 PM</option>
+                      <option value="4:00 PM">4:00 PM</option>
+                      <option value="5:00 PM">5:00 PM</option>
+                      <option value="6:00 PM">6:00 PM</option>
+                      <option value="7:00 PM">7:00 PM</option>
+                      <option value="8:00 PM">8:00 PM</option>
+                      <option value="9:00 PM">9:00 PM</option>
+                      <option value="10:00 PM">10:00 PM</option>
+                      <option value="11:00 PM">11:00 PM</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+
+              <div class="ra-form-field ra-form-field-full">
+                <label class="ra-field-label">{% if is_rtl %}رسالتك{% else %}Your Message{% endif %}</label>
+                <textarea name="message" required placeholder="{% if is_rtl %}اكتب رسالتك هنا...{% else %}Write your message here...{% endif %}" class="ra-field-textarea"></textarea>
+              </div>
+
+              <input type="hidden" name="product_name" value="{{ product.name | default: product.title }}">
+              <input type="hidden" name="product_details" value="">
+              <input type="hidden" name="selected_options" value="">
+              <input type="hidden" name="price" value="{% if product.starting_price %}{{ product.starting_price | money }}{% else %}{{ product.price | money }}{% endif %}">
+
+              <div id="spinner" class="ra-form-spinner" style="display: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 1s linear infinite; margin: 12px auto;">
+                  <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="0.8"></path>
+                </svg>
+              </div>
+
+              <button type="submit" class="ra-form-submit-btn">
+                <span>{% if is_rtl %}احجز الآن ←{% else %}Book Now →{% endif %}</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+      <style>
+        .ra-booking-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2rem;
+          align-items: start;
+        }
+
+        @media (min-width: 992px) {
+          .ra-booking-grid.has-locations-side {
+            grid-template-columns: 1fr 1.15fr;
+          }
+        }
+
+        .ra-booking-title {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--gl-heading, #0f172a);
+          margin-bottom: 1.25rem;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          position: relative;
+        }
+
+        .ra-booking-title::after {
+          content: '';
+          display: inline-block;
+          height: 1px;
+          flex-grow: 1;
+          background: #333333;
+          margin-inline-start: 8px;
+        }
+
+        .ra-booking-form {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 1.75rem;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .ra-booking-form-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+          .ra-booking-form-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
+        .ra-form-field {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .ra-form-field-full {
+          grid-column: 1 / -1;
+          margin-top: 0.5rem;
+        }
+
+        .ra-field-label {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--gl-heading, #1e293b);
+        }
+
+        .ra-field-input,
+        .ra-field-select,
+        .ra-field-textarea {
+          width: 100%;
+          padding: 0.65rem 0.85rem;
+          font-size: 0.9rem;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          background-color: #f8fafc;
+          color: #0f172a;
+          transition: all 0.2s ease;
+          font-family: inherit;
+        }
+
+        .ra-field-input:focus,
+        .ra-field-select:focus,
+        .ra-field-textarea:focus {
+          outline: none;
+          border-color: #000000;
+          background-color: #ffffff;
+          box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .ra-field-textarea {
+          min-height: 100px;
+          resize: vertical;
+        }
+
+        .ra-form-submit-btn {
+          width: 100%;
+          margin-top: 1.25rem;
+          padding: 0.85rem 1.5rem;
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #000000;
+          background: transparent;
+          border: 1.5px solid #000000;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        .ra-form-submit-btn:hover {
+          background: #000000;
+          color: #ffffff;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.15);
+        }
+      </style>
+
+      <script>
+                alert(isRTL ? "تم إرسال طلب الحجز بنجاح!" : "Booking submitted successfully!");
+                formHandler.reset();
+              })
+              .catch(err => {
+                if (spinner) spinner.style.display = "none";
+                alert(isRTL ? "تم إرسال الطلب بنجاح!" : "Request sent successfully!");
+              });
+          }
+        });
+      </script>
+    {% endif %}
+
+    {% if show_related and related_items.size > 0 %}
+      <div style="margin-top:3rem;">
+        <div class="gl-section-header image-title">
+          <h1 class="title-header"> {{ related_products_label }}</h1>
+        </div>
+
+        <div class="gl-products-grid">
+          {% for related_product in related_items limit: related_count %}
+            {% render 'product-card', product_card_item: related_product, translations: translations, theme: theme, shop: shop %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if show_up_sell and up_sell_items.size > 0 %}
+      <div style="margin-top:3rem;">
+        <div class="gl-section-header">
+          <h1 class="title-header">{{ up_sell_products_label }}</h2>
+        </div>
+
+        <div class="gl-products-grid">
+          {% for up_sell_product in up_sell_items limit: related_count %}
+            {% render 'product-card', product_card_item: up_sell_product, translations: translations, theme: theme, shop: shop %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+<div class="gl-lightbox" id="glLightbox" aria-hidden="true">
+  <div class="gl-lightbox-overlay" id="glLightboxOverlay"></div>
+  <button class="gl-lightbox-close" id="glLightboxClose" aria-label="close">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 6 6 18M6 6l12 12"/>
+    </svg>
+  </button>
+  <button
+    {% if is_rtl %}
+      style="transform:rotate(180deg)"
+    {% endif %}
+    class="gl-lightbox-arrow gl-lightbox-prev"
+    id="glLightboxPrev"
+    aria-label="previous"
+  >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m15 18-6-6 6-6"/>
+    </svg>
+  </button>
+  <div class="gl-lightbox-img-wrap">
+    <img src="" alt="" id="glLightboxImg">
+  </div>
+  <button
+    {% if is_rtl %}
+      style="transform:rotate(180deg)"
+    {% endif %}
+    class="gl-lightbox-arrow gl-lightbox-next"
+    id="glLightboxNext"
+    aria-label="next"
+  >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m9 18 6-6-6-6"/>
+    </svg>
+  </button>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const shareTriggers = document.querySelectorAll('.share-trigger');
+
+    shareTriggers.forEach((trigger) => {
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const dropdown = this.nextElementSibling;
+        const isActive = dropdown.classList.contains('active');
+
+        // Close all other dropdowns
+        document.querySelectorAll('.share-dropdown').forEach((dd) => {
+          dd.classList.remove('active');
+        });
+        document.querySelectorAll('.share-trigger').forEach((st) => {
+          st.classList.remove('active');
+        });
+
+        // Toggle current dropdown
+        if (!isActive) {
+          dropdown.classList.add('active');
+          this.classList.add('active');
+        }
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function () {
+      document.querySelectorAll('.share-dropdown').forEach((dd) => {
+        dd.classList.remove('active');
+      });
+      document.querySelectorAll('.share-trigger').forEach((st) => {
+        st.classList.remove('active');
+      });
+    });
+  });
+
+  function scrollToDescription() {
+    const descPanel = document.getElementById('tab-desc-panel');
+    if (descPanel) {
+      const offset = 100;
+      const elementPosition = descPanel.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  function initGalleryLightbox() {
+    var zoomBtn = document.getElementById('glZoomBtn');
+    var lightbox = document.getElementById('glLightbox');
+    var overlay = document.getElementById('glLightboxOverlay');
+    var closeBtn = document.getElementById('glLightboxClose');
+    var prevBtn = document.getElementById('glLightboxPrev');
+    var nextBtn = document.getElementById('glLightboxNext');
+    var lightboxImg = document.getElementById('glLightboxImg');
+    var thumbs = document.querySelectorAll('.gl-product-gallery-thumbs img');
+    var mainImage = document.getElementById('glMainProductImage');
+
+    if (!zoomBtn || !lightbox) return;
+
+    var images = [];
+    var currentIndex = 0;
+
+    function buildImages() {
+      images = [];
+      if (thumbs.length > 0) {
+        thumbs.forEach(function (t) {
+          images.push(t.dataset.full || t.src);
+        });
+      } else if (mainImage) {
+        images.push(mainImage.src);
+      }
+    }
+
+    function openLightbox(index) {
+      buildImages();
+      currentIndex = index || 0;
+      showImage(currentIndex);
+      lightbox.classList.add('active');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function showImage(index) {
+      lightboxImg.src = images[index];
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === images.length - 1;
+    }
+
+    zoomBtn.addEventListener('click', function () {
+      var activeThumb = document.querySelector('.gl-product-gallery-thumbs img.active');
+      var startIndex = 0;
+      if (activeThumb) {
+        var thumbArr = Array.from(thumbs);
+        startIndex = thumbArr.indexOf(activeThumb);
+      }
+      openLightbox(startIndex);
+    });
+
+    overlay.addEventListener('click', closeLightbox);
+    closeBtn.addEventListener('click', closeLightbox);
+
+    prevBtn.addEventListener('click', function () {
+      if (currentIndex > 0) {
+        currentIndex--;
+        showImage(currentIndex);
+      }
+    });
+
+    nextBtn.addEventListener('click', function () {
+      if (currentIndex < images.length - 1) {
+        currentIndex++;
+        showImage(currentIndex);
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') {
+        if (currentIndex > 0) {
+          currentIndex--;
+          showImage(currentIndex);
+        }
+      }
+      if (e.key === 'ArrowRight') {
+        if (currentIndex < images.length - 1) {
+          currentIndex++;
+          showImage(currentIndex);
+        }
+      }
+    });
+  }
+  initGalleryLightbox();
+</script>

@@ -1,0 +1,117 @@
+<link rel="stylesheet" href="{{ 'RA_blogs.css' | asset_url }}">
+
+{% assign c = section.settings %}
+
+{% if request.is_rtl %}
+  {% assign title_text = c.blog_title_ar | default: c.blog_title_en %}
+{% else %}
+  {% assign title_text = c.blog_title_en | default: c.blog_title_ar %}
+{% endif %}
+
+<section class="rablog-section rablog-{{ section.id }} gl-container {% if c.margin_switch %}rablog-section--no-margin{% endif %}"
+         style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  
+  {% if title_text != blank %}
+    <h2 class="rablog__title">
+      {{ title_text }}
+    </h2>
+  {% endif %}
+
+  <div class="rablog__slider-container">
+    <div class="swiper rablog-swiper">
+      <div class="swiper-wrapper">
+        {% assign resolved_articles = section.resolved.blogs %}
+        {% if resolved_articles == blank or resolved_articles.size == 0 %}
+          {% assign resolved_articles = c.blogs %}
+        {% endif %}
+
+        {% if resolved_articles != blank and resolved_articles.size > 0 %}
+          {% for article in resolved_articles %}
+            {% assign art_title = article.title %}
+            {% assign art_url = article.url | default: '#' %}
+            {% assign art_img = article.image.url | default: article.image %}
+
+            <div class="swiper-slide rablog__slide">
+              <div class="rablog__card">
+                <div class="RA_blog_content">
+                  <a href="{{ art_url }}" class="rablog__img-link">
+                    <div class="rablog__img-wrap">
+                      {% if art_img != blank %}
+                        <img src="{{ art_img }}" alt="{{ art_title | escape }}" class="rablog__img" loading="lazy">
+                      {% else %}
+                        <div class="rablog__placeholder"></div>
+                      {% endif %}
+                    </div>
+                    {% if art_title != blank %}
+                      <p class="rablog__slide-title">{{ art_title }}</p>
+                    {% endif %}
+                  </a>
+                </div>
+
+                <a href="{{ art_url }}" class="rablog__read-more">
+                  <span>
+                    {% if request.is_rtl %}اقرأ المزيد{% else %}Read More{% endif %}
+                  </span>
+                  <i class="sicon-arrow-left"></i>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <!-- Demo Articles when no articles selected -->
+          {% assign demo_titles = "أفضل الطرق للعناية بسيارتك في فصل الصيف|5 نصائح هامة قبل شراء سيارة مستعملة بالتقسيط|دليل استئجار السيارات الفخمة والمغريات المفاجئة|مقارنة بين أحدث موديلات بورش وسوبرا لعام 2025" | split: "|" %}
+          {% assign demo_imgs = "https://cdn.salla.sa/form-builder/0caObcp4ISzrn6ExskIH6Xg74IpSUgqzbuAuNtuD.jpg|https://cdn.salla.sa/form-builder/DjbyxEXJDWfRSu7eJO0jtuouAteua86IJi82Sgoq.jpg|https://cdn.salla.sa/form-builder/WcHkC7zApnrILIZC4veXokCjfuq5tz3YSWfBZcUt.png|https://cdn.salla.sa/form-builder/oUpcRrUsoIlorJH4wtZG5cUmG6sp5rkER7bBEcVn.png" | split: "|" %}
+          {% for i in (0..3) %}
+            <div class="swiper-slide rablog__slide">
+              <div class="rablog__card">
+                <div class="RA_blog_content">
+                  <a href="#" class="rablog__img-link">
+                    <div class="rablog__img-wrap">
+                      <img src="{{ demo_imgs[i] }}" alt="Demo Article" class="rablog__img" loading="lazy">
+                    </div>
+                    <p class="rablog__slide-title">{{ demo_titles[i] }}</p>
+                  </a>
+                </div>
+                <a href="#" class="rablog__read-more">
+                  <span>{% if request.is_rtl %}اقرأ المزيد{% else %}Read More{% endif %}</span>
+                  <i class="sicon-arrow-left"></i>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionEl = document.querySelector('.rablog-{{ section.id }}');
+    if (!sectionEl) return;
+
+    const swiperEl = sectionEl.querySelector('.rablog-swiper');
+    if (!swiperEl) return;
+
+    const isAutoplay = {{ c.is_autoplay | json }};
+
+    new Swiper(swiperEl, {
+      slidesPerView: 2,
+      spaceBetween: 15,
+      loop: true,
+      initialSlide: 2,
+      centeredSlides: true,
+      autoplay: isAutoplay ? {
+        delay: 3500,
+        disableOnInteraction: false,
+      } : false,
+      breakpoints: {
+        768: {
+          slidesPerView: 3,
+          spaceBetween: 20,
+          centeredSlides: true
+        }
+      }
+    });
+  });
+</script>

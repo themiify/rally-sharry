@@ -1,0 +1,97 @@
+{% comment %}
+  Trending Products Section — Glamour Theme v2.1
+  Displays a grid of popular/trending products with preview placeholders.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign heading = section.settings.heading | default: 'Trending Now' %}
+{% assign heading_ar = section.settings.heading_ar | default: 'الأكثر رواجاً' %}
+{% assign subtitle = section.settings.subtitle | default: 'Most popular products this week' %}
+{% assign subtitle_ar = section.settings.subtitle_ar | default: 'المنتجات الأكثر طلباً هذا الأسبوع' %}
+{% assign badge_text = section.settings.badge_text %}
+{% assign product_count = section.settings.product_count | default: 6 %}
+{% assign trending_items = collections.trending.products | default: empty %}
+{% if trending_items.size == 0 %}
+  {% assign trending_items = products | default: empty %}
+{% endif %}
+{% if trending_items.size == 0 and product and product.up_sell_products and product.up_sell_products.size > 0 %}
+  {% assign trending_items = product.up_sell_products %}
+{% endif %}
+{% assign add_to_wishlist_label = translations.product.add_to_wishlist | default: 'Add to Wishlist' %}
+{% assign remove_from_wishlist_label = translations.product.remove_from_wishlist | default: 'Remove from Wishlist' %}
+{% assign add_to_compare_label = translations.product.add_to_compare | default: 'Add to Compare' %}
+{% assign remove_from_compare_label = translations.product.remove_from_compare | default: 'Remove from Compare' %}
+{% assign new_label = translations.product.new | default: 'New' %}
+{% assign sale_label = translations.product.sale | default: 'Sale' %}
+{% assign quick_view_label = translations.product.quick_view | default: 'Quick View' %}
+{% assign add_to_cart_label = translations.product.add_to_cart | default: 'Add to Cart' %}
+{% assign compare_added_label = translations.product.compare_added | default: 'Product added to compare.' %}
+{% assign compare_removed_label = translations.product.compare_removed | default: 'Product removed from compare.' %}
+{% assign compare_duplicate_label = translations.product.already_in_compare | default: 'Product is already in compare.' %}
+{% assign trending_label = translations.sections.trending | default: 'Trending Now' %}
+{% assign trending_product_label = translations.sections.trending_product | default: 'Trending Product' %}
+{% assign view_all_label = translations.general.view_all | default: 'View All' %}
+
+<section
+  class="gl-section gl-products-section"
+  style="{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.heading_font_size > 0 %}--section-heading-size: {{ section.settings.heading_font_size }}px;{% endif %}{% if section.settings.body_font_size > 0 %}--section-body-size: {{ section.settings.body_font_size }}px;{% endif %}{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %} "
+>
+  <div class="gl-container">
+    <div class="gl-section-header">
+      {% if badge_text != blank %}
+        <span class="gl-badge gl-badge-hot" style="margin-bottom:0.75rem;display:inline-flex;">{{ badge_text }}</span>
+      {% endif %}
+      <h2>
+        {% if is_rtl %}{{ heading_ar }}{% else %}{{ heading }}{% endif %}
+      </h2>
+      {% if subtitle != blank or subtitle_ar != blank %}
+        <p>
+          {% if is_rtl %}{{ subtitle_ar }}{% else %}{{ subtitle }}{% endif %}
+        </p>
+      {% endif %}
+    </div>
+
+    {% if trending_items.size > 0 %}
+      <div class="gl-products-grid">
+        {% for product in trending_items limit: product_count %}
+          {% render 'product-card', product_card_item: product, translations: translations, theme: theme, shop: shop %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Preview placeholder -->
+      <div class="gl-products-grid">
+        {% for i in (1..4) %}
+          <div class="gl-product-card">
+            <div class="gl-product-card-image">
+              <div class="gl-product-placeholder"></div>
+              {% if i == 2 %}
+                <div class="gl-product-card-badges">
+                  <span class="gl-badge gl-badge-hot">
+                    {{ trending_label }}
+                  </span>
+                </div>
+              {% endif %}
+            </div>
+            <div class="gl-product-card-body">
+              <h3 class="gl-product-card-title">
+                {{ trending_product_label }} {{ i }}
+              </h3>
+              <div class="gl-product-card-price"><span class="current">$39.99</span></div>
+              <div class="gl-product-card-rating">
+                <span class="gl-star filled">★</span><span class="gl-star filled">★</span
+                ><span class="gl-star filled">★</span><span class="gl-star filled">★</span><span class="gl-star">☆</span
+                ><span class="count">({{ i | plus: 15 }})</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 2rem;">
+      <a href="{% if section.settings.view_all_url != blank %}{{ section.settings.view_all_url }}{% else %}/search?new=1&sort=created_at-desc{% endif %}" class="gl-btn gl-btn-outline">
+        {{ view_all_label }}
+      </a>
+    </div>
+  </div>
+</section>

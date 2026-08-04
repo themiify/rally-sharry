@@ -1,0 +1,349 @@
+{% comment %}
+  Product Grid Section — Glamour Theme v2.5
+  Category and Search pages with API-driven filtering, sorting and Load More.
+  All products, filters and pagination are loaded client-side via product-grid.js.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign cols = section.settings.columns | default: 4 %}
+{% assign show_price = section.settings.show_price | default: true %}
+{% assign show_rating = section.settings.show_rating | default: true %}
+{% assign show_quick_add = section.settings.show_quick_add | default: true %}
+{% assign show_wishlist = section.settings.show_wishlist | default: true %}
+{% assign product_card_orientation = section.settings.product_card_orientation | default: 'vertical' %}
+{% if product_card_orientation != 'horizontal' %}
+  {% assign product_card_orientation = 'vertical' %}
+{% endif %}
+{% assign product_card_actions = section.settings.product_card_actions | default: 'view,addToCart,wishlist,compare' %}
+
+{% assign img = section.settings.image %}
+{% assign title = section.settings.title %}
+{% assign btn_text = section.settings.btn_text %}
+{% assign btn_url = section.settings.btn_url | default: '#' %}
+
+{% case cols %}
+  {% when 2 -%}
+    {%- assign cols_class = 'cols-2' %}
+  {% when 3 -%}
+    {%- assign cols_class = 'cols-3' %}
+  {% when 5 -%}
+    {%- assign cols_class = 'cols-5' %}
+  {% else -%}
+    {%- assign cols_class = '' %}
+{% endcase %}
+
+{{- '<!-- product-grid.liquid v2.5 -->' -}}
+
+<script type="application/json" id="gl-pg-i18n">
+  {
+    "filters": "{{ translations.category.filters             | default: 'Filters' }}",
+    "no_filters": "{{ translations.category.no_filters          | default: 'No filters available.' }}",
+    "clear_filters": "{{ translations.category.clear_filters       | default: 'Clear All' }}",
+    "load_more": "{{ translations.category.load_more           | default: 'Load More' }}",
+    "no_products": "{{ translations.category.no_products         | default: 'No products found.' }}",
+    "price_range": "{{ translations.category.price_range         | default: 'Price Range' }}",
+    "min_price": "{{ translations.category.min_price           | default: 'Min' }}",
+    "max_price": "{{ translations.category.max_price           | default: 'Max' }}",
+    "show_more_options": "{{ translations.category.show_more_options   | default: 'Show more' }}",
+    "sort_by": "{{ translations.category.sort_by             | default: 'Sort' }}",
+    "sort_newest": "{{ translations.category.sort_newest         | default: 'Newest' }}",
+    "sort_price_low": "{{ translations.category.sort_price_low      | default: 'Price: Low to High' }}",
+    "sort_price_high": "{{ translations.category.sort_price_high     | default: 'Price: High to Low' }}",
+    "sort_popular": "{{ translations.category.sort_popular        | default: 'Best Selling' }}",
+    "sort_name_az": "{{ translations.category.sort_name_az        | default: 'Name A-Z' }}",
+    "search_products": "{{ translations.category.search_products     | default: 'Search products' }}",
+    "showing": "{{ translations.category.showing             | default: 'Showing' }}",
+    "of": "{{ translations.category.of                  | default: 'of' }}",
+    "products": "{{ translations.category.products            | default: 'Products' }}",
+    "new": "{{ translations.product.new                  | default: 'New' }}",
+    "sale": "{{ translations.product.sale                 | default: 'Sale' }}",
+    "add_to_cart": "{{ translations.product.add_to_cart          | default: 'Add to Cart' }}",
+    "quick_view": "{{ translations.product.quick_view           | default: 'Quick View' }}",
+    "add_to_wishlist": "{{ translations.product.add_to_wishlist      | default: 'Add to Wishlist' }}",
+    "remove_from_wishlist": "{{ translations.product.remove_from_wishlist | default: 'Remove from Wishlist' }}",
+    "add_to_compare": "{{ translations.product.add_to_compare       | default: 'Add to Compare' }}",
+    "remove_from_compare": "{{ translations.product.remove_from_compare  | default: 'Remove from Compare' }}",
+    "compare_added": "{{ translations.product.compare_added        | default: 'Product added to compare.' }}",
+    "compare_removed": "{{ translations.product.compare_removed      | default: 'Product removed from compare.' }}",
+    "already_in_compare": "{{ translations.product.already_in_compare   | default: 'Product is already in compare.' }}",
+    "wishlist": "{{ translations.general.wishlist             | default: 'Wishlist' }}"
+  }
+</script>
+
+<section
+  class="gl-section gl-product-grid-section"
+  data-gl-product-grid="1"
+  data-surface="{{ page.type }}"
+  data-category-id="{{ category.id }}"
+  data-search-query="{{ search.query | url_encode }}"
+  data-api-products="{{ api_routes.products_index }}"
+  data-api-product-card-html="{{ api_routes.product_card_html }}"
+  data-api-attributes="{{ api_routes.categories_attributes }}"
+  data-api-max-price="{{ api_routes.categories_max_price }}"
+  data-api-cart="{{ api_routes.cart_store }}"
+  data-api-wishlist-store="{{ api_routes.wishlist_store }}"
+  data-api-wishlist-index="{{ api_routes.wishlist_index }}"
+  data-api-compare-store="{{ api_routes.compare_store }}"
+  data-api-compare-index="{{ api_routes.compare_index }}"
+  data-api-compare-destroy="{{ api_routes.compare_destroy }}"
+  data-is-rtl="{{ is_rtl }}"
+  data-cols="{{ cols }}"
+  data-show-price="{{ show_price }}"
+  data-show-rating="{{ show_rating }}"
+  data-show-quick-add="{{ show_quick_add }}"
+  data-show-wishlist="{{ show_wishlist }}"
+  data-product-card-orientation="{{ product_card_orientation }}"
+  data-product-card-actions="{{ product_card_actions }}"
+  style="{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.heading_font_size > 0 %}--section-heading-size: {{ section.settings.heading_font_size }}px;{% endif %}{% if section.settings.body_font_size > 0 %}--section-body-size: {{ section.settings.body_font_size }}px;{% endif %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %}{% assign pad = section.settings.section_padding %} "
+>
+  <div class="gl-container">
+    {% if page.type == 'category' and section.settings.show_subcategories and category.subcategories.size > 0 %}
+      <div class="gl-subcategories-strip" aria-label="{{ translations.category.subcategories | default: 'Subcategories' }}">
+        {% for sub in category.subcategories %}
+          <a href="{{ sub.url }}" class="gl-subcategory-card">
+            {% if sub.image != blank %}
+              <img src="{{ sub.image }}" alt="{{ sub.name }}" class="gl-subcategory-card-img" loading="lazy">
+            {% else %}
+              <div class="gl-subcategory-card-placeholder">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M21 15l-5-5L5 21"/>
+                </svg>
+              </div>
+            {% endif %}
+            <span class="gl-subcategory-card-name">{{ sub.name }}</span>
+            {% if sub.products_count > 0 %}
+              <span class="gl-subcategory-card-count">{{ sub.products_count }}</span>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="gl-category-layout">
+      <!--
+        ══════════════════════════════════════════════════
+        Filter Sidebar — populated by product-grid.js
+        ══════════════════════════════════════════════════
+      -->
+      <div>
+        <aside
+          class="gl-filter-sidebar"
+          id="gl-filter-sidebar"
+          aria-label="{{ translations.category.filters | default: 'Filters' }}"
+        >
+          <!-- Mobile close button -->
+          <button
+            type="button"
+            class="gl-mobile-close"
+            id="gl-mobile-close"
+            aria-label="Close filters"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="gl-filter-sidebar-header">
+            <h2 class="gl-filter-sidebar-title">{{ translations.category.filters | default: 'Filters' }}</h2>
+          </div>
+
+          <!-- JS renders filter groups here -->
+          <div id="gl-filter-groups">
+            <!-- Skeleton while loading -->
+            <div class="gl-filter-skeleton-group" aria-hidden="true">
+              <div class="gl-filter-skeleton-title gl-skeleton"></div>
+              <div class="gl-filter-skeleton-option gl-skeleton"></div>
+              <div class="gl-filter-skeleton-option gl-skeleton" style="width:65%"></div>
+              <div class="gl-filter-skeleton-option gl-skeleton" style="width:50%"></div>
+            </div>
+            <div class="gl-filter-skeleton-group" aria-hidden="true">
+              <div class="gl-filter-skeleton-title gl-skeleton" style="width:50%"></div>
+              <div class="gl-filter-skeleton-option gl-skeleton"></div>
+              <div class="gl-filter-skeleton-option gl-skeleton" style="width:70%"></div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            id="gl-clear-filters"
+            class="gl-clear-filters-btn clear-filters-hidden"
+            style="display:block"
+            aria-label="{{ translations.category.clear_filters | default: 'Clear All' }}"
+          >
+            {{ translations.category.clear_filters | default: 'Clear All' }}
+          </button>
+        </aside>
+
+        <!-- Mobile filter overlay -->
+        <div class="gl-filter-overlay" id="gl-filter-overlay" aria-hidden="true"></div>
+
+        {% if section.settings.add_banner %}
+          <div class="gl-promo-card-section" style="margin-block: 1rem;">
+            <div class="gl-promo-card">
+              {% if img != blank %}
+                <img src="{{ img }}" alt="{{ title }}" class="gl-promo-card-img" loading="lazy">
+              {% else %}
+                <div class="gl-promo-card-img-placeholder"></div>
+              {% endif %}
+
+              <div class="gl-promo-card-overlay"></div>
+
+              <div class="gl-promo-card-content">
+                {% if title != blank %}
+                  <h2 class="gl-promo-card-title">{{ title }}</h2>
+                {% endif %}
+                {% if btn_text != blank %}
+                  <a
+                    href="{{ btn_url }}"
+                    class="gl-promo-card-btn"
+                  >
+                    {{ btn_text }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!--
+        ══════════════════════════════════════════════════
+        Products Area
+        ══════════════════════════════════════════════════
+      -->
+      <div class="gl-products-area">
+        <!-- Toolbar -->
+        <div class="gl-toolbar">
+          <!-- Mobile Filter Toggle Button -->
+          <button
+            type="button"
+            class="gl-mobile-filter-toggle"
+            id="gl-mobile-filter-toggle"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <span
+            class="gl-toolbar-count"
+            id="gl-toolbar-count"
+            style="visibility:hidden"
+          ></span>
+
+          <!-- Orientation Toggle Buttons -->
+          <div class="gl-orientation-toggle">
+            <button
+              type="button"
+              class="gl-orientation-btn gl-orientation-btn--vertical {% if product_card_orientation == 'vertical' %}active{% endif %}"
+              id="gl-orientation-vertical"
+              title="Vertical View"
+              data-orientation="vertical"
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M2 7C1.60444 7 1.21776 7.1173 0.888861 7.33706C0.559963 7.55682 0.303617 7.86918 0.152242 8.23463C0.000866562 8.60009 -0.0387401 9.00222 0.0384303 9.39018C0.115601 9.77814 0.306082 10.1345 0.585787 10.4142C0.865492 10.6939 1.22186 10.8844 1.60982 10.9616C1.99778 11.0387 2.39992 10.9991 2.76537 10.8478C3.13082 10.6964 3.44318 10.44 3.66294 10.1111C3.8827 9.78224 4 9.39556 4 9C4 8.46957 3.78929 7.96086 3.41421 7.58579C3.03914 7.21071 2.53043 7 2 7ZM2 14C1.60444 14 1.21776 14.1173 0.888861 14.3371C0.559963 14.5568 0.303617 14.8692 0.152242 15.2346C0.000866562 15.6001 -0.0387401 16.0022 0.0384303 16.3902C0.115601 16.7781 0.306082 17.1345 0.585787 17.4142C0.865492 17.6939 1.22186 17.8844 1.60982 17.9616C1.99778 18.0387 2.39992 17.9991 2.76537 17.8478C3.13082 17.6964 3.44318 17.44 3.66294 17.1111C3.8827 16.7822 4 16.3956 4 16C4 15.4696 3.78929 14.9609 3.41421 14.5858C3.03914 14.2107 2.53043 14 2 14ZM9 4C9.39556 4 9.78224 3.8827 10.1111 3.66294C10.44 3.44318 10.6964 3.13082 10.8478 2.76537C10.9991 2.39992 11.0387 1.99778 10.9616 1.60982C10.8844 1.22186 10.6939 0.865492 10.4142 0.585787C10.1345 0.306082 9.77814 0.115601 9.39018 0.0384303C9.00222 -0.0387401 8.60009 0.000866562 8.23463 0.152242C7.86918 0.303617 7.55682 0.559962 7.33706 0.88886C7.1173 1.21776 7 1.60444 7 2C7 2.53043 7.21071 3.03914 7.58579 3.41421C7.96086 3.78929 8.46957 4 9 4ZM2 8.39371e-07C1.60444 8.39371e-07 1.21776 0.117299 0.888861 0.337062C0.559963 0.556824 0.303617 0.869182 0.152242 1.23463C0.000866562 1.60009 -0.0387401 2.00222 0.0384303 2.39018C0.115601 2.77814 0.306082 3.13451 0.585787 3.41421C0.865492 3.69392 1.22186 3.8844 1.60982 3.96157C1.99778 4.03874 2.39992 3.99914 2.76537 3.84776C3.13082 3.69638 3.44318 3.44004 3.66294 3.11114C3.8827 2.78224 4 2.39556 4 2C4 1.46957 3.78929 0.96086 3.41421 0.585787C3.03914 0.210714 2.53043 8.39371e-07 2 8.39371e-07ZM9 14C8.60444 14 8.21776 14.1173 7.88886 14.3371C7.55996 14.5568 7.30362 14.8692 7.15224 15.2346C7.00087 15.6001 6.96126 16.0022 7.03843 16.3902C7.1156 16.7781 7.30608 17.1345 7.58579 17.4142C7.86549 17.6939 8.22186 17.8844 8.60982 17.9616C8.99778 18.0387 9.39992 17.9991 9.76537 17.8478C10.1308 17.6964 10.4432 17.44 10.6629 17.1111C10.8827 16.7822 11 16.3956 11 16C11 15.4696 10.7893 14.9609 10.4142 14.5858C10.0391 14.2107 9.53043 14 9 14ZM9 7C8.60444 7 8.21776 7.1173 7.88886 7.33706C7.55996 7.55682 7.30362 7.86918 7.15224 8.23463C7.00087 8.60009 6.96126 9.00222 7.03843 9.39018C7.1156 9.77814 7.30608 10.1345 7.58579 10.4142C7.86549 10.6939 8.22186 10.8844 8.60982 10.9616C8.99778 11.0387 9.39992 10.9991 9.76537 10.8478C10.1308 10.6964 10.4432 10.44 10.6629 10.1111C10.8827 9.78224 11 9.39556 11 9C11 8.46957 10.7893 7.96086 10.4142 7.58579C10.0391 7.21071 9.53043 7 9 7Z"
+                  fill="currentColor"
+                />
+
+                <path
+                  d="M16 4C16.3956 4 16.7822 3.8827 17.1111 3.66294C17.44 3.44318 17.6964 3.13082 17.8478 2.76537C17.9991 2.39992 18.0387 1.99778 17.9616 1.60982C17.8844 1.22186 17.6939 0.865492 17.4142 0.585787C17.1345 0.306082 16.7781 0.115601 16.3902 0.0384303C16.0022 -0.0387401 15.6001 0.000866562 15.2346 0.152242C14.8692 0.303617 14.5568 0.559962 14.3371 0.88886C14.1173 1.21776 14 1.60444 14 2C14 2.53043 14.2107 3.03914 14.5858 3.41421C14.9609 3.78929 15.4696 4 16 4ZM16 14C15.6044 14 15.2178 14.1173 14.8889 14.3371C14.56 14.5568 14.3036 14.8692 14.1522 15.2346C14.0009 15.6001 13.9613 16.0022 14.0384 16.3902C14.1156 16.7781 14.3061 17.1345 14.5858 17.4142C14.8655 17.6939 15.2219 17.8844 15.6098 17.9616C15.9978 18.0387 16.3999 17.9991 16.7654 17.8478C17.1308 17.6964 17.4432 17.44 17.6629 17.1111C17.8827 16.7822 18 16.3956 18 16C18 15.4696 17.7893 14.9609 17.4142 14.5858C17.0391 14.2107 16.5304 14 16 14ZM16 7C15.6044 7 15.2178 7.1173 14.8889 7.33706C14.56 7.55682 14.3036 7.86918 14.1522 8.23463C14.0009 8.60009 13.9613 9.00222 14.0384 9.39018C14.1156 9.77814 14.3061 10.1345 14.5858 10.4142C14.8655 10.6939 15.2219 10.8844 15.6098 10.9616C15.9978 11.0387 16.3999 10.9991 16.7654 10.8478C17.1308 10.6964 17.4432 10.44 17.6629 10.1111C17.8827 9.78224 18 9.39556 18 9C18 8.46957 17.7893 7.96086 17.4142 7.58579C17.0391 7.21071 16.5304 7 16 7Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="gl-orientation-btn gl-orientation-btn--horizontal {% if product_card_orientation == 'horizontal' %}active{% endif %}"
+              id="gl-orientation-horizontal"
+              title="Horizontal View"
+              data-orientation="horizontal"
+            >
+              <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M18.8889 2.28571C18.2752 2.28571 17.7778 1.77403 17.7778 1.14286C17.7778 0.51168 18.2752 0 18.8889 0C19.5025 0 20 0.51168 20 1.14286C20 1.77403 19.5025 2.28571 18.8889 2.28571ZM18.8889 9.14286C18.2752 9.14286 17.7778 8.6312 17.7778 8C17.7778 7.3688 18.2752 6.85714 18.8889 6.85714C19.5025 6.85714 20 7.3688 20 8C20 8.6312 19.5025 9.14286 18.8889 9.14286ZM17.7778 14.8571C17.7778 15.4883 18.2752 16 18.8889 16C19.5025 16 20 15.4883 20 14.8571C20 14.2259 19.5025 13.7143 18.8889 13.7143C18.2752 13.7143 17.7778 14.2259 17.7778 14.8571ZM14.4444 0C15.0581 0 15.5556 0.51168 15.5556 1.14286C15.5556 1.77403 15.0581 2.28571 14.4444 2.28571H1.11111C0.497444 2.28571 0 1.77403 0 1.14286C0 0.51168 0.497444 0 1.11111 0H14.4444ZM15.5556 8C15.5556 7.3688 15.0581 6.85714 14.4444 6.85714H1.11111C0.497444 6.85714 0 7.3688 0 8C0 8.6312 0.497444 9.14286 1.11111 9.14286H14.4444C15.0581 9.14286 15.5556 8.6312 15.5556 8ZM14.4444 13.7143C15.0581 13.7143 15.5556 14.2259 15.5556 14.8571C15.5556 15.4883 15.0581 16 14.4444 16H1.11111C0.497444 16 0 15.4883 0 14.8571C0 14.2259 0.497444 13.7143 1.11111 13.7143H14.4444Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <form class="gl-toolbar-search" id="gl-product-search-form" role="search">
+            <input
+              type="search"
+              id="gl-product-search"
+              class="gl-product-search-input"
+              value="{{ search.query | default: request.query.query | escape }}"
+              placeholder="{{ translations.category.search_products | default: 'Search products' }}"
+              autocomplete="off"
+            >
+          </form>
+
+          <div class="gl-toolbar-sort">
+            <label for="gl-sort-select " class="gl-sort-label">
+              {{ translations.category.sort_by | default: 'Sort by' }}
+            </label>
+            <!-- Options inserted by JS with correct value attributes and locale labels -->
+            <select id="gl-sort-select" class="gl-select"></select>
+          </div>
+        </div>
+
+        <!-- Product Grid — JS replaces skeleton cards on first fetch -->
+        <div
+          id="gl-products-grid"
+          class="gl-products-grid {{ cols_class }}"
+          data-loading="true"
+          data-orientation="{{ product_card_orientation }}"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          {% for i in (1..8) %}
+            {% render 'product-card',
+              product_card_loading: true,
+              product_card_orientation: product_card_orientation,
+              product_card_actions: product_card_actions,
+              translations: translations,
+              theme: theme,
+              shop: shop
+            %}
+          {% endfor %}
+        </div>
+
+        <!-- Load More -->
+        <div class="gl-load-more-wrap">
+          <button
+            type="button"
+            id="gl-load-more"
+            class="gl-load-more-btn"
+            style="display:none"
+          >
+            {{ translations.category.load_more | default: 'Load More' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

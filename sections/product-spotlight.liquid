@@ -1,0 +1,202 @@
+{% assign is_rtl = request.is_rtl %}
+{% assign product_id = section.settings.product_id %}
+{% assign product_items = section.resolved.product_id %}
+{% assign spotlight_product = product_items[0] %}
+{% assign heading = section.settings.heading %}
+{% assign heading_ar = section.settings.heading_ar %}
+{% assign show_rating = section.settings.show_rating %}
+{% assign show_description = section.settings.show_description %}
+{% assign cta_label = section.settings.cta_label | default: 'Shop Now' %}
+{% assign cta_label_ar = section.settings.cta_label_ar | default: 'تسوق الآن' %}
+{% assign badge_text = section.settings.badge_text %}
+{% assign layout = section.settings.layout | default: 'image-left' %}
+{% assign add_to_cart_label = translations.product.add_to_cart | default: 'Add to Cart' %}
+{% assign add_to_wishlist_label = translations.product.add_to_wishlist | default: 'Add to Wishlist' %}
+{% assign remove_from_wishlist_label = translations.product.remove_from_wishlist | default: 'Remove from Wishlist' %}
+{% assign sale_label = translations.product.sale | default: 'Sale' %}
+{% assign new_label = translations.product.new | default: 'New' %}
+{% if is_rtl %}{% assign resolved_cta = cta_label_ar %}{% else %}{% assign resolved_cta = cta_label %}{% endif %}
+{% assign pad = section.settings.section_padding %}
+
+<section
+  class="gl-section gl-product-spotlight"
+  style="{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %}{% if pad %}padding: {{ pad.top | default: 80 }}px {{ pad.right | default: 0 }}px {{ pad.bottom | default: 80 }}px {{ pad.left | default: 0 }}px;{% endif %}"
+>
+  <div class="gl-container">
+    {% if heading != blank or heading_ar != blank %}
+      <div class="gl-section-header">
+        <h2>
+          {% if is_rtl and heading_ar != blank %}{{ heading_ar }}{% elsif heading != blank %}{{ heading }}{% endif %}
+        </h2>
+      </div>
+    {% endif %}
+
+    <div
+      class="gl-spotlight-inner"
+      style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;"
+      dir="{{ is_rtl | iif: 'rtl', 'ltr' }}"
+    >
+      <div
+        class="gl-spotlight-media{% if layout == 'image-right' %} gl-spotlight-media--right{% endif %}"
+        style="{% if layout == 'image-right' %}order:2;{% else %}order:{% if is_rtl %}2{% else %}1{% endif %};{% endif %}"
+      >
+        <div
+          class="gl-spotlight-media-wrap"
+          style="position:relative;border-radius:var(--gl-radius-lg,20px);overflow:hidden;aspect-ratio:4/5;background:var(--gl-bg-alt,#f8f4f5);"
+        >
+          {% if spotlight_product and spotlight_product.image != blank %}
+            <a href="{{ spotlight_product.url }}" aria-label="{{ spotlight_product.name }}">
+              <img
+                src="{{ spotlight_product.image }}"
+                alt="{{ spotlight_product.name }}"
+                loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;display:block;"
+              >
+            </a>
+          {% else %}
+            <div
+              class="gl-spotlight-img-placeholder"
+              style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"
+            >
+              <svg
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--gl-border,#eee)"
+                stroke-width="1.5"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9l4-4 4 4 4-5 5 5"/>
+              </svg>
+            </div>
+          {% endif %}
+
+          {% if badge_text != blank %}
+            <span
+              class="gl-badge gl-badge-hot"
+              style="position:absolute;top:16px;{% if is_rtl %}right{% else %}left{% endif %}:16px;font-size:12px;padding:4px 10px;"
+            >
+              {{- badge_text -}}
+            </span>
+          {% elsif spotlight_product and spotlight_product.special_price %}
+            <span
+              class="gl-badge gl-badge-hot"
+              style="position:absolute;top:16px;{% if is_rtl %}right{% else %}left{% endif %}:16px;font-size:12px;padding:4px 10px;"
+            >
+              {{- sale_label -}}
+            </span>
+          {% elsif spotlight_product and spotlight_product.is_new %}
+            <span
+              class="gl-badge gl-badge-accent"
+              style="position:absolute;top:16px;{% if is_rtl %}right{% else %}left{% endif %}:16px;font-size:12px;padding:4px 10px;"
+            >
+              {{- new_label -}}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div
+        class="gl-spotlight-details"
+        style="{% if layout == 'image-right' %}order:1;{% else %}order:{% if is_rtl %}1{% else %}2{% endif %};{% endif %}"
+      >
+        <div class="gl-spotlight-content">
+          {% if spotlight_product %}
+            {% if spotlight_product.sku != blank %}
+              <p class="gl-spotlight-product-sku">SKU: {{ spotlight_product.sku }}</p>
+            {% endif %}
+
+            <h3 class="gl-spotlight-product-name">
+              <a href="{{ spotlight_product.url }}">{{ spotlight_product.name }}</a>
+            </h3>
+
+            <div class="gl-spotlight-product-price">
+              <span class="current">{{ spotlight_product.formatted_price }}</span>
+              {% if spotlight_product.special_price %}
+                <span class="original">{{ spotlight_product.formatted_regular_price }}</span>
+              {% endif %}
+            </div>
+
+            {% if show_rating != false and spotlight_product.avg_rating > 0 %}
+              <div class="gl-spotlight-product-rating">
+                <span class="gl-star filled">★</span>
+                <span class="gl-spotlight-rating-value">{{ spotlight_product.avg_rating }}</span>
+                <span style="font-size:0.8rem;color:var(--gl-muted,#9e8e95);"
+                  >({{ spotlight_product.reviews_count }})</span
+                >
+              </div>
+            {% endif %}
+
+            {% if show_description != false and spotlight_product.short_description_text != blank %}
+              <p class="gl-spotlight-product-description">{{ spotlight_product.short_description_text }}</p>
+            {% endif %}
+
+            <div class="gl-spotlight-actions">
+              {% if spotlight_product.type == 'simple' or spotlight_product.type == 'virtual' %}
+                <button
+                  type="button"
+                  class="gl-btn gl-btn-primary"
+                  data-gl-action="quick-add"
+                  data-product-id="{{ spotlight_product.id }}"
+                  data-add-to-cart-url="{{ spotlight_product.actions.add_to_cart_url }}"
+                  aria-label="{{ add_to_cart_label }}"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path>
+                  </svg>
+                  {{ add_to_cart_label }}
+                </button>
+              {% else %}
+                <a href="{{ spotlight_product.url }}" class="gl-btn gl-btn-primary">{{ resolved_cta }}</a>
+              {% endif %}
+
+              {% if spotlight_product.wishlist_enabled %}
+                <button
+                  type="button"
+                  class="gl-product-card-action-btn"
+                  data-gl-action="wishlist-toggle"
+                  data-product-id="{{ spotlight_product.id }}"
+                  data-wishlist-url="{{ spotlight_product.actions.wishlist_url }}"
+                  data-wishlist-index-url="{{ spotlight_product.actions.wishlist_index_url }}"
+                  data-login-url="{{ spotlight_product.actions.login_url }}"
+                  data-active-label="{{ remove_from_wishlist_label }}"
+                  data-inactive-label="{{ add_to_wishlist_label }}"
+                  aria-label="{{ add_to_wishlist_label }}"
+                  aria-pressed="false"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </button>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="gl-spotlight-skeleton">
+              <div
+                style="height:14px;width:40%;background:var(--gl-bg-alt,#f0ecee);border-radius:4px;margin-bottom:12px;"
+              ></div>
+              <div
+                style="height:32px;width:80%;background:var(--gl-bg-alt,#f0ecee);border-radius:6px;margin-bottom:10px;"
+              ></div>
+              <div
+                style="height:24px;width:30%;background:var(--gl-bg-alt,#f0ecee);border-radius:4px;margin-bottom:20px;"
+              ></div>
+              <div
+                style="height:12px;width:100%;background:var(--gl-bg-alt,#f0ecee);border-radius:3px;margin-bottom:6px;"
+              ></div>
+              <div
+                style="height:12px;width:90%;background:var(--gl-bg-alt,#f0ecee);border-radius:3px;margin-bottom:6px;"
+              ></div>
+              <div
+                style="height:12px;width:70%;background:var(--gl-bg-alt,#f0ecee);border-radius:3px;margin-bottom:24px;"
+              ></div>
+              <div
+                style="height:48px;width:60%;background:var(--gl-bg-alt,#f0ecee);border-radius:var(--gl-radius-sm,8px);"
+              ></div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

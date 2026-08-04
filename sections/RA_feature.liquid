@@ -1,0 +1,56 @@
+<link rel="stylesheet" href="{{ 'RA_feature.css' | asset_url }}">
+
+{% assign c = section.settings %}
+{% assign text_color = c.text_color | default: '#000000' %}
+
+<section class="raf-feature raf-{{ section.id }} {% if c.margin_switch %}raf-feature--no-margin{% endif %}"
+         style="{% if c.is_bg_color %}background-color: {{ c.bg_color | default: '#ffffff' }};{% else %}background-image: url('{{ c.background_image }}');{% endif %}; {% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+
+  <div class="raf__container gl-container">
+    
+    <!-- Left Feature List (First 3 Items) -->
+    <div class="raf__col raf__col--left">
+      {% for item in c.product_feature limit: 3 %}
+        {% if request.is_rtl %}
+          {% assign f_text = item.feature_text_ar | default: item.feature_text_en %}
+        {% else %}
+          {% assign f_text = item.feature_text_en | default: item.feature_text_ar %}
+        {% endif %}
+        
+        {% if f_text != blank %}
+          <p class="raf__text" style="color: {{ text_color }}; --features-color: {{ text_color }};">
+            <span style="color: {{ text_color }};">0{{ forloop.index }}</span>
+            {{ f_text }}
+          </p>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Center Product Image -->
+    <div class="raf__col raf__col--center">
+      {% if c.main_product_image != blank %}
+        <img src="{{ c.main_product_image }}" alt="Main Product" class="raf__product-img" loading="lazy">
+      {% endif %}
+    </div>
+
+    <!-- Right Feature List (Next 3 Items) -->
+    <div class="raf__col raf__col--right">
+      {% for item in c.product_feature offset: 3 limit: 3 %}
+        {% if request.is_rtl %}
+          {% assign f_text = item.feature_text_ar | default: item.feature_text_en %}
+        {% else %}
+          {% assign f_text = item.feature_text_en | default: item.feature_text_ar %}
+        {% endif %}
+
+        {% if f_text != blank %}
+          {% assign num = forloop.index | plus: 3 %}
+          <p class="raf__text" style="color: {{ text_color }}; --features-color: {{ text_color }};">
+            <span style="color: {{ text_color }};">0{{ num }}</span>
+            {{ f_text }}
+          </p>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,133 @@
+/* Section Wrapper */
+.sf-categories {
+  width: 100%;
+  padding: 24px 0;
+  margin-bottom: 30px;
+}
+
+.sf-categories--no-margin {
+  margin-bottom: 0 !important;
+}
+
+.sfc__container {
+  width: 100%;
+}
+
+.sfc__wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Grid Layout */
+.sfc__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .sfc__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sfc__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Category Card */
+.sfc__card {
+  width: 100%;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Image Box Borders */
+.sfc__image-box {
+  width: 100%;
+  height: 159px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #000000;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .sfc__image-box {
+    height: 224px;
+    padding: 8px;
+  }
+}
+
+.sfc__image-box--even {
+  border-width: 1px 1px 0 0;
+}
+
+.sfc__image-box--odd {
+  border-width: 1px 0 0 1px;
+}
+
+[dir="rtl"] .sfc__image-box--even {
+  border-width: 1px 0 0 1px;
+}
+
+[dir="rtl"] .sfc__image-box--odd {
+  border-width: 1px 1px 0 0;
+}
+
+/* Image */
+.sfc__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease-in-out;
+}
+
+.sfc__card:hover .sfc__img {
+  transform: scale(1.1);
+}
+
+/* Category Name */
+.sfc__name {
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .sfc__name {
+    font-size: 20px;
+  }
+}
+
+/* Swiper Controls & Pagination */
+.sfc__swiper {
+  width: 100%;
+  padding-bottom: 24px;
+}
+
+.sfc__slide {
+  height: auto;
+}
+
+.sfc__pagination {
+  position: relative !important;
+  bottom: 0 !important;
+  margin-top: 16px;
+}
+
+.sfc__pagination .swiper-pagination-bullet {
+  background-color: #808080 !important;
+}

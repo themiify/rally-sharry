@@ -1,0 +1,70 @@
+{% assign main_title_en = main_title_en | default: section.settings.main_title_en %}
+{% assign main_title_ar = main_title_ar | default: section.settings.main_title_ar %}
+{% assign title_bg = title_bg | default: section.settings.title_bg %}
+{% assign main_title_color = main_title_color | default: section.settings.main_title_color %}
+{% assign heading_font_size = heading_font_size | default: section.settings.heading_font_size %}
+{% assign is_rtl = request.is_rtl %}
+
+
+{% if main_title_en != blank or main_title_ar != blank %}
+      <div   data-sal="slide-up"
+  data-sal-duration="900"
+  data-sal-easing="ease-out-back" style="background-image: url({{ title_bg | image_url: width: 100}});" class="image-title">
+        <h1  data-sal="zoom-in"
+  data-sal-duration="700"
+  data-sal-delay="200" style="color: {{ main_title_color }};" class="title-heade"> 
+          {% if is_rtl %} 
+               {{ main_title_ar }} 
+           {% else %} 
+              {{ main_title_en }} 
+           {% endif %} 
+          </h1>
+      </div>
+{% endif %}
+
+<style>
+    .image-title {
+      background-size: 100% 100%;
+      margin: 0 auto;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: 30px;
+      position: relative;
+      width: fit-content;
+      overflow: hidden;
+    }
+
+    .image-title h1::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 85%;
+      height: 65%;
+      border-radius: 4px;
+      z-index: 1;
+      border: 1px solid #FFDBAA;
+      transform: translate(-50%, -50%);
+    }
+
+    .title-heade {
+      text-align: center;
+      min-width: 260px;
+      background-color: white;
+      padding: 10px 30px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: var(--section-heading-size, 24px);
+      line-height: 1.5;
+      text-wrap: nowrap;
+      width: fit-content;
+    }
+
+    @media (max-width: 767px) {      .title-heade {
+        font-weight: 700;
+        min-width: 150px;
+        padding: 8px 20px;
+        font-size: 18px;
+      }
+    }
+</style>

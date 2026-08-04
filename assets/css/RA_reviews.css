@@ -1,0 +1,142 @@
+/* Section Wrapper */
+.rar-reviews {
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 30px;
+}
+
+.rar-reviews--no-margin {
+  margin-bottom: 0 !important;
+}
+
+/* Title */
+.rar__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .rar__title {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+}
+
+.rar__title::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background-color: #000000;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .rar__title::before {
+    width: 92px;
+  }
+}
+
+/* Slider Container */
+.rar__slider-container {
+  width: 100%;
+  position: relative;
+}
+
+/* Card */
+.rar__card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Rating Stars */
+.rar__rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.rar__rating .star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.rar__rating .star svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Comment */
+.rar__comment {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  flex-grow: 1;
+}
+
+/* Profile Info */
+.rar__profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rar__avatar-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.rar__avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rar__meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.rar__name {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+}
+
+.rar__job {
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Swiper Pagination Bullets */
+.rar-pagination {
+  position: relative !important;
+  margin-top: 16px !important;
+  bottom: 0 !important;
+}
+
+.rar-pagination .swiper-pagination-bullet {
+  background: #000000 !important;
+  opacity: 0.3;
+}
+
+.rar-pagination .swiper-pagination-bullet-active {
+  opacity: 1;
+}

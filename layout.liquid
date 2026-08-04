@@ -1,0 +1,388 @@
+
+
+<!doctype html>
+<html lang="{{ shop.locale }}" dir="{% if request.is_rtl %}rtl{% else %}ltr{% endif %}">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <meta name="description" content="{{ page.meta_description }}">
+    <title>
+      {{ page.title }}
+      —
+      {{ shop.name }}
+    </title>
+
+    <!-- Fonts (dynamic from theme settings) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {% assign gf_heading = theme.heading_font | default: 'Cairo' | replace: ' ', '+' %}
+    {% assign gf_body = theme.body_font | default: 'Cairo' | replace: ' ', '+' %}
+    {% if gf_heading == gf_body %}
+      <link href="https://fonts.googleapis.com/css2?family={{ gf_heading }}:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    {% else %}
+      <link href="https://fonts.googleapis.com/css2?family={{ gf_heading }}:wght@400;500;600;700;800&family={{ gf_body }}:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    {% endif %}
+
+    <!-- Custom CSS from tenant -->
+    {% if custom_css %}
+      <style>
+        {{ custom_css }}
+      </style>
+    {% endif %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js" defer></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/sal.js@0.8.5/dist/sal.css">
+    <link rel="stylesheet" href="{{ 'product-card-custom.css' | asset_url }}">
+
+    <script src="https://unpkg.com/sal.js@0.8.5/dist/sal.js" defer></script>
+
+
+    <!-- Theme settings as CSS variables -->
+    <style>
+      :root {
+          {% if theme.primary_color %}--gl-primary: {{ theme.primary_color }};{% endif %}
+          {% if theme.secondary_color %}--gl-secondary: {{ theme.secondary_color }};{% endif %}
+          {% if theme.accent_color %}--gl-accent: {{ theme.accent_color }};{% endif %}
+          {% if theme.background_color %}--gl-bg: {{ theme.background_color }};{% endif %}
+          {% if theme.text_color %}--gl-text: {{ theme.text_color }};{% endif %}
+          {% if theme.heading_color %}--gl-heading: {{ theme.heading_color }};{% endif %}
+          {% if theme.subheading_color %}--gl-subheading: {{ theme.subheading_color }};{% endif %}
+          {% if theme.background_footer_color %}--gl-background_footer_color: {{ theme.background_footer_color }};{% endif %}
+          {% if theme.container_width %}--gl-container: {{ theme.container_width }}px;{% endif %}
+          {% if theme.border_radius %}--gl-radius: {{ theme.border_radius }}px;{% endif %}
+          {% if theme.base_font_size %}--gl-font-size: {{ theme.base_font_size }}px;{% endif %}
+          {% if theme.heading_font %}--gl-font-heading: '{{ theme.heading_font }}', sans-serif;{% endif %}
+          {% if theme.body_font %}--gl-font-body: '{{ theme.body_font }}', sans-serif;{% endif %}
+      }
+ 
+    </style>
+  </head>
+  <body>
+    {% if theme.enable_loader != false %}
+      {% render 'RA_loader', theme: theme %}
+    {% endif %}
+
+    <!-- Mobile Menu -->
+    
+
+    <!-- Search Overlay -->
+    <div class="gl-search-overlay">
+      <div class="gl-search-box">
+        <form action="/search" method="GET">
+          <input
+            type="search"
+            name="query"
+            placeholder="{% if request.is_rtl %}ابحثي عن منتجات...{% else %}Search for products...{% endif %}"
+            autocomplete="off"
+          >
+        </form>
+      </div>
+    </div>
+
+    <!-- Quick View Popup -->
+    <div class="gl-quick-view-overlay" id="quickViewModal">
+      <div class="gl-quick-view-content">
+        <button class="gl-quick-view-close" aria-label="Close quick view">✕</button>
+        <div class="gl-quick-view-body">
+          <div class="gl-quick-view-image">
+            <div class="gl-quick-view-gallery">
+              <div class="gl-quick-view-main-image">
+                <img id="quickViewImage" src="" alt="" loading="lazy">
+              </div>
+              <div class="gl-quick-view-thumbnails" id="quickViewThumbnails">
+                <!-- Thumbnails will be dynamically added here -->
+              </div>
+            </div>
+          </div>
+          <div class="gl-quick-view-info">
+            
+            <div id="quickViewCategory" class="gl-quick-view-category"></div>
+            <h2 id="quickViewTitle" class="gl-quick-view-title"></h2>
+
+
+            
+            <div class="gl-quick-view-meta">
+              <div id="quickViewMetaInfo" class="gl-quick-view-meta-detail">
+                <!-- Meta info will be dynamically added here -->
+              </div>
+              <div class="share-rat">
+                     <div id="quickViewRating" class="gl-quick-view-rating">
+                <div class="gl-stars" aria-label="Product rating">
+                  <!-- Stars will be dynamically added -->
+                </div>
+                <a href="#" class="gl-quick-view-reviews-link"></a>
+              </div>
+              <div class="gl-quick-view-share">
+                  <span class="gl-share-label gl-share-trigger" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    {% if request.is_rtl %}مشاركة{% else %}Share{% endif %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s ease;">
+                      <path d="M6 9l6 6 6-6"></path>
+                    </svg>
+                  </span>
+                  <div class="gl-share-dropdown">
+                    <a  href="{{ theme.social_facebook }}" class="gl-share-facebook" target="_blank" rel="noopener">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                      </svg>
+                      <span>Facebook</span>
+                    </a>
+                    <a  href="{{ theme.social_twitter }}" class="gl-share-twitter" target="_blank" rel="noopener">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4l11.73 15h5L9 4H4zm13.15 13L6.35 6H5.25l10.8 11h1.1z"></path>
+                      </svg>
+                      <span>Twitter</span>
+                    </a>
+                    <a  href="{{ theme.social_whatsapp }}" class="gl-share-whatsapp" target="_blank" rel="noopener">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                      </svg>
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+            </div>
+              </div>
+            
+            <div id="quickViewDescription" class="gl-quick-view-description" style="display: none;">
+              <p></p>
+            </div>
+            
+      
+            
+            <div class="gl-quick-view-actions">
+              <div class="qtypr">
+
+                <div class="gl-quick-view-quantity">
+                  <span class="label-qty">{% if request.is_rtl %}الكمية{% else %}Qty{% endif %}</span>
+                  <div class="gl-product-quantity">
+                    <button type="button" aria-label="{% if request.is_rtl %}تقليل الكمية{% else %}Decrease quantity{% endif %}" data-qty-minus>−</button>
+                    <input type="number" name="quantity" value="1" min="1" max="99" aria-label="{% if request.is_rtl %}الكمية{% else %}Quantity{% endif %}">
+                    <button type="button" aria-label="{% if request.is_rtl %}زيادة الكمية{% else %}Increase quantity{% endif %}" data-qty-plus>+</button>
+                  </div>
+                </div>
+            <div class="gl-quick-view-price">
+              <span id="quickViewPrice" class="current"></span>
+              <span id="quickViewOriginalPrice" class="original" style="display: none;"></span>
+            </div>
+              </div>
+                
+                <div class="gl-quick-view-buttons">
+                  {% if request.is_rtl %}
+                    <button type="button" id="quickViewQuickAdd" class="gl-btn gl-btn-add-cart" data-gl-action="quick-add" data-product-id="" data-add-to-cart-url="">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                      </svg>
+                      أضف للسلة
+                    </button>
+                  {% else %}
+                    <button type="button" id="quickViewQuickAdd" class="gl-btn gl-btn-add-cart" data-gl-action="quick-add" data-product-id="" data-add-to-cart-url="">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                      </svg>
+                      Add to Cart
+                    </button>
+                  {% endif %}
+                  
+                  <a id="quickViewLink" href="" class="gl-btn btn-buy">
+                    {% if request.is_rtl %}عرض المنتج{% else %}View Product{% endif %}
+                  </a>
+                </div>
+
+        
+                
+              
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Section -->
+    {{ content_for_header }}
+
+    <!-- Dynamic Breadcrumb Navigation -->
+    {% assign is_rtl = request.is_rtl %}
+    {% assign page_type = page.type %}
+    {% assign current_title = page.title %}
+    
+    {% unless page_type == 'home' %}
+      {% capture breadcrumb_html %}
+        <nav aria-label="Breadcrumb" >
+          <div class="gl-container">
+            <ol class="gl-breadcrumb">
+              <li>
+                <a href="/">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                  <span>{% if is_rtl %}الرئيسية{% else %}Home{% endif %}</span>
+                </a>
+              </li>
+              
+              {% case page_type %}
+                {% when 'home' %}
+                  <li  class="wrapper" >
+                    <span class="gl-breadcrumb-separator">
+                      {% if is_rtl %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      {% endif %}
+                    </span>
+                    <span class="active">{% if is_rtl %}الرئيسية{% else %}Home{% endif %}</span>
+                  </li>
+                  
+                {% when 'category' %}
+                  <li class="wrapper" >
+                    <span class="gl-breadcrumb-separator">
+                      {% if is_rtl %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      {% endif %}
+                    </span>
+                    <span class="active">{% if is_rtl %}كل المنتجات{% else %}All Products{% endif %}</span>
+                  </li>
+                  
+                {% when 'product' %}
+                  <li class="wrapper" >
+                    <span class="gl-breadcrumb-separator">
+                      {% if is_rtl %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      {% endif %}
+                    </span>
+                    <span class="active">{% if is_rtl %}تفاصيل المنتج{% else %}Product Details{% endif %}</span>
+                  </li>
+                  
+                {% when 'search' %}
+                  <li class="wrapper" >
+                    <span class="gl-breadcrumb-separator">
+                      {% if is_rtl %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      {% endif %}
+                    </span>
+                    <span class="active">{% if is_rtl %}البحث{% else %}Search{% endif %}</span>
+                  </li>
+                  
+                {% when 'cart' %}
+                  <li  class="wrapper" >
+                    <span class="gl-breadcrumb-separator">
+                      {% if is_rtl %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      {% endif %}
+                    </span>
+                    <span class="active">{% if is_rtl %}السلة{% else %}Cart{% endif %}</span>
+                  </li>
+                  
+                {% when 'cms' %}
+                  <li class="wrapper" >
+                    <span class="gl-breadcrumb-separator">
+                      {% if is_rtl %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      {% endif %}
+                    </span>
+                    <span class="active">{{ current_title }}</span>
+                  </li>
+                  
+                {% when 'custom' %}
+                  <li class="wrapper" >
+                    <span class="gl-breadcrumb-separator">
+                      {% if is_rtl %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      {% endif %}
+                    </span>
+                    <span class="active">{{ current_title }}</span>
+                  </li>
+                  
+                {% else %}
+                  <li class="wrapper" >
+                    <span class="gl-breadcrumb-separator">
+                      {% if is_rtl %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                      {% else %}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      {% endif %}
+                    </span>
+                    <span class="active">{{ current_title }}</span>
+                  </li>
+              {% endcase %}
+            </ol>
+          </div>
+        </nav>
+      {% endcapture %}
+      
+      {{ breadcrumb_html }}
+    {% endunless %}
+    <!-- Main Content -->
+    <main>
+        {{ content_for_layout }}
+       {% if theme.is_whatsapp_icon != blank %}
+        {% render 'os_whatsapp' , theme: theme %}
+      {% endif %}
+      {% if theme.is_arow_to_top != blank %}
+        {% render 'osh_arrowtop' , theme: theme %}
+      {% endif %}
+       {% if  theme.show_popup  != blank %}
+        {% render 'osh-poup' , is_rtl: is_rtl, theme: theme %}
+      {% endif %}
+    </main>
+
+    <!-- Footer Section -->
+    {{ content_for_footer }}
+    <script>
+   sal({
+    once: false
+  });
+</script>
+  </body>
+</html>

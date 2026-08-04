@@ -1,0 +1,29 @@
+{
+    "name": "theme-template",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Glamour PRO theme build tooling. Run 'npm install' once from this directory, then use the commands below.",
+    "scripts": {
+        "dev": "concurrently --names 'preview,js' --prefix-colors 'cyan,yellow' \"node preview/server.js\" \"node build.mjs --watch\"",
+        "build": "node build.mjs",
+        "pack": "node build.mjs --pack"
+    },
+    "scripts-info": {
+        "dev": "Development: starts preview server (http://localhost:3060) + JS watcher in parallel. Edit .liquid/.css/.js — browser auto-refreshes.",
+        "build": "Production JS build: bundles assets/js/index.js → assets/js/theme-template.js (minified). Run before pack or to test the bundle.",
+        "pack": "Release: production JS build + creates theme-template.zip (flat, upload-ready). Only ships: theme.json, layout.liquid, sections/, locales/, assets/css/*.css, assets/js/glamour-pro.js. Excludes preview/ local runtime state such as preview/state.json."
+    },
+    "devDependencies": {
+        "archiver": "^7.0.0",
+        "chokidar": "^3.6.0",
+        "concurrently": "^9.1.2",
+        "ejs": "^6.0.1",
+        "esbuild": "^0.25.2",
+        "express": "^4.18.0",
+        "liquidjs": "^10.17.0",
+        "ws": "^8.18.0"
+    },
+    "dependencies": {
+        "multer": "^2.2.0"
+    }
+}

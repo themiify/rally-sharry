@@ -1,0 +1,253 @@
+{% assign bg_image = section.settings['banner-image'] %}
+{% assign bg_image_ar = section.settings['banner-image_ar'] %}
+{% assign categories = section.resolved.selected_categories %}
+{% assign is_rtl = request.is_rtl %}
+
+<section class="gl-index-banner ">
+  <div
+    class="gl-index-banner-bg"
+    style="background-image: url('{% if is_rtl and bg_image_ar != blank %}{{ bg_image_ar }}{% elsif bg_image != blank %}{{ bg_image }}{% endif %}');"
+  ></div>
+
+  <div class="gl-container  gl-index-banner-inner">
+    <div class="gl-index-banner-cats">
+      <div class="swiper gl-cats-swiper">
+        <div class="swiper-wrapper">
+          {% for cat in categories %}
+            <div class="swiper-slide">
+              <a href="{{ cat.url }}" class="gl-cat-card">
+                <div class="gl-cat-img-wrap">
+                  {% if cat.image != blank %}
+                    <img src="{{ cat.image }}" alt="{{ cat.name }}" loading="lazy">
+                    <span class="gl-cat-name">{{ cat.name }}</span>
+                  {% else %}
+                    <div class="gl-cat-img-placeholder"></div>
+                  {% endif %}
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+        {%- if section.settings.show_pagination -%}
+          <div class="swiper-pagination"></div>
+        {%- endif -%}
+        {%- if section.settings.show_arrows -%}
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .gl-index-banner {
+    position: relative;
+    min-height: 320px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    padding-bottom: 2rem;
+  }
+
+  .gl-index-banner-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+  }
+
+  .gl-index-banner-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 60%);
+  }
+
+  .gl-index-banner-inner {
+    position: relative;
+    z-index: 1;
+   
+    width: 100%;
+    padding-inline: 2rem;
+  }
+
+  .gl-index-banner-cats {
+    position: relative;
+  }
+
+  .gl-index-banner .gl-cats-swiper {
+    width: 100%;
+    padding-block: 8px;
+    padding-inline: 24px;
+  }
+
+  .gl-index-banner .gl-cats-swiper .swiper-slide {
+    width: auto;
+  }
+
+  .gl-index-banner .gl-cat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .gl-index-banner .gl-cat-img-wrap {
+    width: 150px;
+    height: 150px;
+    border-radius: 4px;
+    background-color: #faeff0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+
+  .gl-index-banner .gl-cat-img-wrap img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .gl-index-banner .gl-cat-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(220, 80, 100, 0.1);
+  }
+
+  .gl-index-banner .gl-cat-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gl-heading);
+    text-align: center;
+  }
+
+  .gl-index-banner .swiper-button-prev,
+  .gl-index-banner .swiper-button-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 20px;
+    height: 20px;
+    border: none;
+    color: #ececec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .gl-index-banner .swiper-button-prev {
+    left: -18px;
+  }
+
+  .gl-index-banner .swiper-button-next {
+    right: -18px;
+  }
+
+  .gl-index-banner .swiper-button-prev.swiper-button-disabled,
+  .gl-index-banner .swiper-button-next.swiper-button-disabled {
+    opacity: 1;
+    cursor: not-allowed;
+  }
+
+  /* Pagination */
+  .gl-index-banner .swiper-pagination {
+    position: relative;
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 0px;
+  }
+  .gl-index-banner .swiper-pagination-bullet {
+    width: 28px;
+    height: 8px;
+    border-radius: 4px !important;
+    background: #de9099;
+    border: none;
+    margin: 0 !important;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .gl-index-banner .swiper-pagination-bullet-active {
+    background: #f0ccd0;
+  }
+
+  @media (max-width: 1024px) {
+  .gl-index-banner-cats {
+    width: 70%;
+  }
+}
+
+
+  @media (max-width: 768px) {
+    .gl-index-banner .swiper-button-prev,
+    .gl-index-banner .swiper-button-next {
+      display: none;
+    }
+    .gl-index-banner .gl-index-banner-cats {
+      width: 100%;
+    }
+    .gl-index-banner {
+      min-height: 250px;
+    }
+
+  .gl-index-banner   .gl-cat-img-wrap {
+      width: 100px;
+      height: 100px;
+    }
+
+    .gl-index-banner-inner {
+      padding-inline: 1rem;
+    }
+    .gl-index-banner .gl-cat-img-wrap img{
+      width: 60px;
+      height: 60px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const swiperEl = document.querySelector('.gl-cats-swiper');
+    if (swiperEl) {
+      new Swiper('.gl-cats-swiper', {
+        slidesPerView: 2,
+        spaceBetween: 20,
+        navigation: {
+          nextEl: swiperEl.querySelector('.swiper-button-next'),
+          prevEl: swiperEl.querySelector('.swiper-button-prev'),
+        },
+        pagination: {
+          el: swiperEl.querySelector('.swiper-pagination'),
+          clickable: true,
+        },
+        breakpoints: {
+          640: {
+            slidesPerView: 3,
+            spaceBetween: 20,
+          },
+          768: {
+            slidesPerView: 4,
+            spaceBetween: 8,
+          },
+          1024: {
+            slidesPerView: 6,
+            spaceBetween: 8,
+          },
+        },
+      });
+    }
+  });
+</script>

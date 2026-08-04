@@ -1,0 +1,120 @@
+<link rel="stylesheet" href="{{ 'RA_main-banner.css' | asset_url }}">
+
+{% assign c = section.settings %}
+
+{% if request.is_rtl %}
+  {% assign first_btn_text = c.first_button_text_ar | default: c.first_button_text_en %}
+  {% assign second_btn_text = c.second_button_text_ar | default: c.second_button_text_en %}
+{% else %}
+  {% assign first_btn_text = c.first_button_text_en | default: c.first_button_text_ar %}
+  {% assign second_btn_text = c.second_button_text_en | default: c.second_button_text_ar %}
+{% endif %}
+
+{% assign button_text_color = c.button_text_colors | default: '#ffffff' %}
+
+<section class="sf-main-banner sf-{{ section.id }} {% if c.margin_switch %}sf-main-banner--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  <div class="sf__container">
+    {% if c.transition_buttons %}
+      <div class="sf__buttons">
+        <div class="sf__button-wrapper" style="border: 1px solid {{ button_text_color }} !important;">
+          <a href="{{ c.first_button }}" class="sf__button-first" style="color: {{ button_text_color }};">
+            {{ first_btn_text }}
+          </a>
+          <i class="sicon-arrow-left sf__icon" style="color: {{ button_text_color }};"></i>
+        </div>
+        <div class="sf__button-wrapper sf__button-wrapper--secondary" style="border: 1px solid {{ button_text_color }} !important;">
+          <a href="{{ c.second_butto }}" class="sf__button-second" style="color: {{ button_text_color }};">
+            {{ second_btn_text }}
+          </a>
+          <i class="sicon-arrow-left sf__icon" style="color: {{ button_text_color }};"></i>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="sf__slider-wrap">
+      <div class="sf__tabs">
+        {% for image in c.images_collection %}
+          <span class="sf__tab-item {% if forloop.first %}sf__tab-item--active{% endif %}" data-index="{{ forloop.index0 }}">
+            {{ image.category_name }}
+          </span>
+        {% endfor %}
+      </div>
+
+      <div class="swiper sf__swiper sf__swiper-{{ section.id }}">
+        <div class="swiper-wrapper">
+          {% for image in c.images_collection %}
+            {% if request.is_rtl %}
+              {% assign main_title = image.main_title_ar | default: image.main_title_en %}
+              {% assign sub_title = image.sub_title_ar | default: image.sub_title_en %}
+            {% else %}
+              {% assign main_title = image.main_title_en | default: image.main_title_ar %}
+              {% assign sub_title = image.sub_title_en | default: image.sub_title_ar %}
+            {% endif %}
+            <div class="swiper-slide sf__slide">
+              <div class="sf__content">
+                {% if main_title != blank %}
+                  <h2 class="sf__title" style="color: {{ image.main_title_color | default: '#ffffff' }};">{{ main_title }}</h2>
+                {% endif %}
+                {% if sub_title != blank %}
+                  <p class="sf__subtitle" style="color: {{ image.sub_title_color | default: '#ffffff' }};">{{ sub_title }}</p>
+                {% endif %}
+                {% if image.is_button %}
+                  <a href="{{ image.button_url }}" class="sf__btn" style="color: {{ image.button_text_color | default: '#000000' }}; background-color: {{ image.button_bg_color | default: '#ffffff' }};">
+                    <span>{{ image.button_text }}</span>
+                    <i class="sicon-arrow-left sf__btn-icon"></i>
+                  </a>
+                {% endif %}
+              </div>
+              <div class="sf__media">
+                <picture class="sf__picture">
+                  {% if image.product_image != blank %}
+                    <source media="(min-width: 650px)" srcset="{{ image.product_image }}">
+                  {% endif %}
+                  <img src="{{ image.product_image_mobile | default: image.product_image }}" alt="{{ image.category_name | escape }}" class="sf__img">
+                </picture>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="swiper-pagination sf__pagination"></div>
+        <div class="swiper-button-prev sf__prev"></div>
+        <div class="swiper-button-next sf__next"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionEl = document.querySelector('.sf-{{ section.id }}');
+    if (!sectionEl) return;
+    const swiperContainer = sectionEl.querySelector('.sf__swiper');
+    const tabItems = sectionEl.querySelectorAll('.sf__tab-item');
+
+    if (swiperContainer && typeof Swiper !== 'undefined') {
+      const mainSwiper = new Swiper(swiperContainer, {
+        loop: false,
+        speed: 800,
+        autoplay: {
+          delay: 5000,
+          disableOnInteraction: false,
+        },
+        on: {
+          slideChange: function () {
+            const activeIdx = this.realIndex;
+            tabItems.forEach((tab, i) => {
+              tab.classList.toggle('sf__tab-item--active', i === activeIdx);
+            });
+          }
+        }
+      });
+
+      tabItems.forEach((tab) => {
+        tab.addEventListener('click', function () {
+          const idx = parseInt(this.getAttribute('data-index'), 10);
+          mainSwiper.slideTo(idx);
+        });
+      });
+    }
+  });
+</script>

@@ -1,0 +1,135 @@
+/* Section Wrapper */
+.sfa-about-us {
+  width: 100%;
+  padding: 32px 0;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+@media (min-width: 768px) {
+  .sfa-about-us {
+    margin-bottom: 30px;
+  }
+}
+
+.sfa-about-us--no-margin {
+  margin-bottom: 0 !important;
+}
+
+/* Container */
+.sfa__container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .sfa__container {
+    flex-direction: row;
+    gap: 48px;
+  }
+}
+
+/* Title Wrap & Title */
+.sfa__title-wrap {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .sfa__title-wrap {
+    width: 168px;
+    flex-shrink: 0;
+  }
+}
+
+.sfa__title {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin: 0;
+}
+
+.sfa__title::before {
+  content: '';
+  display: block;
+  width: 92px;
+  height: 1px;
+  background-color: #000000;
+  flex-shrink: 0;
+}
+
+/* Content & Fade Container */
+.sfa__content {
+  position: relative;
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.625;
+  text-align: right;
+}
+
+@media (min-width: 640px) {
+  .sfa__content {
+    width: 75%;
+  }
+}
+
+@media (min-width: 768px) {
+  .sfa__content {
+    font-size: 14px;
+  }
+}
+
+.sfa__paragraph {
+  position: relative;
+  z-index: 3;
+  font-weight: 500;
+  font-size: 14px;
+  padding-bottom: 16px;
+  padding-right: 16px;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .sfa__paragraph {
+    font-size: 20px;
+  }
+}
+
+.sfa__first-words {
+  display: inline;
+}
+
+.fade-word,
+.sfa__word {
+  opacity: 0.5;
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.fade-container:hover .fade-word {
+  opacity: 1;
+}
+
+/* Decorative Borders */
+.sfa__border-v {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  height: 80%;
+  background-color: #9ca3af;
+}
+
+.sfa__border-h {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #9ca3af;
+}

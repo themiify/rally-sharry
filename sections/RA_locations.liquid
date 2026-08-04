@@ -1,0 +1,222 @@
+<link rel="stylesheet" href="{{ 'RA_locations.css' | asset_url }}">
+
+{% assign c = section.settings %}
+{% assign loc_list = c.singlelocations %}
+{% if loc_list == blank or loc_list.size == 0 %}
+  {% assign loc_list = theme.singlelocations %}
+{% endif %}
+{% if loc_list == blank or loc_list.size == 0 %}
+  {% assign loc_list = theme.settings.singlelocations %}
+{% endif %}
+
+{% assign is_arabic = true %}
+{% if request.is_rtl == false or request.locale == 'en' or store.locale == 'en' %}
+  {% assign is_arabic = false %}
+{% endif %}
+
+{% assign map_ar = c.map_title_ar | default: section.settings.map_title_ar | default: theme.map_title_ar | default: theme.settings.map_title_ar %}
+{% assign map_en = c.map_title_en | default: section.settings.map_title_en | default: theme.map_title_en | default: theme.settings.map_title_en %}
+
+{% if is_arabic %}
+  {% assign title_text = map_ar %}
+  {% if title_text == blank or title_text == 'Our Locations' %}
+    {% assign title_text = 'مواقعنا' %}
+  {% endif %}
+{% else %}
+  {% assign title_text = map_en %}
+  {% if title_text == blank or title_text == 'مواقعنا' or title_text == 'فروعنا' %}
+    {% assign title_text = 'Our Locations' %}
+  {% endif %}
+{% endif %}
+
+{% assign has_custom_locs = true %}
+{% if loc_list == blank or loc_list.size == 0 %}
+  {% assign has_custom_locs = false %}
+{% endif %}
+
+<section class="ral-locations ral-{{ section.id | default: 'single' }} gl-container {% if c.margin_switch %}ral-locations--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  {% if title_text != blank %}
+    <h2 class="ral__title">
+      {{ title_text }}
+    </h2>
+  {% endif %}
+
+  <div class="ral__tabs-wrapper {% if c.maps_switch %}ral__tabs-wrapper--side{% endif %}">
+    <!-- Locations Tabs Navigation -->
+    <div class="ral__nav" role="tablist">
+      {% if has_custom_locs %}
+        {% for locate in loc_list %}
+          {% if request.is_rtl %}
+            {% assign loc_name = locate.location_name_ar | default: locate.location_name_en %}
+            {% assign loc_title = locate.location_title_ar | default: locate.location_title_en %}
+          {% else %}
+            {% assign loc_name = locate.location_name_en | default: locate.location_name_ar %}
+            {% assign loc_title = locate.location_title_en | default: locate.location_title_ar %}
+          {% endif %}
+
+          <button 
+            type="button" 
+            class="ral__tab-btn {% if forloop.first %}ral__tab-btn--active{% endif %}"
+            role="tab" 
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            data-tab="tab-{{ section.id | default: 'single' }}-{{ forloop.index }}">
+            
+            {% if locate.location_image != blank %}
+              <div class="ral__img-wrap">
+                <img src="{{ locate.location_image }}" alt="{{ loc_name | escape }}" class="ral__img" loading="lazy">
+              </div>
+            {% endif %}
+
+            <div class="ral__info">
+              {% if loc_name != blank %}
+                <h3 class="ral__name">{{ loc_name }}</h3>
+              {% endif %}
+              
+              {% if loc_title != blank %}
+                <p class="ral__subtitle">{{ loc_title }}</p>
+              {% endif %}
+
+              <!-- Rating Stars (mab_link) -->
+              <div class="ral__rating">
+                {% assign rating = locate.mab_link | default: 5 %}
+                {% assign locate_idx = forloop.index %}
+                {% for i in (1..5) %}
+                  <span class="star">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <defs>
+                        <linearGradient id="grad-{{ section.id | default: 'single' }}-{{ locate_idx }}-{{ i }}">
+                          <stop offset="{% if rating >= i %}100%{% elsif rating > i-1 %}{{ rating | minus: i | plus: 1 | times: 100 }}%{% else %}0%{% endif %}" stop-color="#f5a623"/>
+                          <stop offset="0%" stop-color="#ddd"/>
+                        </linearGradient>
+                      </defs>
+                      <path fill="url(#grad-{{ section.id | default: 'single' }}-{{ locate_idx }}-{{ i }})"
+                        d="M12 17.27L18.18 21 16.54 13.97 
+                           22 9.24 14.81 8.63 
+                           2 9.24 7.46 13.97 
+                           5.82 21z"/>
+                    </svg>
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+          </button>
+        {% endfor %}
+      {% else %}
+        {% comment %} Default demo 3 branches if empty {% endcomment %}
+        <button type="button" class="ral__tab-btn ral__tab-btn--active" role="tab" aria-selected="true" data-tab="tab-{{ section.id | default: 'single' }}-1">
+          <div class="ral__img-wrap">
+            <img src="https://cdn.salla.sa/form-builder/tCyH15ZBeiXOc8MK4o07wAhlkO0PvK1S7L1HTs2C.png" alt="فرع الرياض الرئيسي" class="ral__img" loading="lazy">
+          </div>
+          <div class="ral__info">
+            <h3 class="ral__name">{% if request.is_rtl %}فرع الرياض الرئيسي{% else %}Riyadh Main Branch{% endif %}</h3>
+            <p class="ral__subtitle">{% if request.is_rtl %}طريق الملك فهد، العليا{% else %}King Fahd Road, Olaya{% endif %}</p>
+            <div class="ral__rating">
+              {% for i in (1..5) %}<span class="star"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="#f5a623" d="M12 17.27L18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21z"/></svg></span>{% endfor %}
+            </div>
+          </div>
+        </button>
+
+        <button type="button" class="ral__tab-btn" role="tab" aria-selected="false" data-tab="tab-{{ section.id | default: 'single' }}-2">
+          <div class="ral__img-wrap">
+            <img src="https://cdn.salla.sa/form-builder/tCyH15ZBeiXOc8MK4o07wAhlkO0PvK1S7L1HTs2C.png" alt="فرع جدة" class="ral__img" loading="lazy">
+          </div>
+          <div class="ral__info">
+            <h3 class="ral__name">{% if request.is_rtl %}فرع جدة{% else %}Jeddah Branch{% endif %}</h3>
+            <p class="ral__subtitle">{% if request.is_rtl %}طريق الكورنيش، الشاطئ{% else %}Corniche Road, Ash Shati{% endif %}</p>
+            <div class="ral__rating">
+              {% for i in (1..5) %}<span class="star"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="#f5a623" d="M12 17.27L18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21z"/></svg></span>{% endfor %}
+            </div>
+          </div>
+        </button>
+
+        <button type="button" class="ral__tab-btn" role="tab" aria-selected="false" data-tab="tab-{{ section.id | default: 'single' }}-3">
+          <div class="ral__img-wrap">
+            <img src="https://cdn.salla.sa/form-builder/tCyH15ZBeiXOc8MK4o07wAhlkO0PvK1S7L1HTs2C.png" alt="فرع الخبر" class="ral__img" loading="lazy">
+          </div>
+          <div class="ral__info">
+            <h3 class="ral__name">{% if request.is_rtl %}فرع الخبر{% else %}Khobar Branch{% endif %}</h3>
+            <p class="ral__subtitle">{% if request.is_rtl %}شارع الأمير تركي، الروضة{% else %}Prince Turki Street, Rawdah{% endif %}</p>
+            <div class="ral__rating">
+              {% for i in (1..5) %}<span class="star"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="#f5a623" d="M12 17.27L18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21z"/></svg></span>{% endfor %}
+            </div>
+          </div>
+        </button>
+      {% endif %}
+    </div>
+
+    <!-- Locations Map Contents -->
+    <div class="ral__content-wrapper">
+      {% if has_custom_locs %}
+        {% for locate in loc_list %}
+          <div 
+            id="tab-{{ section.id | default: 'single' }}-{{ forloop.index }}" 
+            class="ral__tab-pane {% if forloop.first %}ral__tab-pane--active{% endif %}"
+            role="tabpanel">
+            
+            {% if locate.location_url != blank %}
+              <div class="ral__map-frame-wrap">
+                <iframe 
+                  src="{{ locate.location_url }}" 
+                  width="100%" 
+                  height="100%" 
+                  style="border:0;" 
+                  allowfullscreen="" 
+                  loading="lazy" 
+                  referrerpolicy="no-referrer-when-downgrade" 
+                  class="ral__iframe">
+                </iframe>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        {% comment %} Default demo map panes if empty {% endcomment %}
+        <div id="tab-{{ section.id | default: 'single' }}-1" class="ral__tab-pane ral__tab-pane--active" role="tabpanel">
+          <div class="ral__map-frame-wrap">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3623.7744319854497!2d46.675298!3d24.713552!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f03890d489399%3A0xba974d1c98e79fd5!2sRiyadh!5e0!3m2!1sen!2ssa!4v1620000000000!5m2!1sen!2ssa" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="ral__iframe"></iframe>
+          </div>
+        </div>
+        <div id="tab-{{ section.id | default: 'single' }}-2" class="ral__tab-pane" role="tabpanel">
+          <div class="ral__map-frame-wrap">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3711.234567890123!2d39.112345!3d21.543210!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x15c3d01234567890%3A0x1234567890abcdef!2sJeddah!5e0!3m2!1sen!2ssa!4v1620000000000!5m2!1sen!2ssa" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="ral__iframe"></iframe>
+          </div>
+        </div>
+        <div id="tab-{{ section.id | default: 'single' }}-3" class="ral__tab-pane" role="tabpanel">
+          <div class="ral__map-frame-wrap">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3575.123456789012!2d50.212345!3d26.283210!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e49e01234567890%3A0x1234567890abcdef!2sKhobar!5e0!3m2!1sen!2ssa!4v1620000000000!5m2!1sen!2ssa" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="ral__iframe"></iframe>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionEl = document.querySelector('.ral-{{ section.id | default: 'single' }}');
+    if (!sectionEl) return;
+
+    const buttons = sectionEl.querySelectorAll('.ral__tab-btn');
+    const panes = sectionEl.querySelectorAll('.ral__tab-pane');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-tab');
+
+        buttons.forEach(b => {
+          b.classList.remove('ral__tab-btn--active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        panes.forEach(p => p.classList.remove('ral__tab-pane--active'));
+
+        this.classList.add('ral__tab-btn--active');
+        this.setAttribute('aria-selected', 'true');
+        
+        const activePane = sectionEl.querySelector('#' + targetId);
+        if (activePane) {
+          activePane.classList.add('ral__tab-pane--active');
+        }
+      });
+    });
+  });
+</script>

@@ -1,0 +1,35 @@
+<link rel="stylesheet" href="{{ 'RA_brands.css' | asset_url }}">
+
+{% assign c = section.settings %}
+
+<section class="rab-brands rab-{{ section.id }} {% if c.margin_switch %}rab-brands--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  <div class="rab__container gl-container">
+    {% assign quantity = c.brandsss.size %}
+    <div class="rab__loop-slide">
+      <div class="rab__slider" style="--width: 200px; --height: 100px; --quantity: {{ quantity | default: 6 }}; --speed: 15s;">
+        <div class="rab__list">
+          {% for brand in c.brandsss %}
+            {% assign brand_name = brand.brand_name_en | default: brand.brand_name_ar %}
+            <div class="rab__item" style="--position: {{ forloop.index }};">
+              <a href="{{ brand.brand_url | default: '#' }}" class="rab__link">
+                <!-- English Brand Name Text (Default View) -->
+                {% if brand_name != blank %}
+                  <div class="rab__title">
+                    <p class="rab__text">{{ brand_name }}</p>
+                  </div>
+                {% endif %}
+
+                <!-- Brand Logo Image (Hover View) -->
+                <div class="rab__image-wrap">
+                  {% if brand.brand_logo != blank %}
+                    <img src="{{ brand.brand_logo }}" alt="{{ brand_name | escape }}" class="rab__img" loading="lazy">
+                  {% endif %}
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

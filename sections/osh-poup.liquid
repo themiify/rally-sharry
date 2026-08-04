@@ -1,0 +1,426 @@
+
+<section class="popup-overlay" >  <div class="popup-card" style="background: {{ theme.popup_bg }};">
+    <button id="popup-close" class="popup-close">✕</button>
+
+    {% if theme.popup_img %}
+      <div class="popup-image-wrapper">
+        <img src="{{ theme.popup_img }}" class="popup-image">
+      </div>
+    {% endif %}
+
+    <div class="popup-content">
+      <span class="popup-badge" style="color: {{ theme.promotional_header_color }};">
+        {% if is_rtl %} {{ theme.promotional_header_ar }} {% else %} {{ theme.promotional_header_en }} {% endif %}
+      </span>
+
+      <h2 class="popup-title" style="color: {{ theme.main_header_color }};">
+        {% if is_rtl %} {{ theme.main_header_ar }} {% else %} {{ theme.main_header_en }} {% endif %}
+      </h2>
+
+      {% if theme.popup_type == 'discount_code' %}
+        <div
+          id="coupon-code"
+          class="coupon-box"
+          data-code="{{ theme.code_text }}"
+          style="background: {{ theme.code_text_bg }}; color: {{ theme.code_text_color }};"
+        >
+          <span>{{ theme.code_text }}</span>
+        </div>
+
+        <small class="coupon-note">
+          {% if is_rtl %}
+            اضغط على الكود للنسخ
+          {% else %}
+            Click the code to copy
+          {% endif %}
+        </small>
+
+      {% else %}
+        <form id="newsletter-form-popup" action="{{ theme.newsletter_url }}" method="POST">
+          <input
+            type="email"
+            id="newsletter-email-popup"
+            name="email"
+            placeholder="{% if is_rtl %}البريد الإلكتروني{% else %}Email address{% endif %}"
+            class="popup-input"
+            style="background: {{ theme.input_text_bg }}; color: {{ theme.input_text_color }};"
+          >
+
+          <button
+            type="submit"
+            id="newsletter-submit-popup"
+            class="popup-btn"
+            style="background: {{ theme.btn_text_bg }}; color: {{ theme.btn_text_color }};"
+          >
+            {% if is_rtl %} {{ theme.btn_text_ar }} {% else %} {{ theme.btn_text_en }} {% endif %}
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .popup-input::placeholder {
+  color: {{ theme.placeholder_text_color }};
+}
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: 0.4s ease;
+  }
+
+  .popup-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .popup-card {
+    width: 92%;
+    max-width: 560px;
+
+    border-radius: 32px;
+
+    overflow: hidden;
+
+    position: relative;
+
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18);
+
+    transform: translateY(80px) scale(0.9);
+
+    transition: 0.5s ease;
+  }
+
+  .popup-overlay.show .popup-card {
+    transform: translateY(0) scale(1);
+  }
+
+  .popup-close {
+    position: absolute;
+    top: 18px;
+    inset-inline-end: 18px;
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    background: #fff;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+    z-index: 10;
+
+    transition: 0.3s;
+  }
+
+  .popup-close:hover {
+    transform: rotate(90deg);
+  }
+
+  .popup-image-wrapper {
+    padding: 35px 35px 0;
+  }
+
+  .popup-image {
+    width: 100px;
+    display: block;
+    margin: auto;
+
+    animation: popupFloat 3s infinite ease-in-out;
+  }
+
+  .popup-content {
+    padding: 25px 35px 40px;
+    text-align: center;
+  }
+
+  .popup-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 18px;
+
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.06);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    margin-bottom: 18px;
+  }
+
+  .popup-title {
+    font-size: 30px;
+    line-height: 1.5;
+    font-weight: 800;
+
+    margin-bottom: 28px;
+  }
+
+  .popup-input {
+    width: 100%;
+    height: 58px;
+
+    border: none;
+    border-radius: 16px;
+
+    padding: 0 20px;
+
+    font-size: 15px;
+
+    margin-bottom: 14px;
+  }
+
+  .popup-input:focus {
+    outline: none;
+  }
+
+  .popup-btn {
+    width: 100%;
+    height: 58px;
+
+    border: none;
+    border-radius: 16px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    transition: 0.3s;
+  }
+
+  .popup-btn:hover {
+    transform: translateY(-3px);
+  }
+
+  .popup-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .coupon-box {
+    height: 70px;
+
+    border-radius: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 25px;
+
+    cursor: pointer;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    transition: 0.3s;
+  }
+
+  .coupon-box:hover {
+    transform: translateY(-4px);
+  }
+
+  .coupon-note {
+    display: block;
+    margin-top: 12px;
+    opacity: 0.7;
+  }
+
+  .toastify {
+    border-radius: 16px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18) !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    padding: 14px 22px !important;
+    font-family: inherit;
+  }
+
+  .toast-success {
+    background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  }
+
+  .toast-error {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+  }
+
+  @keyframes popupFloat {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .popup-content {
+      padding: 20px 20px 30px;
+    }
+
+    .popup-title {
+      font-size: 22px;
+    }
+
+    .popup-image {
+      width: 160px;
+    }
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const popup = document.querySelector('.popup-overlay');
+    const closeBtn = document.getElementById('popup-close');
+
+    const dir = popup?.dataset.dir || document.documentElement.dir || 'ltr';
+    const isRtl = dir === 'rtl';
+
+    const messages = {
+      couponCopied: isRtl ? 'تم نسخ الكود بنجاح ✓' : 'Code copied successfully ✓',
+      couponFailed: isRtl ? 'فشل نسخ الكود ✕' : 'Failed to copy code ✕',
+      emptyEmail: isRtl ? 'من فضلك أدخل بريدك الإلكتروني' : 'Please enter your email address',
+      invalidEmail: isRtl ? 'البريد الإلكتروني غير صحيح' : 'Please enter a valid email address',
+      sending: isRtl ? 'جاري الإرسال...' : 'Sending...',
+      subscribed: isRtl ? 'تم الاشتراك بنجاح ✓' : 'Subscribed successfully ✓',
+      serverError: isRtl ? 'حدث خطأ، حاول مرة أخرى' : 'Something went wrong, please try again',
+      connectionError: isRtl ? 'فشل الاتصال، حاول مرة أخرى' : 'Connection failed, please try again',
+    };
+
+    const STORAGE_KEY = 'popup_seen';
+    const SHOW_DELAY_MS = 5000;
+
+    function closePopup() {
+      popup.classList.remove('show');
+    }
+
+    if (popup) {
+      let alreadySeen = false;
+
+      try {
+        alreadySeen = localStorage.getItem(STORAGE_KEY) === 'true';
+      } catch (e) {
+        alreadySeen = false;
+      }
+
+      if (!alreadySeen) {
+        setTimeout(() => {
+          popup.classList.add('show');
+
+          try {
+            localStorage.setItem(STORAGE_KEY, 'true');
+          } catch (e) {}
+        }, SHOW_DELAY_MS);
+      }
+
+      closeBtn?.addEventListener('click', closePopup);
+
+      popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+          closePopup();
+        }
+      });
+    }
+
+    function showToast(message, type = 'success') {
+      Toastify({
+        text: message,
+        duration: 3000,
+        gravity: 'top',
+        position: isRtl ? 'right' : 'left',
+        stopOnFocus: true,
+        className: type === 'success' ? 'toast-success' : 'toast-error',
+        style: { direction: dir },
+      }).showToast();
+    }
+
+    const coupon = document.getElementById('coupon-code');
+
+    if (coupon) {
+      coupon.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(coupon.dataset.code);
+
+          showToast(messages.couponCopied, 'success');
+        } catch {
+          showToast(messages.couponFailed, 'error');
+        }
+      });
+    }
+
+    const newsletterForm = document.getElementById('newsletter-form-popup');
+
+    if (newsletterForm) {
+      newsletterForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const emailInput = document.getElementById('newsletter-email-popup');
+        const submitBtn = document.getElementById('newsletter-submit-popup');
+        const email = emailInput.value.trim();
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!email) {
+          showToast(messages.emptyEmail, 'error');
+          emailInput.focus();
+          return;
+        }
+
+        if (!emailRegex.test(email)) {
+          showToast(messages.invalidEmail, 'error');
+          emailInput.focus();
+          return;
+        }
+
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = messages.sending;
+
+        try {
+          const response = await fetch(newsletterForm.action, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ email }),
+          });
+
+          if (response.ok) {
+            showToast(messages.subscribed, 'success');
+            newsletterForm.reset();
+            closePopup();
+          } else {
+            showToast(messages.serverError, 'error');
+          }
+        } catch {
+          showToast(messages.connectionError, 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+        }
+      });
+    }
+  });
+</script>

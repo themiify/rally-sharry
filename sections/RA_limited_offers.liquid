@@ -1,0 +1,174 @@
+<link rel="stylesheet" href="{{ 'RA_limited_offers.css' | asset_url }}">
+
+{% assign c = section.settings %}
+
+{% if request.is_rtl %}
+  {% assign title_text = c.main_title_ar | default: c.main_title_en %}
+  {% assign btn_text = c.button_text_ar | default: c.button_text_en %}
+{% else %}
+  {% assign title_text = c.main_title_en | default: c.main_title_ar %}
+  {% assign btn_text = c.button_text_en | default: c.button_text_ar %}
+{% endif %}
+
+{% assign bg_image_url = c.bg_image | default: 'https://cdn.salla.sa/form-builder/2CCCLeQH8UsMj1nZGEmbx4sbQ2mXd1TJUR6cUYRm.png' %}
+{% assign video_url = c.video_link | default: 'https://files.catbox.moe/3xlvx9.mp4' %}
+{% assign end_date = c.limited_offers | default: '2026-12-31T23:59' %}
+
+<section class="ralo-limited-offers ralo-{{ section.id }} gl-container {% if c.margin_switch %}ralo-limited-offers--no-margin{% endif %}"
+         style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  
+  <div class="ralo__wrapper {% if c.is_switch %}ralo__wrapper--reverse{% endif %}">
+    
+    <!-- Products Slider Side -->
+    <div class="ralo__products-col">
+      <div class="swiper ralo-swiper">
+        <div class="swiper-wrapper">
+          {% assign resolved_products = section.resolved.products_collection %}
+          {% if resolved_products == blank or resolved_products.size == 0 %}
+            {% assign resolved_products = c.products_collection %}
+          {% endif %}
+          {% if resolved_products != blank and resolved_products.size > 0 %}
+            {% for prod in resolved_products %}
+              <div class="swiper-slide ralo__slide">
+                {% include 'product-card', product_card_item: prod %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <!-- Demo Product Cards when no specific products selected -->
+            {% for i in (1..4) %}
+              <div class="swiper-slide ralo__slide">
+                {% include 'product-card' %}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdown & Content Media Side -->
+    <div class="ralo__offer-content">
+      {% if c.bg_image_switch %}
+        <div class="ralo__bg-media">
+          <img src="{{ bg_image_url }}" alt="{{ title_text | escape }}" class="ralo__media-obj">
+        </div>
+      {% else %}
+        <div class="ralo__bg-media">
+          <video autoplay muted loop playsinline class="ralo__media-obj">
+            <source src="{{ video_url }}" type="video/mp4">
+          </video>
+        </div>
+      {% endif %}
+
+      <div class="ralo__overlay"></div>
+
+      <div class="ralo__text-box">
+        {% if title_text != blank %}
+          <h2 class="ralo__main-title" style="color: {{ c.main_title_color | default: '#ffffff' }};">
+            {{ title_text }}
+          </h2>
+        {% endif %}
+
+        <!-- Countdown Timer Component -->
+        <div class="ralo__countdown" data-end-date="{{ end_date }}">
+          <div class="ralo__count-item">
+            <div class="ralo__count-val count-days">00</div>
+            <div class="ralo__count-lbl">أيام</div>
+          </div>
+          <div class="ralo__count-item">
+            <div class="ralo__count-val count-hours">00</div>
+            <div class="ralo__count-lbl">ساعات</div>
+          </div>
+          <div class="ralo__count-item">
+            <div class="ralo__count-val count-mins">00</div>
+            <div class="ralo__count-lbl">دقائق</div>
+          </div>
+          <div class="ralo__count-item">
+            <div class="ralo__count-val count-secs">00</div>
+            <div class="ralo__count-lbl">ثواني</div>
+          </div>
+        </div>
+
+        {% if c.is_button %}
+          <a href="{{ c.button_url | default: '#' }}"
+             class="ralo__btn"
+             style="color: {{ c.button_text_color | default: '#000000' }}; background-color: {{ c.button_bg_color | default: '#ffffff' }};">
+            <span>{{ btn_text | default: 'شاهد العروض' }}</span>
+            <i class="sicon-arrow-left"></i>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionEl = document.querySelector('.ralo-{{ section.id }}');
+    if (!sectionEl) return;
+
+    // Initialize Swiper
+    const swiperEl = sectionEl.querySelector('.ralo-swiper');
+    if (swiperEl) {
+      const isAutoplay = {{ c.is_autoplay | json }};
+      new Swiper(swiperEl, {
+        slidesPerView: 1.5,
+        spaceBetween: 15,
+        loop: true,
+        autoplay: isAutoplay ? {
+          delay: 3000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true
+        } : false,
+        breakpoints: {
+          768: {
+            slidesPerView: 2,
+            spaceBetween: 12
+          },
+          1080: {
+            slidesPerView: 2.5,
+            spaceBetween: 16
+          }
+        }
+      });
+    }
+
+    // Initialize Countdown Timer
+    const countdownEl = sectionEl.querySelector('.ralo__countdown');
+    if (countdownEl) {
+      const endDateStr = countdownEl.getAttribute('data-end-date');
+      const targetDate = new Date(endDateStr).getTime();
+
+      const daysVal = countdownEl.querySelector('.count-days');
+      const hoursVal = countdownEl.querySelector('.count-hours');
+      const minsVal = countdownEl.querySelector('.count-mins');
+      const secsVal = countdownEl.querySelector('.count-secs');
+
+      function updateTimer() {
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+          if (daysVal) daysVal.textContent = '00';
+          if (hoursVal) hoursVal.textContent = '00';
+          if (minsVal) minsVal.textContent = '00';
+          if (secsVal) secsVal.textContent = '00';
+          return;
+        }
+
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (daysVal) daysVal.textContent = d < 10 ? '0' + d : d;
+        if (hoursVal) hoursVal.textContent = h < 10 ? '0' + h : h;
+        if (minsVal) minsVal.textContent = m < 10 ? '0' + m : m;
+        if (secsVal) secsVal.textContent = s < 10 ? '0' + s : s;
+      }
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    }
+  });
+</script>

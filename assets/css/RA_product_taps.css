@@ -1,0 +1,159 @@
+/* ===================================================================
+   RA Product Tabs Component (.RA_product_taps)
+   =================================================================== */
+
+.RA_product_taps {
+    position: relative;
+    width: 100%;
+}
+
+.RA_product_taps .s-tabs-header {
+    border-bottom: 2px solid #e5e7eb;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.RA_product_taps .s-tabs-header::-webkit-scrollbar {
+    display: none;
+}
+
+.RA_product_taps .ra-tab-btn {
+    border: none;
+    background: transparent;
+    border-bottom: 3px solid transparent;
+    color: #4b5563;
+    transition: all 0.25s ease;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.RA_product_taps .ra-tab-btn.active,
+.RA_product_taps .ra-tab-btn:hover {
+    color: #000000;
+    border-bottom-color: #000000;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* Desktop Split Layout */
+@media (min-width: 641px) {
+    .RA_product_taps .ra-panel-body {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 20px !important;
+        align-items: stretch !important;
+        width: 100% !important;
+    }
+    .RA_product_taps .ra-products-col {
+        display: block !important;
+        width: 32% !important;
+        max-width: 32% !important;
+        flex: 0 0 32% !important;
+        max-height: 420px !important;
+        overflow-y: auto !important;
+    }
+    .RA_product_taps .ra-mobile-slider-wrap {
+        display: none !important;
+    }
+    .RA_product_taps .ra-preview-col {
+        display: block !important;
+        width: 65% !important;
+        max-width: 65% !important;
+        flex: 1 1 65% !important;
+        height: 420px !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        background: #f3f4f6 !important;
+        position: relative !important;
+    }
+}
+
+/* Mobile Layout (<640px) */
+@media (max-width: 640px) {
+    .RA_product_taps .ra-panel-body {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+    .RA_product_taps .ra-products-col {
+        display: none !important;
+    }
+    .RA_product_taps .ra-mobile-slider-wrap {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 8px !important;
+    }
+    .RA_product_taps .ra-mobile-slider {
+        display: flex !important;
+        gap: 12px !important;
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+        padding-bottom: 4px !important;
+    }
+    .RA_product_taps .ra-mobile-slider::-webkit-scrollbar {
+        display: none !important;
+    }
+    .RA_product_taps .ra-mobile-card-item {
+        flex: 0 0 135px !important;
+        width: 135px !important;
+        border: 1.5px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        padding: 8px !important;
+        background: #ffffff !important;
+        transition: all 0.25s ease !important;
+    }
+    .RA_product_taps .ra-mobile-card-item.active {
+        border-color: #000000 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    }
+    .RA_product_taps .ra-preview-col {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        height: 260px !important;
+        border-radius: 14px !important;
+    }
+}
+
+.RA_product_taps .ra-preview-col a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.RA_product_taps .ra-preview-col img {
+    width: 100%;
+    height: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.RA_product_taps .ra-preview-col:hover img {
+    transform: scale(1.02);
+}
+
+.RA_product_taps .s-products-list-horizontal-cards {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px;
+}
+
+.RA_product_taps .s-product-card-entry {
+    transition: all 0.25s ease !important;
+}
+
+.RA_product_taps .s-product-card-entry:hover,
+.RA_product_taps .s-product-card-entry.active {
+    border-color: #000000 !important;
+    background: #f9fafb !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
+}

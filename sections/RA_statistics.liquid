@@ -1,0 +1,89 @@
+<link rel="stylesheet" href="{{ 'RA_statistics.css' | asset_url }}">
+
+{% assign c = section.settings %}
+{% assign des_color = c.des_color | default: '#ffffff' %}
+{% assign bg_image = c.img_bg | default: 'https://cdn.salla.sa/form-builder/DjbyxEXJDWfRSu7eJO0jtuouAteua86IJi82Sgoq.jpg' %}
+
+<section class="ras-statistics ras-{{ section.id }} gl-container {% if c.margin_switch %}ras-statistics--no-margin{% endif %}" style="background-image: url('{{ bg_image }}'); {% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+  <div class="ras__overlay"></div>
+  
+  <div class="ras__wrapper {% if c.is_cointaner %}gl-container{% else %}ras__wrapper--full{% endif %}">
+    <div class="ras__cards">
+      {% for item in c.collection %}
+        {% if request.is_rtl %}
+          {% assign des_text = item.des_ar | default: item.des_en %}
+        {% else %}
+          {% assign des_text = item.des_en | default: item.des_ar %}
+        {% endif %}
+        
+        <div class="ras__card">
+          <!-- Desktop Icon Image -->
+          {% if item.img_icon != blank %}
+            <div class="ras__icon-box ras__icon-box--desktop">
+              <img src="{{ item.img_icon }}" alt="{{ des_text | escape }}" class="ras__icon-img" loading="lazy">
+            </div>
+          {% endif %}
+
+          <div class="ras__details">
+            <div class="ras__counter-box">
+              <!-- Mobile Icon Image -->
+              {% if item.img_icon != blank %}
+                <div class="ras__icon-box ras__icon-box--mobile">
+                  <img src="{{ item.img_icon }}" alt="{{ des_text | escape }}" class="ras__icon-img" loading="lazy">
+                </div>
+              {% endif %}
+              
+              <span class="ras__plus" style="color: {{ des_color }};">+</span>
+              <span class="ras__counter counter" style="color: {{ des_color }};" data-target="{{ item.number | default: 0 }}">
+                {{ item.number | default: 0 }}
+              </span>
+            </div>
+            
+            {% if des_text != blank %}
+              <p class="ras__description" style="color: {{ des_color }};">{{ des_text }}</p>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sectionEl = document.querySelector('.ras-{{ section.id }}');
+    if (!sectionEl) return;
+
+    function startCounter(counter) {
+      const target = parseInt(counter.getAttribute('data-target'), 10) || 0;
+      let current = 0;
+      const step = Math.ceil(target / 100) || 1;
+
+      const updateCounter = () => {
+        if (current < target) {
+          current += step;
+          if (current > target) current = target;
+          counter.innerText = current.toLocaleString();
+          requestAnimationFrame(updateCounter);
+        } else {
+          counter.innerText = target.toLocaleString();
+        }
+      };
+
+      updateCounter();
+    }
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          startCounter(entry.target);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.6 });
+
+    sectionEl.querySelectorAll('.counter').forEach(counter => {
+      observer.observe(counter);
+    });
+  });
+</script>

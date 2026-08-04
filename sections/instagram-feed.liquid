@@ -1,0 +1,90 @@
+{% comment %}
+  Instagram Feed Section — Glamour Theme v2.1
+  Displays a grid of Instagram images.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign heading = section.settings.heading | default: 'Follow Us on Instagram' %}
+{% assign heading_ar = section.settings.heading_ar | default: 'تابعينا على إنستغرام' %}
+{% assign handle = section.settings.instagram_handle %}
+{% assign profile_url = section.settings.instagram_url | default: '#' %}
+
+<section
+  class="gl-section gl-instagram-section"
+  style="background-color: var(--gl-bg);{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.heading_font_size > 0 %}--section-heading-size: {{ section.settings.heading_font_size }}px;{% endif %}{% if section.settings.body_font_size > 0 %}--section-body-size: {{ section.settings.body_font_size }}px;{% endif %}{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %} "
+>
+  <div class="gl-container">
+    <div class="gl-section-header">
+      <h2>
+        {% if is_rtl %}{{ heading_ar }}{% else %}{{ heading }}{% endif %}
+      </h2>
+      {% if handle != blank %}
+        <a
+          href="{{ profile_url }}"
+          target="_blank"
+          rel="noopener"
+          class="gl-instagram-handle"
+          style="display:inline-block;margin-top:0.5rem;color:var(--gl-primary);font-weight:600;"
+        >
+          {{ handle }}
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="gl-instagram-grid">
+      {% assign has_images = false %}
+      {% for i in (1..6) %}
+        {% assign img_key = 'insta' | append: i | append: '_image' %}
+        {% assign url_key = 'insta' | append: i | append: '_url' %}
+        {% assign img = section.settings[img_key] %}
+        {% assign url = section.settings[url_key] | default: '#' %}
+
+        {% if img %}
+          {% assign has_images = true %}
+          <a href="{{ url }}" target="_blank" rel="noopener" class="gl-instagram-item">
+            <img src="{{ img }}" alt="Instagram Image {{ i }}" loading="lazy">
+            <div class="gl-instagram-item-overlay">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+
+      {% if has_images == false %}
+        <!-- Preview placeholders -->
+        {% for i in (1..6) %}
+          <div class="gl-instagram-item">
+            <div
+              style="width:100%;height:100%;background: linear-gradient({{ i | times: 60 }}deg, var(--gl-secondary), var(--gl-primary-light));"
+            ></div>
+            <div class="gl-instagram-item-overlay">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              </svg>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>

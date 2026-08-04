@@ -1,0 +1,202 @@
+
+<div id="floating-whatsapp">
+  <div class="pulse"></div>
+  <div class="pulse delay1"></div>
+  <div class="pulse delay2"></div>
+  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+<path fill="#fff" d="M4.9,43.3l2.7-9.8C5.9,30.6,5,27.3,5,24C5,13.5,13.5,5,24,5c5.1,0,9.8,2,13.4,5.6	C41,14.2,43,18.9,43,24c0,10.5-8.5,19-19,19c0,0,0,0,0,0h0c-3.2,0-6.3-0.8-9.1-2.3L4.9,43.3z"></path><path fill="#fff" d="M4.9,43.8c-0.1,0-0.3-0.1-0.4-0.1c-0.1-0.1-0.2-0.3-0.1-0.5L7,33.5c-1.6-2.9-2.5-6.2-2.5-9.6	C4.5,13.2,13.3,4.5,24,4.5c5.2,0,10.1,2,13.8,5.7c3.7,3.7,5.7,8.6,5.7,13.8c0,10.7-8.7,19.5-19.5,19.5c-3.2,0-6.3-0.8-9.1-2.3	L5,43.8C5,43.8,4.9,43.8,4.9,43.8z"></path><path fill="#cfd8dc" d="M24,5c5.1,0,9.8,2,13.4,5.6C41,14.2,43,18.9,43,24c0,10.5-8.5,19-19,19h0c-3.2,0-6.3-0.8-9.1-2.3	L4.9,43.3l2.7-9.8C5.9,30.6,5,27.3,5,24C5,13.5,13.5,5,24,5 M24,43L24,43L24,43 M24,43L24,43L24,43 M24,4L24,4C13,4,4,13,4,24	c0,3.4,0.8,6.7,2.5,9.6L3.9,43c-0.1,0.3,0,0.7,0.3,1c0.2,0.2,0.4,0.3,0.7,0.3c0.1,0,0.2,0,0.3,0l9.7-2.5c2.8,1.5,6,2.2,9.2,2.2	c11,0,20-9,20-20c0-5.3-2.1-10.4-5.8-14.1C34.4,6.1,29.4,4,24,4L24,4z"></path><path fill="#40c351" d="M35.2,12.8c-3-3-6.9-4.6-11.2-4.6C15.3,8.2,8.2,15.3,8.2,24c0,3,0.8,5.9,2.4,8.4L11,33l-1.6,5.8	l6-1.6l0.6,0.3c2.4,1.4,5.2,2.2,8,2.2h0c8.7,0,15.8-7.1,15.8-15.8C39.8,19.8,38.2,15.8,35.2,12.8z"></path><path fill="#fff" fill-rule="evenodd" d="M19.3,16c-0.4-0.8-0.7-0.8-1.1-0.8c-0.3,0-0.6,0-0.9,0	s-0.8,0.1-1.3,0.6c-0.4,0.5-1.7,1.6-1.7,4s1.7,4.6,1.9,4.9s3.3,5.3,8.1,7.2c4,1.6,4.8,1.3,5.7,1.2c0.9-0.1,2.8-1.1,3.2-2.3	c0.4-1.1,0.4-2.1,0.3-2.3c-0.1-0.2-0.4-0.3-0.9-0.6s-2.8-1.4-3.2-1.5c-0.4-0.2-0.8-0.2-1.1,0.2c-0.3,0.5-1.2,1.5-1.5,1.9	c-0.3,0.3-0.6,0.4-1,0.1c-0.5-0.2-2-0.7-3.8-2.4c-1.4-1.3-2.4-2.8-2.6-3.3c-0.3-0.5,0-0.7,0.2-1c0.2-0.2,0.5-0.6,0.7-0.8	c0.2-0.3,0.3-0.5,0.5-0.8c0.2-0.3,0.1-0.6,0-0.8C20.6,19.3,19.7,17,19.3,16z" clip-rule="evenodd"></path>
+</svg>
+</div>
+
+<style>
+#floating-whatsapp {
+  position: fixed;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  z-index: 99999;
+  transition: transform 0.2s ease, left 0.2s ease, top 0.2s ease;
+  user-select: none;
+  background: transparent;
+}
+
+
+.pulse.delay1 { animation-delay: 0.5s; }
+.pulse.delay2 { animation-delay: 1s; }
+
+.pulse {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  border: 2px solid #a0d9b0; 
+  border-radius: 50%;
+  opacity: 0;
+  animation: pulseWave 2.5s infinite;
+}
+
+@keyframes pulseWave {
+  0% { transform: scale(1); opacity: 0.4; }  
+  70% { transform: scale(2); opacity: 0; }  
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+#floating-whatsapp svg {
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#floating-whatsapp:active {
+  transform: scale(0.95);
+}
+</style>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const icon = document.getElementById('floating-whatsapp');
+  const saved = JSON.parse(localStorage.getItem('whatsappPosition'));
+
+  let offsetX, offsetY, isDown = false, moved = false;
+  let startX, startY;
+  let overlay;
+
+  function getScrollbarWidth() {
+    return window.innerWidth - document.documentElement.clientWidth;
+  }
+
+  function setInitialPosition() {
+    const iconRect = icon.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const scrollbarWidth = getScrollbarWidth();
+
+    const iconWidth = iconRect.width;
+    const iconHeight = iconRect.height;
+
+    if (saved) {
+      let left = (windowWidth - iconWidth - scrollbarWidth) * saved.leftPercent / 100;
+      let top = (windowHeight - iconHeight) * saved.topPercent / 100;
+
+      left = Math.min(Math.max(left, 0), windowWidth - iconWidth - scrollbarWidth);
+      top = Math.min(Math.max(top, 0), windowHeight - iconHeight);
+
+      icon.style.left = left + 'px';
+      icon.style.top = top + 'px';
+
+    } else {
+      icon.style.left = (windowWidth - iconWidth - scrollbarWidth - 20) + 'px';
+      icon.style.top = (windowHeight - iconHeight - 150) + 'px';
+    }
+  }
+
+  setInitialPosition();
+  window.addEventListener('resize', setInitialPosition);
+
+  function startDrag(e) {
+    isDown = true;
+    moved = false;
+    icon.style.transition = 'none';
+
+    overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+      position: 'fixed', top: 0, left: 0,
+      width: '100vw', height: '100vh',
+      background: 'transparent',
+      zIndex: 9999
+    });
+    document.body.appendChild(overlay);
+
+    const rect = icon.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    offsetX = clientX - rect.left;
+    offsetY = clientY - rect.top;
+
+    startX = clientX;
+    startY = clientY;
+  }
+
+  function drag(e) {
+    if (!isDown) return;
+    e.preventDefault();
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const iconRect = icon.getBoundingClientRect();
+    const iconWidth = iconRect.width;
+    const iconHeight = iconRect.height;
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const scrollbarWidth = getScrollbarWidth();
+
+    let left = clientX - offsetX;
+    let top = clientY - offsetY;
+
+    left = Math.min(Math.max(left, 0), windowWidth - iconWidth - scrollbarWidth);
+    top = Math.min(Math.max(top, 0), windowHeight - iconHeight);
+
+    icon.style.left = left + 'px';
+    icon.style.top = top + 'px';
+
+    moved = true;
+  }
+
+  function endDrag(e) {
+    if (!isDown) return;
+    isDown = false;
+
+    const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+    const distance = Math.hypot(clientX - startX, clientY - startY);
+    if (distance < 5) moved = false;
+
+    const iconRect = icon.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const iconWidth = iconRect.width;
+    const scrollbarWidth = getScrollbarWidth();
+
+    if (iconRect.left + iconWidth / 2 < windowWidth / 2) {
+      icon.style.left = '0px';
+    } else {
+      icon.style.left = (windowWidth - iconWidth - scrollbarWidth) + 'px';
+    }
+
+    localStorage.setItem('whatsappPosition', JSON.stringify({
+      leftPercent: (parseFloat(icon.style.left) / (window.innerWidth - iconWidth - scrollbarWidth)) * 100,
+      topPercent: (parseFloat(icon.style.top) / (window.innerHeight - iconRect.height)) * 100
+    }));
+
+    if (overlay) overlay.remove();
+
+    icon.style.transition = 'transform 0.2s ease, left 0.2s ease, top 0.2s ease';
+  }
+
+  icon.addEventListener('mousedown', startDrag);
+  icon.addEventListener('touchstart', startDrag, { passive: false });
+
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('touchmove', drag, { passive: false });
+
+  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('touchend', endDrag);
+
+  icon.addEventListener('click', (e) => {
+    if (moved) return;
+
+    const phone = "{{ theme.phone_whatsapp }}";
+    const message = "{{ theme.message_whatsapp }}";
+
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+  });
+});
+</script>

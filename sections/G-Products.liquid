@@ -1,0 +1,159 @@
+{% comment %}
+  Category Carousel Section — Glamour Theme v2.4.5
+  ZID/Shopify-style "Shop by Category" header + auto-scrolling product carousel.
+  - Tenant picks ONE category (type: category) — ALL products in that category are loaded.
+  - JS fetches /api/products?category_id=X at runtime via category-carousel.js.
+  - Falls back to collections.featured placeholders when no category is selected.
+  - Buttons use data-gl-action — handled by glamour-pro.js event delegation.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign category_id = section.settings.category_id %}
+{% assign heading = section.settings.heading | default: 'Shop the Collection' %}
+{% assign heading_ar = section.settings.heading_ar | default: 'تسوق المجموعة' %}
+{% assign subtitle = section.settings.subtitle %}
+{% assign subtitle_ar = section.settings.subtitle_ar %}
+{% assign autoplay = section.settings.autoplay | default: true %}
+{% assign autoplay_speed = section.settings.autoplay_speed | default: 3000 %}
+{% assign show_dots = section.settings.show_dots | default: true %}
+{% assign show_arrows = section.settings.show_arrows | default: true %}
+{% assign view_all_label = translations.general.view_all | default: 'View All' %}
+{% assign add_to_cart_label = translations.product.add_to_cart | default: 'Add to Cart' %}
+{% assign add_to_wishlist_label = translations.product.add_to_wishlist | default: 'Add to Wishlist' %}
+{% assign remove_from_wishlist_label = translations.product.remove_from_wishlist | default: 'Remove from Wishlist' %}
+{% assign sale_label = translations.product.sale | default: 'Sale' %}
+{% assign new_label = translations.product.new | default: 'New' %}
+{% assign quick_view_label = translations.product.quick_view | default: 'Quick View' %}
+{% assign product_card_orientation = section.settings.product_card_orientation | default: 'vertical' %}
+{% if product_card_orientation != 'horizontal' %}
+  {% assign product_card_orientation = 'vertical' %}
+{% endif %}
+{% assign product_card_actions = section.settings.product_card_actions | default: 'view,addToCart,wishlist,compare' %}
+
+{% assign carousel_id = 'gl-cc-products' %}
+
+<section
+  class="gl-section gl-category-carousel"
+  style="{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %}{% if pad %}padding: {{ pad.top | default: 72 }}px {{ pad.right | default: 0 }}px {{ pad.bottom | default: 72 }}px {{ pad.left | default: 0 }}px;{% endif %}"
+  data-section="category-carousel"
+  data-carousel-id="{{ carousel_id }}"
+  data-category-id="{{ category_id }}"
+  data-products-url="{{ api_routes.products_index }}"
+  data-product-card-html-url="{{ api_routes.product_card_html }}"
+  data-product-card-orientation="{{ product_card_orientation }}"
+  data-product-card-actions="{{ product_card_actions }}"
+  data-autoplay="{{ autoplay }}"
+  data-autoplay-speed="{{ autoplay_speed }}"
+  data-is-rtl="{{ is_rtl }}"
+  data-add-to-cart-url="{{ api_routes.cart_store }}"
+  data-wishlist-url="{{ api_routes.wishlist_store }}"
+  data-wishlist-index-url="{{ api_routes.wishlist_index }}"
+  data-compare-url="{{ api_routes.compare_store }}"
+  data-compare-index-url="{{ api_routes.compare_index }}"
+  data-compare-destroy-url="{{ api_routes.compare_destroy }}"
+  data-login-url="{{ api_routes.customer_login | default: '/customer/login' }}"
+  data-add-to-cart-label="{{ add_to_cart_label }}"
+  data-add-to-wishlist-label="{{ add_to_wishlist_label }}"
+  data-remove-from-wishlist-label="{{ remove_from_wishlist_label }}"
+  data-add-to-compare-label="{{ translations.product.add_to_compare | default: 'Add to Compare' }}"
+  data-remove-from-compare-label="{{ translations.product.remove_from_compare | default: 'Remove from Compare' }}"
+  data-sale-label="{{ sale_label }}"
+  data-new-label="{{ new_label }}"
+  data-quick-view-label="{{ quick_view_label }}"
+>
+  <div class="gl-container">
+    {% render 'G-Header-section',
+      main_title_en: section.settings.heading,
+      main_title_ar: section.settings.heading_ar,
+      title_bg: section.settings.heading_bg,
+      main_title_color: section.settings.heading_color,
+      is_rtl: is_rtl
+    %}
+    <div class="gl-category-carousel-header">
+      <div class="gl-category-carousel-header-text">
+        <h2 class="gl-category-carousel-title">
+          {% if is_rtl and heading_ar != blank %}{{ heading_ar }}{% else %}{{ heading }}{% endif %}
+        </h2>
+        {% if subtitle != blank or subtitle_ar != blank %}
+          <p class="gl-category-carousel-subtitle">
+            {% if is_rtl and subtitle_ar != blank -%}
+              {{- subtitle_ar -}}
+            {%- elsif subtitle != blank -%}
+              {{- subtitle -}}
+            {%- endif %}
+          </p>
+        {% endif %}
+      </div>
+      {% if category_id != blank and category_id != 0 %}
+        <a
+          href="/search?category_id={{ category_id }}"
+          class="gl-btn gl-btn-outline gl-category-carousel-viewall"
+        >
+          {{ view_all_label }}
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            style="{% if is_rtl %}transform:scaleX(-1);{% endif %}"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      {% endif %}
+    </div>
+
+    {% comment %} Track — populated by JS; skeleton cards shown only until hydration completes {% endcomment %}
+    <div class="gl-cc-viewport" style="overflow:hidden;position:relative;">
+      <div
+        class="gl-cc-track"
+        id="{{ carousel_id }}-track"
+        style="display:flex;gap:1.25rem;transition:transform .4s cubic-bezier(.25,.46,.45,.94);will-change:transform;"
+      >
+        {% for i in (1..5) %}
+          <div class="gl-cc-card" style="flex:0 0 calc(25% - 1rem);min-width:200px;">
+            {% render 'product-card',
+              product_card_loading: true,
+              product_card_orientation: product_card_orientation,
+              product_card_actions: product_card_actions,
+              theme: theme,
+              shop: shop
+            %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% comment %} Navigation — shown/hidden by CSS based on settings {% endcomment %}
+    {% if show_arrows %}
+      <button
+        class="gl-cc-arrow gl-cc-arrow-prev"
+        aria-label="Previous"
+        data-carousel="{{ carousel_id }}"
+        data-dir="prev"
+        style="{% unless show_arrows %}display:none{% endunless %}"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <button
+        class="gl-cc-arrow gl-cc-arrow-next"
+        aria-label="Next"
+        data-carousel="{{ carousel_id }}"
+        data-dir="next"
+        style="{% unless show_arrows %}display:none{% endunless %}"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    {% endif %}
+
+    {% if show_dots %}
+      <div class="gl-cc-dots" id="{{ carousel_id }}-dots"></div>
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,619 @@
+{% comment %}
+  Header Section — Glamour Theme v2.1
+  Main site navigation, logo, and utilities.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign is_sticky = section.settings.sticky  %}
+{% assign show_search = section.settings.search_enabled  %}
+{% assign show_cart = section.settings.cart_enabled  %}
+{% assign show_announcement = section.settings.show_announcement  %}
+{% assign show_fav = section.settings.show_fav  %}
+{% assign cart_items_count = cart.items_count | default: 0 %}
+{% assign wishlist_items_count = wishlist.items_count | default: 0 %}
+{% assign header_menu = section.menu %}
+
+
+{% if header_menu == blank %}
+  {% assign header_menu = menus.main %}
+{% endif %}
+
+
+
+{% if show_announcement and section.settings.announcement_text != blank %}
+<div class="gl-announcement" dir="rtl">
+  <div class="gl-announcement-wrapper">
+    {% assign repeat = 12 %}
+    {% for i in (1..repeat) %}
+      <div class="gl-announcement-content">
+        <span class="gl-announcement-text">
+          {% if is_rtl %}
+            {{ section.settings.announcement_text_ar }}
+          {% else %}
+            {{ section.settings.announcement_text }}
+          {% endif %}
+        </span>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+
+<div class="top-header">
+  <div class="gl-container top-header-inner">
+    <div class="contact-info">
+      <span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4.36675 15.1667C5.12008 15.1667 5.91341 14.9867 6.73341 14.64C7.53341 14.3 8.34008 13.8334 9.12675 13.2667C9.90675 12.6934 10.6601 12.0534 11.3734 11.3534C12.0801 10.64 12.7201 9.88671 13.2867 9.11337C13.8601 8.31337 14.3201 7.51337 14.6467 6.74004C14.9934 5.91337 15.1667 5.11337 15.1667 4.36004C15.1667 3.84004 15.0734 3.34671 14.8934 2.88671C14.7067 2.41337 14.4067 1.97337 14.0001 1.59337C13.4867 1.08671 12.9001 0.833374 12.2734 0.833374C12.0134 0.833374 11.7467 0.893374 11.5201 1.00004C11.2601 1.12004 11.0401 1.30004 10.8801 1.54004L9.33341 3.72004C9.19341 3.91337 9.08675 4.10004 9.01341 4.28671C8.92675 4.48671 8.88008 4.68671 8.88008 4.88004C8.88008 5.13337 8.95341 5.38004 9.09341 5.61337C9.19341 5.79337 9.34675 5.98671 9.54008 6.18004L9.99341 6.65337C9.98675 6.67337 9.98008 6.68671 9.97341 6.70004C9.89341 6.84004 9.73341 7.08004 9.42675 7.44004C9.10008 7.81337 8.79341 8.15337 8.48675 8.46671C8.09341 8.85337 7.76675 9.16004 7.46008 9.41337C7.08008 9.73337 6.83341 9.89337 6.68675 9.96671L6.70008 10L6.21341 9.52004C6.00675 9.31337 5.80675 9.16004 5.61341 9.06004C5.24675 8.83337 4.78008 8.79337 4.31341 8.98671C4.14008 9.06004 3.95341 9.16004 3.75341 9.30004L1.54008 10.8734C1.29341 11.04 1.11341 11.2534 1.00675 11.5067C0.906748 11.76 0.860082 11.9934 0.860082 12.2267C0.860082 12.5467 0.933414 12.8667 1.07341 13.1667C1.21342 13.4667 1.38675 13.7267 1.60675 13.9667C1.98675 14.3867 2.40008 14.6867 2.88008 14.88C3.34008 15.0667 3.84008 15.1667 4.36675 15.1667ZM12.2734 1.83337C12.6401 1.83337 12.9801 1.99337 13.3067 2.31337C13.6134 2.60004 13.8267 2.91337 13.9601 3.25337C14.1001 3.60004 14.1667 3.96671 14.1667 4.36004C14.1667 4.98004 14.0201 5.65337 13.7267 6.34671C13.4267 7.05337 13.0067 7.78671 12.4734 8.52004C11.9401 9.25337 11.3334 9.96671 10.6667 10.64C10.0001 11.3 9.28008 11.9134 8.54008 12.4534C7.82008 12.98 7.08008 13.4067 6.34675 13.7134C5.20675 14.2 4.14008 14.3134 3.26008 13.9467C2.92008 13.8067 2.62008 13.5934 2.34675 13.2867C2.19341 13.12 2.07341 12.94 1.97341 12.7267C1.89341 12.56 1.85341 12.3867 1.85341 12.2134C1.85341 12.1067 1.87341 12 1.92675 11.88C1.94675 11.84 1.98675 11.7667 2.11341 11.68L4.32675 10.1067C4.46008 10.0134 4.58008 9.94671 4.69341 9.90004C4.84008 9.84004 4.90008 9.78004 5.12675 9.92004C5.26008 9.98671 5.38008 10.0867 5.51341 10.22L6.02008 10.72C6.28008 10.9734 6.68008 11.0334 6.98675 10.92L7.16675 10.84C7.44008 10.6934 7.76008 10.4667 8.11341 10.1667C8.43341 9.89337 8.78008 9.57337 9.20008 9.16004C9.52675 8.82671 9.85341 8.47337 10.1934 8.08004C10.5067 7.71337 10.7334 7.40004 10.8734 7.14004L10.9534 6.94004C10.9934 6.78671 11.0067 6.70004 11.0067 6.60671C11.0067 6.36671 10.9201 6.15337 10.7534 5.98671L10.2534 5.46671C10.1201 5.33337 10.0201 5.20671 9.95341 5.09337C9.90008 5.00671 9.88008 4.93337 9.88008 4.86671C9.88008 4.81337 9.90008 4.73337 9.93341 4.65337C9.98008 4.54671 10.0534 4.42671 10.1467 4.30004L11.6934 2.11337C11.7601 2.02004 11.8401 1.95337 11.9401 1.90671C12.0467 1.86004 12.1601 1.83337 12.2734 1.83337ZM6.70008 10.0067L6.80675 10.46L6.62675 9.99337C6.66008 9.98671 6.68675 9.99337 6.70008 10.0067Z" fill="#FFDBAA"/>
+          <path d="M3.66667 6.49996C3.94 6.49996 4.16667 6.27329 4.16667 5.99996C4.16667 5.75996 4.40667 5.25996 4.80667 4.83329C5.2 4.41329 5.63333 4.16663 6 4.16663C6.27333 4.16663 6.5 3.93996 6.5 3.66663C6.5 3.39329 6.27333 3.16663 6 3.16663C5.35333 3.16663 4.67333 3.51329 4.08 4.14663C3.52667 4.73996 3.16667 5.46663 3.16667 5.99996C3.16667 6.27329 3.39333 6.49996 3.66667 6.49996Z" fill="#FFDBAA"/>
+          <path d="M1.33333 6.50004C1.60667 6.50004 1.83333 6.27337 1.83333 6.00004C1.83333 3.70004 3.7 1.83337 6 1.83337C6.27333 1.83337 6.5 1.60671 6.5 1.33337C6.5 1.06004 6.27333 0.833374 6 0.833374C3.15333 0.833374 0.833333 3.15337 0.833333 6.00004C0.833333 6.27337 1.06 6.50004 1.33333 6.50004Z" fill="#FFDBAA"/>
+        </svg>
+        <a class="phone" href="tel:{{section.settings.store_phone}}">
+          {{ section.settings.store_phone }}
+          </a>
+          </span>
+      <span>|</span>
+      <span>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13.3184 11.7769H2.45257C1.80229 11.7761 1.17889 11.5173 0.719115 11.0575C0.259339 10.5976 0.00072575 9.97417 0 9.32389V2.45257C0.000725985 1.80233 0.259354 1.17893 0.719143 0.719144C1.17893 0.259354 1.80233 0.000725985 2.45257 0H13.3184C13.9687 0.00072575 14.5921 0.25934 15.052 0.719116C15.5119 1.17889 15.7706 1.80229 15.7714 2.45257V9.32389C15.7707 9.97425 15.512 10.5978 15.0522 11.0576C14.5923 11.5175 13.9688 11.7762 13.3184 11.7769ZM2.45257 1.14286C2.10532 1.14322 1.7724 1.28132 1.52686 1.52686C1.28132 1.77241 1.14322 2.10533 1.14286 2.45257V9.32389C1.1431 9.67121 1.28115 10.0042 1.5267 10.2499C1.77226 10.4955 2.10525 10.6337 2.45257 10.6341H13.3184C13.6658 10.6337 13.9988 10.4955 14.2444 10.2499C14.4901 10.0043 14.6282 9.67125 14.6286 9.32389V2.45257C14.6281 2.10528 14.4899 1.77236 14.2443 1.52684C13.9987 1.28131 13.6657 1.14322 13.3184 1.14286H2.45257Z" fill="#FFDBAA"/>
+          <path d="M7.87856 7.42634C7.39911 7.43106 6.93207 7.27404 6.55285 6.98063L0.441765 2.11069C0.323251 2.01618 0.247134 1.87846 0.230159 1.72783C0.213185 1.5772 0.256742 1.426 0.35125 1.30749C0.445758 1.18897 0.583475 1.11286 0.734104 1.09588C0.884734 1.07891 1.03594 1.12247 1.15445 1.21697L7.26371 6.08692C7.44418 6.21492 7.6601 6.28341 7.88136 6.28284C8.10262 6.28227 8.31819 6.21266 8.49799 6.08372L14.5318 1.21926C14.6497 1.12414 14.8006 1.07976 14.9512 1.09588C15.1018 1.112 15.2399 1.18729 15.335 1.3052C15.4301 1.42311 15.4745 1.57397 15.4584 1.7246C15.4423 1.87523 15.367 2.01329 15.2491 2.1084L9.21708 6.97286C8.83524 7.27144 8.36325 7.43135 7.87856 7.42634Z" fill="#FFDBAA"/>
+        </svg>
+        <a class="mail" href="mailto:{{section.settings.store_email}}">
+          {{ section.settings.store_email }}
+          </a>
+          </span>
+    </div>
+    <div class="">
+        <div class="gl-lang-dropdown">
+            <button class="gl-lang-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+                {% if shop.locale == 'ar' %}
+                    عربي
+                {% else %}
+                    EN
+                {% endif %}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            <div class="gl-lang-dropdown-menu">
+                <a href="?locale=en" class="gl-lang-dropdown-item {% if shop.locale == 'en' %}active{% endif %}">
+                    EN
+                    {% if shop.locale == 'en' %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    {% endif %}
+                </a>
+                <a href="?locale=ar" class="gl-lang-dropdown-item {% if shop.locale == 'ar' %}active{% endif %}">
+                    عربي
+                    {% if shop.locale == 'ar' %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+<header class="gl-header {% if is_sticky %}gl-header-sticky{% endif %}">
+  <div class="gl-container">
+    <div class="gl-header-inner">
+      <!-- Mobile Menu Toggle -->
+      <div class="mobile-menu-header">
+        <button class="gl-menu-toggle" aria-label="Toggle Menu"><span></span><span></span><span></span></button>
+          <!-- Logo -->
+      <a href="/" class="gl-logo-mobile">
+        {% assign _logo_src = section.settings.store_logo | default: theme.store_logo %}
+        {% if _logo_src != blank %}
+          <img
+            src="{{ _logo_src }}"
+            alt="{{ section.settings.store_name | default: theme.store_name | default: shop.name }}"
+            class="gl-logo-img"
+          >
+        {% else %}
+          <span class="gl-logo-text">
+            {% if is_rtl %}
+              {{ section.settings.store_name_ar | default: theme.store_name_ar | default: shop.name }}
+            {% else %}
+              {{ section.settings.store_name | default: theme.store_name | default: shop.name }}
+            {% endif %}
+          </span>
+        {% endif %}
+      </a>
+      </div>
+
+      <!-- Logo -->
+      <a href="/" class="gl-logo">
+        {% assign _logo_src = section.settings.store_logo | default: theme.store_logo %}
+        {% if _logo_src != blank %}
+          <img
+            src="{{ _logo_src }}"
+            alt="{{ section.settings.store_name | default: theme.store_name | default: shop.name }}"
+            class="gl-logo-img"
+          >
+        {% else %}
+          <span class="gl-logo-text">
+            {% if is_rtl %}
+              {{ section.settings.store_name_ar | default: theme.store_name_ar | default: shop.name }}
+            {% else %}
+              {{ section.settings.store_name | default: theme.store_name | default: shop.name }}
+            {% endif %}
+          </span>
+        {% endif %}
+      </a>
+
+           <!-- Desktop Navigation -->
+      <nav class="gl-nav">
+        <ul class="gl-nav-list">
+          {% for item in header_menu %}
+            <li class="gl-nav-item {% if item.children.size > 0 %}gl-nav-has-children{% endif %}">
+              <a
+                href="{{ item.url }}"
+                class="gl-nav-link {% if item.active %}active{% endif %}"
+                {% if item.new_tab %}
+                  target="_blank" rel="noopener"
+                {% endif %}
+              >
+                {{ item.title }}
+                {% if item.children.size > 0 %}
+                  <svg
+                    class="gl-nav-chevron"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                {% endif %}
+              </a>
+              {% if item.children.size > 0 %}
+                <ul class="gl-nav-dropdown">
+                  {% for child in item.children %}
+                    <li>
+                      <a
+                        href="{{ child.url }}"
+                        class="gl-nav-dropdown-link"
+                        {% if child.new_tab %}
+                          target="_blank" rel="noopener"
+                        {% endif %}
+                      >
+                        {{- child.title -}}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+
+      <!-- Utility Actions -->
+      <div class="gl-header-actions">
+        {% if show_search %}
+          <button class="gl-header-action-btn" aria-label="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        {% endif %}
+
+    
+
+        {% if show_fav %}
+          <a
+            href="{{ api_routes.customer_login | default: '/customer/login' }}"
+            class="gl-header-action-btn gl-cart-btn"
+            aria-label="favorite"
+            data-gl-auth-href
+            data-auth-href-guest="{{ api_routes.customer_login | default: '/customer/login' }}"
+            data-auth-href-auth="{{ api_routes.customer_wishlist | default: '/customer/account/wishlist' }}"
+          >
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path d="M12.62 20.81C12.28 20.93 11.72 20.93 11.38 20.81C8.48 19.82 2 15.69 2 8.68998C2 5.59998 4.49 3.09998 7.56 3.09998C9.38 3.09998 10.99 3.97998 12 5.33998C13.01 3.97998 14.63 3.09998 16.44 3.09998C19.51 3.09998 22 5.59998 22 8.68998C22 15.69 15.52 19.82 12.62 20.81Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span
+              class="gl-cart-count"
+              data-wishlist-count
+              {% if wishlist_items_count == 0 %}
+                style="display:none;"
+              {% endif %}
+            >
+              {{- wishlist_items_count -}}
+            </span>
+          </a>
+        {% endif %}
+        {% if show_cart %}
+          <a href="/checkout/cart" class="gl-header-action-btn gl-cart-btn" aria-label="Cart">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span
+              class="gl-cart-count"
+              data-cart-count
+              {% if cart_items_count == 0 %}
+                style="display:none;"
+              {% endif %}
+            >
+              {{- cart_items_count -}}
+            </span>
+          </a>
+        {% endif %}
+        <div class="user-dropdown-wrapper">
+          <button type="button" class="user-dropdown-toggle" aria-label="User menu">
+            <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 26.6667C24 24.5449 23.1571 22.5101 21.6568 21.0098C20.1565 19.5095 18.1217 18.6667 16 18.6667M16 18.6667C13.8782 18.6667 11.8434 19.5095 10.3431 21.0098C8.84281 22.5101 7.99996 24.5449 7.99996 26.6667M16 18.6667C18.9455 18.6667 21.3333 16.2788 21.3333 13.3333C21.3333 10.3878 18.9455 7.99999 16 7.99999C13.0544 7.99999 10.6666 10.3878 10.6666 13.3333C10.6666 16.2788 13.0544 18.6667 16 18.6667ZM29.3333 16C29.3333 23.3638 23.3638 29.3333 16 29.3333C8.63616 29.3333 2.66663 23.3638 2.66663 16C2.66663 8.63619 8.63616 2.66666 16 2.66666C23.3638 2.66666 29.3333 8.63619 29.3333 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="user-dropdown-menu" data-gl-auth-menu>
+            <div class="p-5 !p-0" data-gl-auth-guest>
+              <div class="grid gap-2.5 p-5 pb-0">
+                <p class="text-xl font-dmserif">
+                  {% if shop.locale == 'ar' %}مرحباً{% else %}Welcome{% endif %}
+                </p>
+                <p class="text-sm">
+                  {% if shop.locale == 'ar' %}سجل الدخول لإدارة السلة، الطلبات وقائمة الرغبات{% else %}Sign in to manage cart, orders and wishlist{% endif %}
+                </p>
+              </div>
+              <p class="w-full mt-3 border border-zinc-200"></p>
+              <div class="mt-2.5 grid gap-1 pb-2.5">
+                <a class="px-5 py-2 text-base cursor-pointer hover:bg-gray-100" href="{{ api_routes.customer_login | default: '/customer/login' }}">
+                  {% if shop.locale == 'ar' %}تسجيل الدخول{% else %}Login{% endif %}
+                </a>
+                <a class="px-5 py-2 text-base cursor-pointer hover:bg-gray-100" href="{{ api_routes.customer_register | default: '/customer/register' }}">
+                  {% if shop.locale == 'ar' %}إنشاء حساب{% else %}Register{% endif %}
+                </a>
+              </div>
+            </div>
+            <div class="p-5 !p-0" data-gl-auth-customer style="display:none;">
+              <div class="grid gap-2.5 p-5 pb-0">
+                <p class="text-xl font-dmserif">
+                  {% if shop.locale == 'ar' %}مرحباً{% else %}Welcome{% endif %}<span data-gl-auth-customer-name></span>
+                </p>
+                <p class="text-sm">
+                  {% if shop.locale == 'ar' %}إدارة السلة، الطلبات وقائمة الرغبات{% else %}Manage cart, orders and wishlist{% endif %}
+                </p>
+              </div>
+              <p class="w-full mt-3 border border-zinc-200"></p>
+              <div class="mt-2.5 grid gap-1 pb-2.5">
+                <a class="px-5 py-2 text-base cursor-pointer hover:bg-gray-100" href="{{ api_routes.customer_profile | default: '/customer/account/profile' }}">
+                  {% if shop.locale == 'ar' %}الملف الشخصي{% else %}Profile{% endif %}
+                </a>
+                <a class="px-5 py-2 text-base cursor-pointer hover:bg-gray-100" href="{{ api_routes.customer_orders | default: '/customer/account/orders' }}">
+                  {% if shop.locale == 'ar' %}الطلبات{% else %}Orders{% endif %}
+                </a>
+                <a class="px-5 py-2 text-base cursor-pointer hover:bg-gray-100" href="{{ api_routes.customer_wishlist | default: '/customer/account/wishlist' }}">
+                  {% if shop.locale == 'ar' %}قائمة الرغبات{% else %}Wishlist{% endif %}
+                </a>
+                <a class="px-5 py-2 text-base cursor-pointer hover:bg-gray-100" href="{{ api_routes.customer_logout | default: '/customer/logout' }}" onclick="event.preventDefault(); document.getElementById('customerLogout').submit();">
+                  {% if shop.locale == 'ar' %}تسجيل الخروج{% else %}Logout{% endif %}
+                </a>
+                <form id="customerLogout" method="POST" action="{{ api_routes.customer_logout | default: '/customer/logout' }}" style="display:none;">
+                  <input type="hidden" name="_token" value="{{ csrf_token }}">
+                  <input type="hidden" name="_method" value="DELETE">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="gl-mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+<div class="gl-mobile-menu" id="mobileMenu">
+       <a href="/" class="">
+        {% assign _logo_src = theme.store_logo %}
+        {% if _logo_src != blank %}
+          <img
+            src="{{ _logo_src }}"
+            alt="{{ theme.store_name | default: shop.name }}"
+            class="gl-logo-img"
+          >
+        {% else %}
+          <span class="gl-logo-text">
+            {% if request.is_rtl %}
+              {{ theme.store_name_ar | default: shop.name }}
+            {% else %}
+              {{ theme.store_name | default: shop.name }}
+            {% endif %}
+          </span>
+        {% endif %}
+      </a>
+      <button class="gl-mobile-menu-close" aria-label="Close menu">✕</button>
+      <nav class="gl-mobile-menu-nav">
+        {% for item in menus.main %}
+          <div class="gl-mobile-nav-item">
+            <a
+              href="{{ item.url }}"
+              class="gl-mobile-nav-link"
+              {% if item.new_tab %}
+                target="_blank" rel="noopener"
+              {% endif %}
+            >
+              {{- item.title -}}
+            </a>
+            {% if item.children.size > 0 %}
+              <div class="gl-mobile-submenu">
+                {% for child in item.children %}
+                  <a
+                    href="{{ child.url }}"
+                    class="gl-mobile-submenu-link"
+                    {% if child.new_tab %}
+                      target="_blank" rel="noopener"
+                    {% endif %}
+                  >
+                    {{- child.title -}}
+                  </a>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </nav>
+      <!-- Language switcher in mobile -->
+     <div class="">
+        <div class="gl-lang-dropdown">
+            <button class="gl-lang-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+                {% if shop.locale == 'ar' %}
+                    عربي
+                {% else %}
+                    EN
+                {% endif %}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            <div class="gl-lang-dropdown-menu">
+                <a href="?locale=en" class="gl-lang-dropdown-item {% if shop.locale == 'en' %}active{% endif %}">
+                    EN
+                    {% if shop.locale == 'en' %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    {% endif %}
+                </a>
+                <a href="?locale=ar" class="gl-lang-dropdown-item {% if shop.locale == 'ar' %}active{% endif %}">
+                    عربي
+                    {% if shop.locale == 'ar' %}
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+    </div>
+
+<!-- Search Popup -->
+<div id="gl-search-popup" class="gl-search-popup" style="display: none;">
+  <div class="gl-search-popup-overlay" onclick="closeSearchPopup()"></div>
+  <div class="gl-search-popup-content">
+    <div class="header-wrapper" >
+      <section class="gl-toolbar-search" id="gl-product-search-form" role="search">
+        <input
+          type="search"
+          id="gl-product-search"
+          class="gl-product-search-input"
+          value="{{ search.query | default: request.query.query | escape }}"
+          placeholder="{{ translations.category.search_products | default: 'Search for' }}"
+          autocomplete="off"
+        >
+      </section>
+      <div class="gl-search-popup-header">
+        <button class="gl-search-popup-close" onclick="closeSearchPopup()" aria-label="Close search">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="gl-search-results" class="gl-search-results" style="display: none;">
+      <div class="gl-search-results-header">
+        <span class="gl-search-results-count"></span>
+      </div>
+      <div class="gl-search-results-list" id="gl-search-results-list">
+        <!-- Search results will be inserted here -->
+      </div>
+      <div class="gl-search-results-footer">
+        <a href="#" class="gl-search-view-all" id="gl-search-view-all">
+          {% if shop.locale == 'ar' %}عرض جميع النتائج{% else %}View all results{% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let searchTimeout;
+let currentSearchQuery = '';
+
+function openSearchPopup() {
+  const popup = document.getElementById('gl-search-popup');
+  const searchInput = document.getElementById('gl-product-search');
+  popup.style.display = 'flex';
+  setTimeout(() => {
+    popup.classList.add('active');
+    searchInput.focus();
+  }, 10);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSearchPopup() {
+  const popup = document.getElementById('gl-search-popup');
+  popup.classList.remove('active');
+  setTimeout(() => {
+    popup.style.display = 'none';
+    clearSearchResults();
+  }, 300);
+  document.body.style.overflow = '';
+}
+
+function clearSearchResults() {
+  const resultsContainer = document.getElementById('gl-search-results');
+  const resultsList = document.getElementById('gl-search-results-list');
+  const searchInput = document.getElementById('gl-product-search');
+  
+  resultsContainer.style.display = 'none';
+  resultsList.innerHTML = '';
+  searchInput.value = '';
+  currentSearchQuery = '';
+}
+
+function performSearch(query) {
+  // Trim whitespace and check if query has actual content
+  const trimmedQuery = query.trim();
+  
+  if (!trimmedQuery || trimmedQuery.length < 2) {
+    hideSearchResults();
+    return;
+  }
+
+  // Show loading state
+  showSearchLoading();
+
+  // Clear previous timeout
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+
+  // Debounce search
+  searchTimeout = setTimeout(async () => {
+    try {
+      // Use the theme's API routes for products
+      const apiProductsUrl = '{{ api_routes.products_index }}';
+      const response = await fetch(`${apiProductsUrl}?query=${encodeURIComponent(trimmedQuery)}&limit=5`);
+      
+      if (!response.ok) {
+        throw new Error('Search failed');
+      }
+      
+      const data = await response.json();
+      
+      // Debug: Log the API response structure
+      console.log('Search API Response:', data);
+      
+      // Transform API data to match expected format
+      const products = data.data || data.products || data || [];
+      const results = products.map(product => {
+        const mappedProduct = {
+          id: product.id,
+          name: product.name || product.title || product.name,
+          price: product.price ? (product.formatted_price || `${product.currency || ''}${product.price}`) : 'Price not available',
+          image: product.image || product.featured_image || product.base_image?.small_image_url || '/placeholder-product.jpg',
+          url: product.url_key || product.url || product.product_url || product.permalink
+        };
+        
+        // Debug: Log each mapped product
+        console.log('Mapped Product:', mappedProduct);
+        
+        return mappedProduct;
+      });
+      
+      displaySearchResults(results, trimmedQuery);
+    } catch (error) {
+      console.error('Search error:', error);
+      // Show error state
+      displaySearchResults([], trimmedQuery);
+    }
+  }, 300);
+}
+
+function showSearchLoading() {
+  const resultsContainer = document.getElementById('gl-search-results');
+  const resultsList = document.getElementById('gl-search-results-list');
+  const resultsCount = document.querySelector('.gl-search-results-count');
+  
+  resultsContainer.style.display = 'block';
+  resultsCount.textContent = '{% if shop.locale == "ar" %}جاري البحث...{% else %}Searching...{% endif %}';
+  resultsList.innerHTML = '<div class="gl-search-loading"><div class="gl-spinner"></div></div>';
+}
+
+function displaySearchResults(results, query) {
+  const resultsContainer = document.getElementById('gl-search-results');
+  const resultsList = document.getElementById('gl-search-results-list');
+  const resultsCount = document.querySelector('.gl-search-results-count');
+  const viewAllLink = document.getElementById('gl-search-view-all');
+  
+  currentSearchQuery = query;
+  
+  if (results.length === 0) {
+    resultsCount.textContent = '{% if shop.locale == "ar" %}لا توجد نتائج{% else %}No results found{% endif %}';
+    resultsList.innerHTML = '<div class="gl-search-no-results">{% if shop.locale == "ar" %}لا توجد منتجات مطابقة لبحثك{% else %}No products match your search{% endif %}</div>';
+    viewAllLink.style.display = 'none';
+  } else {
+    const resultText = results.length === 1 
+      ? '{% if shop.locale == "ar" %}نتيجة واحدة{% else %}1 result{% endif %}'
+      : `{% if shop.locale == "ar" %}${results.length} نتائج{% else %}${results.length} results{% endif %}`;
+    resultsCount.textContent = resultText;
+    
+    let resultsHTML = '';
+    results.forEach(product => {
+      resultsHTML += `
+        <div class="gl-search-result-item">
+          <div class="gl-search-result-image">
+            <img src="${product.image}" alt="${product.name}" loading="lazy">
+          </div>
+          <div class="gl-search-result-info">
+            <h4 class="gl-search-result-name">${product.name}</h4>
+            <p class="gl-search-result-price">${product.price}</p>
+          </div>
+          <a href="/${product.url}" class="gl-search-result-link"></a>
+        </div>
+      `;
+    });
+    
+    resultsList.innerHTML = resultsHTML;
+    viewAllLink.style.display = 'block';
+    viewAllLink.href = '/';
+  }
+  
+  resultsContainer.style.display = 'block';
+}
+
+function hideSearchResults() {
+  const resultsContainer = document.getElementById('gl-search-results');
+  resultsContainer.style.display = 'none';
+}
+
+// Add click event to search button
+document.addEventListener('DOMContentLoaded', function() {
+  const searchBtn = document.querySelector('.gl-header-action-btn[aria-label="Search"]');
+  const searchInput = document.getElementById('gl-product-search');
+  
+  if (searchBtn) {
+    searchBtn.addEventListener('click', openSearchPopup);
+  }
+  
+  if (searchInput) {
+    // Handle search input
+    searchInput.addEventListener('input', function(e) {
+      performSearch(e.target.value);
+    });
+    
+    // Handle form submission
+    document.getElementById('gl-product-search-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const query = searchInput.value.trim();
+      if (query) {
+        window.location.href = `{{ api_routes.products_index }}?search=${encodeURIComponent(query)}`;
+      }
+    });
+  }
+  
+  // Close popup on ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeSearchPopup();
+    }
+  });
+});
+</script> 

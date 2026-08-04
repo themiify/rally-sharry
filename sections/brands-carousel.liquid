@@ -1,0 +1,87 @@
+{% comment %}
+  Brands Carousel Section — Glamour Theme v2.1
+  A seamlessly scrolling marquee showcasing brand logos.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign scroll_speed = section.settings.scroll_speed | default: 30 %}
+{% assign brands = section.settings.brands %}
+
+
+<section
+  data-sal="zoom-in"
+  data-sal-duration="600"
+  data-sal-delay="{{ forloop.index0 | times: 60 }}"
+  class=" gl-brands-section"
+  style="
+    {% assign bg_image = section.settings.bg_image_ar %}
+    {% if request.is_rtl and section.settings.bg_image_ar != blank %}
+      {% assign bg_image = section.settings.bg_image_ar %}
+    {% endif %}
+    {% if bg_image != blank %}
+      background-image: url('{{ bg_image }}');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    {% endif %}
+  "
+>
+  <div class="gl-container">
+
+    <div class="brands-marquee">
+      <div class="brands-track" style="--scroll-speed: {{ scroll_speed }}s;">
+
+        {% for brand in brands %}
+          {% assign brand_name    = brand.name    | default: 'Brand' %}
+          {% assign brand_name_ar = brand.name_ar | default: brand_name %}
+          {% assign display_name  = brand_name %}
+          {% if is_rtl %}{% assign display_name = brand_name_ar %}{% endif %}
+
+          {% assign brand_logo = brand.logo %}
+          {% if is_rtl and brand.logo_ar != blank %}
+            {% assign brand_logo = brand.logo_ar %}
+          {% endif %}
+
+          <div class="brand-item">
+            {% if brand_logo != blank %}
+              {% if brand_logo contains 'http' %}
+                <img
+                  src="{{ brand_logo }}"
+                  alt="{{ display_name }}"
+                  width="160"
+                  height="80"
+                  loading="lazy"
+                  onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';"
+                >
+              {% else %}
+                <img
+                  src="{{ brand_logo | image_url: width: 320 }}"
+                  alt="{{ display_name }}"
+                  width="160"
+                  height="80"
+                  loading="lazy"
+                  onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';"
+                >
+              {% endif %}
+              <span class="brand-fallback" style="display:none;">{{ display_name }}</span>
+            {% else %}
+              <span class="brand-fallback">{{ display_name }}</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function() {
+  const track = document.querySelector('.brands-track');
+  if (track) {
+    const content = track.innerHTML;
+    track.innerHTML = content + content;
+  }
+})();
+</script>
