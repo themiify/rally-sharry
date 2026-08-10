@@ -35,9 +35,6 @@
     transition: transform 0.3s ease;
 }
 
-.gl-product-card-vertical-custom:hover .gl-product-card-image img {
-    transform: scale(1.1);
-}
 
 /* Brand Logo - Top Right */
 .gl-product-card-vertical-custom .gl-product-card-brand-logo {
