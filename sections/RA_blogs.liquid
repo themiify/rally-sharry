@@ -86,32 +86,41 @@
 </section>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  function initRablogSwiper() {
     const sectionEl = document.querySelector('.rablog-{{ section.id }}');
     if (!sectionEl) return;
 
     const swiperEl = sectionEl.querySelector('.rablog-swiper');
-    if (!swiperEl) return;
+    if (!swiperEl || typeof Swiper === 'undefined') return;
+
+    if (swiperEl.swiper) return;
 
     const isAutoplay = {{ c.is_autoplay | json }};
 
     new Swiper(swiperEl, {
-      slidesPerView: 2,
-      spaceBetween: 15,
+      slidesPerView: 1.2,
+      spaceBetween: 16,
       loop: true,
-      initialSlide: 2,
-      centeredSlides: true,
       autoplay: isAutoplay ? {
         delay: 3500,
         disableOnInteraction: false,
       } : false,
       breakpoints: {
-        768: {
+        640: {
+          slidesPerView: 2,
+          spaceBetween: 20
+        },
+        992: {
           slidesPerView: 3,
-          spaceBetween: 20,
-          centeredSlides: true
+          spaceBetween: 24
         }
       }
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRablogSwiper);
+  } else {
+    initRablogSwiper();
+  }
 </script>

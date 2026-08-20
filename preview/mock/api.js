@@ -448,27 +448,27 @@ function registerMockApis(app) {
         {
             id: 23, code: 'color', name: 'Color', type: 'select', swatch_type: 'color',
             options: [
-                { id: 1,  name: 'Red',    swatch_value: '#dc2626', count: 12 },
-                { id: 2,  name: 'Pink',   swatch_value: '#ec4899', count: 8  },
-                { id: 3,  name: 'Nude',   swatch_value: '#d4a574', count: 15 },
-                { id: 4,  name: 'Brown',  swatch_value: '#92400e', count: 7  },
-                { id: 5,  name: 'Berry',  swatch_value: '#7c3aed', count: 6  },
+                { id: 1, name: 'Red', swatch_value: '#dc2626', count: 12 },
+                { id: 2, name: 'Pink', swatch_value: '#ec4899', count: 8 },
+                { id: 3, name: 'Nude', swatch_value: '#d4a574', count: 15 },
+                { id: 4, name: 'Brown', swatch_value: '#92400e', count: 7 },
+                { id: 5, name: 'Berry', swatch_value: '#7c3aed', count: 6 },
             ],
         },
         {
             id: 24, code: 'size', name: 'Size', type: 'select', swatch_type: 'text',
             options: [
-                { id: 10, name: 'Travel',  swatch_value: null, count: 18 },
+                { id: 10, name: 'Travel', swatch_value: null, count: 18 },
                 { id: 11, name: 'Regular', swatch_value: null, count: 30 },
-                { id: 12, name: 'Jumbo',   swatch_value: null, count: 10 },
+                { id: 12, name: 'Jumbo', swatch_value: null, count: 10 },
             ],
         },
         {
             id: 25, code: 'brand', name: 'Brand', type: 'select', swatch_type: null,
             options: [
-                { id: 20, name: 'Glamour',  swatch_value: null, count: 22 },
-                { id: 21, name: 'Luxe',     swatch_value: null, count: 14 },
-                { id: 22, name: 'Naturelle',swatch_value: null, count: 9  },
+                { id: 20, name: 'Glamour', swatch_value: null, count: 22 },
+                { id: 21, name: 'Luxe', swatch_value: null, count: 14 },
+                { id: 22, name: 'Naturelle', swatch_value: null, count: 9 },
             ],
         },
         { id: 26, code: 'price', name: 'Price Range', type: 'price', swatch_type: null, options: [] },
@@ -511,25 +511,88 @@ function registerMockApis(app) {
 
     // ── Booking slots (mirrors shop.booking-product.slots.index) ──────────
 
-    app.get('/api/booking/:productId/slots', (req, res) => {
-        const date = req.query.date || new Date().toISOString().slice(0, 10);
+    function toTimestamp(date, minutes) {
+        const hour = Math.floor(minutes / 60);
+        const minute = minutes % 60;
+        const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
 
-        // Generate mock time slots
+        return Math.floor(new Date(`${date}T${time}+03:00`).getTime() / 1000);
+    }
+
+    function formatTime(minutes) {
+        const hour = Math.floor(minutes / 60);
+        const minute = minutes % 60;
+
+        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+    }
+
+    function makeFlatBookingSlots(date, bookingType) {
+        const settings = {
+            default: { duration: 60, breakTime: 15 },
+            appointment: { duration: 45, breakTime: 10 },
+            table: { duration: 120, breakTime: 30 },
+        }[bookingType] || { duration: 60, breakTime: 15 };
         const slots = [];
-        const startHour = 9;
-        const endHour = 18;
-        const duration = 60; // minutes
+        const start = 9 * 60;
+        const end = 18 * 60;
+        let cursor = start;
 
-        for (let h = startHour; h < endHour; h++) {
-            const from = `${String(h).padStart(2, '0')}:00`;
-            const to = `${String(h + 1).padStart(2, '0')}:00`;
+        while (cursor + settings.duration <= end) {
+            const slotEnd = cursor + settings.duration;
+            const from = formatTime(cursor);
+            const to = formatTime(slotEnd);
+            const fromTimestamp = toTimestamp(date, cursor);
+            const toTimestampValue = toTimestamp(date, slotEnd);
+
             slots.push({
-                id: h - startHour + 1,
+                id: slots.length + 1,
                 from,
                 to,
-                timestamp: `${date} ${from}`,
+                timestamp: `${fromTimestamp}-${toTimestampValue}`,
+                remaining_qty: 10,
+                capacity: 10,
+                is_available: true,
+            });
+
+            cursor = slotEnd + settings.breakTime;
+        }
+
+        return slots;
+    }
+
+    function makeRentalSlots(date) {
+        const slots = [];
+        const start = 9 * 60;
+        const end = 18 * 60;
+        const hourlySlots = [];
+
+        for (let cursor = start; cursor + 60 <= end; cursor += 60) {
+            hourlySlots.push({
+                from: formatTime(cursor),
+                to: formatTime(cursor + 60),
+                from_timestamp: toTimestamp(date, cursor),
+                to_timestamp: toTimestamp(date, cursor + 60),
+                remaining_qty: 10,
+                capacity: 10,
+                is_available: true,
             });
         }
+
+        return [{
+            time: `${formatTime(start)} - ${formatTime(end)}`,
+            slots: hourlySlots,
+            remaining_qty: hourlySlots.length,
+            capacity: 10,
+            is_available: true,
+        }];
+    }
+
+    app.get('/api/booking/:productId/slots', (req, res) => {
+        const date = req.query.date || new Date().toISOString().slice(0, 10);
+        const bookingType = req.query.booking_type || 'default';
+        const slots = bookingType === 'rental'
+            ? makeRentalSlots(date)
+            : makeFlatBookingSlots(date, bookingType);
 
         res.json({ data: slots });
     });

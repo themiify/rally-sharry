@@ -13,7 +13,42 @@ export function initializeBookingForms(apiClient, showToast, unwrapPayload) {
         }
 
         bindStandardBooking(root, apiClient, showToast, unwrapPayload);
+        bindTableBooking(root);
     });
+}
+
+function bindTableBooking(root) {
+    var summary = root.querySelector('[data-booking-table-summary]');
+    var guestsInput = root.querySelector('[data-booking-guests]');
+
+    if (!summary || !guestsInput) {
+        return;
+    }
+
+    var update = function () {
+        var guests = Math.max(parseInt(guestsInput.value, 10) || 0, 0);
+        var guestLimit = Math.max(parseInt(summary.getAttribute('data-guest-limit'), 10) || 1, 1);
+        var units = summary.getAttribute('data-price-type') === 'table'
+            ? Math.ceil(guests / guestLimit)
+            : guests;
+        var price = parseFloat(summary.getAttribute('data-price')) || 0;
+
+        if (guests <= 0) {
+            summary.textContent = '';
+
+            return;
+        }
+
+        var totalLabel = summary.getAttribute('data-total-label') + ': ' + (price * units).toFixed(2);
+        var tableLabel = summary.getAttribute('data-price-type') === 'table'
+            ? summary.getAttribute('data-tables-label') + ': ' + Math.ceil(guests / guestLimit) + ' | '
+            : '';
+
+        summary.textContent = tableLabel + totalLabel;
+    };
+
+    guestsInput.addEventListener('input', update);
+    update();
 }
 
 function bindStandardBooking(root, apiClient, showToast, unwrapPayload) {
@@ -26,9 +61,6 @@ function bindStandardBooking(root, apiClient, showToast, unwrapPayload) {
     dateInput.addEventListener('change', function () {
         loadStandardBookingSlots(root, apiClient, showToast, unwrapPayload);
     });
-    dateInput.addEventListener('input', function () {
-        loadStandardBookingSlots(root, apiClient, showToast, unwrapPayload);
-    });
 
     if (dateInput.value) {
         loadStandardBookingSlots(root, apiClient, showToast, unwrapPayload);
@@ -38,77 +70,114 @@ function bindStandardBooking(root, apiClient, showToast, unwrapPayload) {
 function bindRentalBooking(root, apiClient, showToast, unwrapPayload) {
     var dateInput = root.querySelector('[data-booking-rental-date]');
     var slotSelect = root.querySelector('[data-booking-rental-slot-select]');
-    var dateFromInput = root.querySelector('input[name="booking[date_from]"]');
-    var dateToInput = root.querySelector('input[name="booking[date_to]"]');
+    var fromSelect = root.querySelector('[data-booking-rental-from]');
+    var toSelect = root.querySelector('[data-booking-rental-to]');
+    var dailyFrom = root.querySelector('[name="booking[date_from]"]');
+    var dailyTo = root.querySelector('[name="booking[date_to]"]');
 
     root.querySelectorAll('[data-booking-renting-type]').forEach(function (input) {
         input.addEventListener('change', function () {
             toggleRentalMode(root);
+            updateRentalPriceSummary(root);
         });
     });
 
-    if (dateFromInput) {
-        dateFromInput.addEventListener('change', function () {
-            if (dateInput && !dateInput.value) {
-                dateInput.value = dateFromInput.value;
-            }
-        });
-    }
-
-    if (dateInput) {
+    if (dateInput && slotSelect) {
         dateInput.addEventListener('change', function () {
-            if (dateFromInput && !dateFromInput.value) {
-                dateFromInput.value = dateInput.value;
-            }
-            if (dateToInput && !dateToInput.value) {
-                dateToInput.value = dateInput.value;
-            }
-            loadRentalBookingSlots(root, apiClient, showToast, unwrapPayload);
-        });
-        dateInput.addEventListener('input', function () {
-            if (dateFromInput && !dateFromInput.value) {
-                dateFromInput.value = dateInput.value;
-            }
-            if (dateToInput && !dateToInput.value) {
-                dateToInput.value = dateInput.value;
-            }
             loadRentalBookingSlots(root, apiClient, showToast, unwrapPayload);
         });
 
-        if (dateInput.value) {
-            if (dateFromInput && !dateFromInput.value) {
-                dateFromInput.value = dateInput.value;
-            }
-            if (dateToInput && !dateToInput.value) {
-                dateToInput.value = dateInput.value;
-            }
-            loadRentalBookingSlots(root, apiClient, showToast, unwrapPayload);
-        }
-    }
-
-    if (slotSelect) {
         slotSelect.addEventListener('change', function () {
             populateRentalTimeSlots(root);
         });
     }
 
+    [toSelect, dailyFrom, dailyTo].forEach(function (input) {
+        if (input) {
+            input.addEventListener('change', function () {
+                updateRentalPriceSummary(root);
+            });
+        }
+    });
+
+    if (fromSelect) {
+        fromSelect.addEventListener('change', function () {
+            populateRentalEndSlots(root);
+            updateRentalPriceSummary(root);
+        });
+    }
+
     toggleRentalMode(root);
+    updateRentalPriceSummary(root);
+}
+
+function updateRentalPriceSummary(root) {
+    var summary = root.querySelector('[data-booking-rental-price-summary]');
+
+    if (!summary) {
+        return;
+    }
+
+    var selectedType = root.querySelector('[data-booking-renting-type]:checked');
+    var mode = selectedType ? selectedType.value : root.querySelector('[name="booking[renting_type]"]')?.value;
+    var amount = 0;
+    var duration = '';
+
+    if (mode === 'daily') {
+        var from = root.querySelector('[name="booking[date_from]"]')?.value;
+        var to = root.querySelector('[name="booking[date_to]"]')?.value;
+
+        if (from && to) {
+            var start = new Date(from + 'T00:00:00');
+            var end = new Date(to + 'T00:00:00');
+            var days = Math.floor((end - start) / 86400000) + 1;
+
+            if (days > 0) {
+                amount = (parseFloat(summary.getAttribute('data-daily-price')) || 0) * days;
+                duration = days + ' days';
+            }
+        }
+    } else {
+        var hourlyFrom = parseInt(root.querySelector('[data-booking-rental-from]')?.value, 10) || 0;
+        var hourlyTo = parseInt(root.querySelector('[data-booking-rental-to]')?.value, 10) || 0;
+        var hours = (hourlyTo - hourlyFrom) / 3600;
+
+        if (hours > 0) {
+            amount = (parseFloat(summary.getAttribute('data-hourly-price')) || 0) * hours;
+            duration = hours + ' hours';
+        }
+    }
+
+    summary.textContent = amount > 0
+        ? summary.getAttribute('data-total-label') + ': ' + amount.toFixed(2) + ' (' + duration + ')'
+        : '';
 }
 
 function toggleRentalMode(root) {
     var selectedType = root.querySelector('[data-booking-renting-type]:checked');
-    var dailyFields = root.querySelector('[data-booking-rental-daily-fields]');
-    var hourlyFields = root.querySelector('[data-booking-rental-hourly-fields]');
-    var isHourly = !selectedType || selectedType.value === 'hourly';
+    var fixedType = root.querySelector('[name="booking[renting_type]"]:not([data-booking-renting-type])');
+    var fields = root._bookingRentalFields || (root._bookingRentalFields = {
+        daily: root.querySelector('[data-booking-rental-daily-fields]'),
+        hourly: root.querySelector('[data-booking-rental-hourly-fields]'),
+    });
+    var mode = selectedType ? selectedType.value : fixedType && fixedType.value;
+    var active = mode === 'daily' ? fields.daily : fields.hourly;
+    var inactive = mode === 'daily' ? fields.hourly : fields.daily;
 
-    if (dailyFields) {
-        dailyFields.hidden = isHourly;
-        dailyFields.style.display = isHourly ? 'none' : '';
+    if (inactive && inactive.parentNode) {
+        inactive.parentNode.removeChild(inactive);
     }
 
-    if (hourlyFields) {
-        hourlyFields.hidden = !isHourly;
-        hourlyFields.style.display = !isHourly ? 'none' : '';
+    if (active && !active.parentNode) {
+        root.appendChild(active);
+    }
+
+    if (active) {
+        active.removeAttribute('hidden');
+        active.querySelectorAll('[data-booking-rental-daily-input], [data-booking-rental-hourly-input]').forEach(function (input) {
+            input.disabled = false;
+            input.required = true;
+        });
     }
 }
 
@@ -125,19 +194,17 @@ function loadStandardBookingSlots(root, apiClient, showToast, unwrapPayload) {
 
     apiClient.get(url, {
         date: dateInput.value,
+        booking_type: root.getAttribute('data-booking-type') || undefined,
     })
         .then(function (responseData) {
             var payload = unwrapPayload(responseData) || [];
-            var slots = Array.isArray(payload)
-                ? payload
-                : (payload && Array.isArray(payload.data)
-                    ? payload.data
-                    : (payload && Array.isArray(payload.slots) ? payload.slots : []));
+            var slots = Array.isArray(payload) ? payload : [];
 
             populateSelect(slotSelect, slots.map(function (slot) {
                 return {
-                    value: slot.timestamp || slot.from_timestamp || slot.from || slot.id || '',
-                    label: [slot.from, slot.to].filter(Boolean).join(' - ') || slot.time || slot.label || '',
+                    value: slot.timestamp || slot.from_timestamp || slot.from || '',
+                    label: formatAvailabilityLabel(root, [slot.from, slot.to].filter(Boolean).join(' - '), slot),
+                    disabled: slot.is_available === false,
                 };
             }), root.getAttribute('data-empty-label'));
         })
@@ -151,17 +218,6 @@ function loadRentalBookingSlots(root, apiClient, showToast, unwrapPayload) {
     var url = root.getAttribute('data-booking-slots-url');
     var dateInput = root.querySelector('[data-booking-rental-date]');
     var slotSelect = root.querySelector('[data-booking-rental-slot-select]');
-    var dateFromInput = root.querySelector('input[name="booking[date_from]"]');
-    var dateToInput = root.querySelector('input[name="booking[date_to]"]');
-
-    if (dateInput && dateInput.value) {
-        if (dateFromInput && !dateFromInput.value) {
-            dateFromInput.value = dateInput.value;
-        }
-        if (dateToInput && !dateToInput.value) {
-            dateToInput.value = dateInput.value;
-        }
-    }
 
     if (!url || !dateInput || !slotSelect || !dateInput.value) {
         return;
@@ -171,20 +227,18 @@ function loadRentalBookingSlots(root, apiClient, showToast, unwrapPayload) {
 
     apiClient.get(url, {
         date: dateInput.value,
+        booking_type: root.getAttribute('data-booking-type') || undefined,
     })
         .then(function (responseData) {
             var payload = unwrapPayload(responseData) || [];
 
-            root._glRentalSlots = Array.isArray(payload)
-                ? payload
-                : (payload && Array.isArray(payload.data)
-                    ? payload.data
-                    : (payload && Array.isArray(payload.slots) ? payload.slots : []));
+            root._glRentalSlots = Array.isArray(payload) ? payload : [];
 
             populateSelect(slotSelect, root._glRentalSlots.map(function (slot, index) {
                 return {
                     value: String(index),
-                    label: slot.time || slot.label || [slot.from, slot.to].filter(Boolean).join(' - ') || '',
+                    label: formatAvailabilityLabel(root, slot.time || '', slot),
+                    disabled: slot.is_available === false,
                 };
             }), root.getAttribute('data-empty-label'));
 
@@ -202,38 +256,75 @@ function populateRentalTimeSlots(root) {
     var slotSelect = root.querySelector('[data-booking-rental-slot-select]');
     var fromSelect = root.querySelector('[data-booking-rental-from]');
     var toSelect = root.querySelector('[data-booking-rental-to]');
-    var dateInput = root.querySelector('[data-booking-rental-date]');
-    var dateFromInput = root.querySelector('input[name="booking[date_from]"]');
-    var dateToInput = root.querySelector('input[name="booking[date_to]"]');
     var slots = root._glRentalSlots || [];
-    var selectedIndex = parseInt(slotSelect && slotSelect.value, 10);
-    var selectedSlot = !isNaN(selectedIndex) ? slots[selectedIndex] : null;
+    var selectedSlot = slots[parseInt(slotSelect && slotSelect.value, 10)] || null;
     var timeSlots = selectedSlot && Array.isArray(selectedSlot.slots)
         ? selectedSlot.slots
-        : (selectedSlot && Array.isArray(selectedSlot.time_slots) ? selectedSlot.time_slots : []);
+        : [];
 
     populateSelect(fromSelect, timeSlots.map(function (slot) {
         return {
-            value: slot.from_timestamp || slot.from || slot.id || slot.value || '',
-            label: slot.from || slot.time || slot.label || '',
+            value: slot.from_timestamp || '',
+            label: formatAvailabilityLabel(root, slot.from || '', slot),
+            disabled: slot.is_available === false,
         };
     }), root.getAttribute('data-select-time-label'));
 
-    populateSelect(toSelect, timeSlots.map(function (slot) {
-        return {
-            value: slot.to_timestamp || slot.to || slot.id || slot.value || '',
-            label: slot.to || slot.time || slot.label || '',
-        };
-    }), root.getAttribute('data-select-time-label'));
+    populateRentalEndSlots(root, timeSlots);
+}
 
-    if (dateInput && dateInput.value) {
-        if (dateFromInput && !dateFromInput.value) {
-            dateFromInput.value = dateInput.value;
-        }
-        if (dateToInput && !dateToInput.value) {
-            dateToInput.value = dateInput.value;
-        }
+function populateRentalEndSlots(root, availableSlots) {
+    var slotSelect = root.querySelector('[data-booking-rental-slot-select]');
+    var fromSelect = root.querySelector('[data-booking-rental-from]');
+    var toSelect = root.querySelector('[data-booking-rental-to]');
+    var slots = root._glRentalSlots || [];
+    var selectedSlot = slots[parseInt(slotSelect && slotSelect.value, 10)] || null;
+    var timeSlots = (availableSlots || (selectedSlot && Array.isArray(selectedSlot.slots)
+        ? selectedSlot.slots
+        : [])).filter(function (slot) { return slot.is_available !== false; });
+    var from = parseInt(fromSelect && fromSelect.value, 10) || 0;
+    var usableSlots = timeSlots;
+
+    populateSelect(toSelect, usableSlots
+        .filter(function (slot) {
+            return from > 0 && Number(slot.to_timestamp) > from && isContiguousRange(timeSlots, from, Number(slot.to_timestamp));
+        })
+        .map(function (slot) {
+            return {
+                value: slot.to_timestamp || '',
+                label: formatAvailabilityLabel(root, slot.to || '', slot),
+            };
+        }), root.getAttribute('data-select-time-label'));
+}
+
+function formatAvailabilityLabel(root, label, slot) {
+    if (slot.is_available === false) {
+        return label + ' — ' + (root.getAttribute('data-sold-out-label') || 'Sold out');
     }
+
+    if (slot.remaining_qty) {
+        return label + ' — ' + slot.remaining_qty + ' ' + (root.getAttribute('data-remaining-label') || 'remaining');
+    }
+
+    return label;
+}
+
+function isContiguousRange(slots, from, to) {
+    var cursor = from;
+
+    while (cursor < to) {
+        var segment = slots.find(function (slot) {
+            return Number(slot.from_timestamp) === cursor;
+        });
+
+        if (!segment) {
+            return false;
+        }
+
+        cursor = Number(segment.to_timestamp);
+    }
+
+    return cursor === to;
 }
 
 function setSelectLoading(select, loadingLabel) {
@@ -260,6 +351,7 @@ function populateSelect(select, options, placeholder) {
         var option = document.createElement('option');
         option.value = optionConfig.value;
         option.textContent = optionConfig.label;
+        option.disabled = optionConfig.disabled === true;
         select.appendChild(option);
     });
 }

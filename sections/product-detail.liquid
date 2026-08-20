@@ -51,6 +51,10 @@
 {% assign select_date_label = translations.product.select_date | default: 'Select Date' %}
 {% assign select_slot_label = translations.product.select_slot | default: 'Select Slot' %}
 {% assign guests_label = translations.product.guests | default: 'Guests' %}
+{% assign tables_required_label = translations.product.tables_required | default: 'Tables required' %}
+{% assign booking_total_label = translations.product.booking_total | default: 'Booking total' %}
+{% assign sold_out_label = translations.product.sold_out | default: 'Sold out' %}
+{% assign remaining_label = translations.product.remaining | default: 'remaining' %}
 {% assign daily_basis_label = translations.product.daily_basis | default: 'Daily Basis' %}
 {% assign hourly_basis_label = translations.product.hourly_basis | default: 'Hourly Basis' %}
 {% assign from_label = translations.product.from | default: 'From' %}
@@ -86,7 +90,7 @@
 
 <section
   style="{% if section.settings.heading_font_override != blank %}--section-font-heading: '{{ section.settings.heading_font_override }}', sans-serif;{% endif %}{% if section.settings.body_font_override != blank %}--section-font-body: '{{ section.settings.body_font_override }}', sans-serif;{% endif %}{% if section.settings.heading_font_size > 0 %}--section-heading-size: {{ section.settings.heading_font_size }}px;{% endif %}{% if section.settings.body_font_size > 0 %}--section-body-size: {{ section.settings.body_font_size }}px;{% endif %}{% assign pad = section.settings.section_padding %}{% if section.settings.section_bg_color != blank %}background-color: {{ section.settings.section_bg_color }};{% endif %} "
-  class="product-single"
+  class="gl-section product-single"
 >
   <div class="gl-container">
     <div class="product-detail">
@@ -165,7 +169,7 @@
             {% if show_stock %}
               <span>
                 {{ availability_label }}:
-                <strong class="product-stock {% if product.in_stock %}out-of-stock{% else %}out-of-stock{% endif %}">
+                <strong class="product-stock {% if product.in_stock %}in-stock{% else %}out-of-stock{% endif %}">
                   {% if product.in_stock %}
                     {{ in_stock_label }}
                   {% else %}
@@ -597,9 +601,12 @@
                 <div
                   data-booking-slot-root
                   data-booking-slots-url="{{ product.booking.slot_api_url }}"
+                  data-booking-type="{{ product.booking.type }}"
                   data-loading-label="{{ loading_label }}"
                   data-empty-label="{{ no_slots_available_label }}"
                   data-error-label="{{ booking_load_error_label }}"
+                  data-sold-out-label="{{ sold_out_label }}"
+                  data-remaining-label="{{ remaining_label }}"
                   style="display:grid;gap:0.75rem;"
                 >
                   {% if product.booking.today_slots_text != blank %}
@@ -631,7 +638,7 @@
                     </label>
                   </div>
 
-                  {% if product.booking.type == 'table' and product.booking.table_slot.guest_limit > 0 %}
+                  {% if product.booking.type == 'table' %}
                     <label style="display:grid;gap:0.4rem;max-width:180px;">
                       <span>{{ guests_label }}</span>
                       <input
@@ -639,7 +646,8 @@
                         name="booking[guests]"
                         value="1"
                         min="1"
-                        max="{{ product.booking.table_slot.guest_limit }}"
+                        max="{{ product.booking.qty }}"
+                        data-booking-guests
                         class="gl-select"
                         required
                       >
@@ -647,6 +655,15 @@
                   {% endif %}
 
                   {% if product.booking.type == 'table' %}
+                    <div
+                      data-booking-table-summary
+                      data-price="{{ product.price }}"
+                      data-price-type="{{ product.booking.table_slot.price_type }}"
+                      data-guest-limit="{{ product.booking.table_slot.guest_limit }}"
+                      data-tables-label="{{ tables_required_label }}"
+                      data-total-label="{{ booking_total_label }}"
+                      style="display:grid;gap:0.35rem;color:var(--gl-subheading-light);"
+                    ></div>
                     <label style="display:grid;gap:0.4rem;">
                       <span>{{ notes_label }}</span>
                       <textarea name="booking[note]" rows="3" class="gl-select" required></textarea>
@@ -668,12 +685,14 @@
                       </div>
                       <div style="display:flex;gap:0.75rem;align-items:center;">
                         <span>{{ ticket.formatted_price_text | default: ticket.formatted_price }}</span>
+                        <small>{{ ticket.remaining_qty }} {{ remaining_label }}</small>
                         <input
                           type="number"
                           name="booking[qty][{{ ticket.id }}]"
                           value="0"
                           min="0"
-                          max="{{ ticket.qty }}"
+                          max="{{ ticket.remaining_qty }}"
+                          {% if ticket.is_available == false %}disabled{% endif %}
                           class="gl-select"
                           style="width:90px;"
                         >
@@ -686,12 +705,24 @@
                   data-booking-slot-root
                   data-booking-mode="rental"
                   data-booking-slots-url="{{ product.booking.slot_api_url }}"
+                  data-booking-type="{{ product.booking.type }}"
                   data-loading-label="{{ loading_label }}"
                   data-empty-label="{{ no_slots_available_label }}"
                   data-error-label="{{ booking_load_error_label }}"
+                  data-sold-out-label="{{ sold_out_label }}"
+                  data-remaining-label="{{ remaining_label }}"
                   data-select-time-label="{{ select_time_label }}"
                   style="display:grid;gap:0.75rem;"
                 >
+                  <div
+                    data-booking-rental-price-summary
+                    data-daily-price="{{ product.booking.rental_slot.daily_price }}"
+                    data-hourly-price="{{ product.booking.rental_slot.hourly_price }}"
+                    data-daily-label="{{ daily_basis_label }}"
+                    data-hourly-label="{{ hourly_basis_label }}"
+                    data-total-label="{{ booking_total_label }}"
+                    style="display:grid;gap:0.35rem;color:var(--gl-subheading-light);"
+                  ></div>
                   {% if product.booking.rental_slot.renting_type == 'daily_hourly' %}
                     <div style="display:flex;gap:1rem;flex-wrap:wrap;">
                       <label style="display:flex;gap:0.5rem;align-items:center;">
@@ -727,11 +758,22 @@
                     <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;">
                       <label style="display:grid;gap:0.4rem;">
                         <span>{{ select_date_label }}</span>
-                        <input type="date" name="booking[date]" data-booking-rental-date class="gl-select">
+                        <input
+                          type="date"
+                          name="booking[date]"
+                          data-booking-rental-date
+                          data-booking-rental-hourly-input
+                          class="gl-select"
+                        >
                       </label>
                       <label style="display:grid;gap:0.4rem;">
                         <span>{{ select_slot_label }}</span>
-                        <select name="booking[slot]" data-booking-rental-slot-select class="gl-select">
+                        <select
+                          name="booking[slot]"
+                          data-booking-rental-slot-select
+                          data-booking-rental-hourly-input
+                          class="gl-select"
+                        >
                           <option value="">{{ select_slot_label }}</option>
                         </select>
                       </label>
@@ -739,13 +781,23 @@
                     <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;">
                       <label style="display:grid;gap:0.4rem;">
                         <span>{{ from_label }}</span>
-                        <select name="booking[slot][from]" data-booking-rental-from class="gl-select">
+                        <select
+                          name="booking[slot][from]"
+                          data-booking-rental-from
+                          data-booking-rental-hourly-input
+                          class="gl-select"
+                        >
                           <option value="">{{ select_time_label }}</option>
                         </select>
                       </label>
                       <label style="display:grid;gap:0.4rem;">
                         <span>{{ to_label }}</span>
-                        <select name="booking[slot][to]" data-booking-rental-to class="gl-select">
+                        <select
+                          name="booking[slot][to]"
+                          data-booking-rental-to
+                          data-booking-rental-hourly-input
+                          class="gl-select"
+                        >
                           <option value="">{{ select_time_label }}</option>
                         </select>
                       </label>
@@ -761,11 +813,21 @@
                   >
                     <label style="display:grid;gap:0.4rem;">
                       <span>{{ from_label }}</span>
-                      <input type="date" name="booking[date_from]" class="gl-select">
+                      <input
+                        type="date"
+                        name="booking[date_from]"
+                        data-booking-rental-daily-input
+                        class="gl-select"
+                      >
                     </label>
                     <label style="display:grid;gap:0.4rem;">
                       <span>{{ to_label }}</span>
-                      <input type="date" name="booking[date_to]" class="gl-select">
+                      <input
+                        type="date"
+                        name="booking[date_to]"
+                        data-booking-rental-daily-input
+                        class="gl-select"
+                      >
                     </label>
                   </div>
                 </div>
@@ -994,6 +1056,7 @@
       </div>
     </div>
 
+   
 
     {% if show_tabs %}
       <div class="gl-product-tabs">
@@ -1112,310 +1175,6 @@
           {% endif %}
         </div>
       </div>
-    {% endif %}
-
-    <!-- ── SINGLE PRODUCT BOOKING FORM & LOCATIONS SECTION ── -->
-    {% assign show_singleform = section.settings.show_singleform %}
-    {% if show_singleform == nil %}
-      {% assign show_singleform = theme.show_singleform %}
-    {% endif %}
-    {% if show_singleform == nil %}
-      {% assign show_singleform = theme.settings.show_singleform %}
-    {% endif %}
-    {% if show_singleform == nil %}
-      {% assign show_singleform = true %}
-    {% endif %}
-
-    {% if show_singleform %}
-      {% assign form_title = section.settings.form_main_title | default: theme.form_main_title | default: theme.settings.form_main_title | default: 'احجز موعدك' %}
-      {% assign form_sheet_url = section.settings.link_google_sheet | default: theme.link_google_sheet | default: theme.settings.link_google_sheet | default: 'https://sheetdb.io/api/v1/d48ieq7n70kqa' %}
-      {% assign days_start = section.settings.days_work_start | default: theme.days_work_start | default: theme.settings.days_work_start | default: 'saturday' %}
-      {% assign days_end = section.settings.days_work_end | default: theme.days_work_end | default: theme.settings.days_work_end | default: 'thursday' %}
-      {% assign hours_start = section.settings.hours_work_start | default: theme.hours_work_start | default: theme.settings.hours_work_start | default: '9:00 صباحًا' %}
-      {% assign hours_end = section.settings.hours_work_end | default: theme.hours_work_end | default: theme.settings.hours_work_end | default: '9:00 مساءً' %}
-
-      {% assign show_locations_side = section.settings.show_location_with_form %}
-      {% if show_locations_side == nil %}
-        {% assign show_locations_side = theme.show_location_with_form %}
-      {% endif %}
-      {% if show_locations_side == nil %}
-        {% assign show_locations_side = theme.settings.show_location_with_form %}
-      {% endif %}
-
-      <div class="ra-booking-section" id="raBookingSection" style="margin-top: 3.5rem; margin-bottom: 3.5rem;">
-        <div class="ra-booking-grid {% if show_locations_side %}has-locations-side{% endif %}" id="raBookingGrid">
-          
-          {% if show_locations_side %}
-            <!-- Locations / Map Column (Left side in LTR / Right side in RTL - matching Figma) -->
-            <div class="ra-booking-locations-col" id="raBookingLocationsCol">
-              {% render 'RA_locations', theme: theme, section: section %}
-            </div>
-          {% endif %}
-
-          <!-- Booking Form Column (Matching Figma) -->
-          <div class="ra-booking-form-col" id="raBookingFormCol" {% unless show_locations_side %}style="max-width: 780px; margin: 0 auto; width: 100%;"{% endunless %}>
-            {% if form_title != blank %}
-          
-           
-                <h2 class="ral__title">
-        {{ form_title }}
-      </h2>
-            {% endif %}
-
-            <form id="form-handler" class="ra-booking-form" action="{{ form_sheet_url }}" method="POST">
-              <div class="ra-booking-form-grid">
-                <div class="ra-form-field">
-                  <label class="ra-field-label">{% if is_rtl %}الاسم{% else %}Name{% endif %}</label>
-                  <input type="text" name="name" required placeholder="{% if is_rtl %}ادخل اسمك{% else %}Enter your name{% endif %}" class="ra-field-input">
-                </div>
-                <div class="ra-form-field">
-                  <label class="ra-field-label">{% if is_rtl %}اسم العائلة{% else %}Family Name{% endif %}</label>
-                  <input type="text" name="family_name" placeholder="{% if is_rtl %}ادخل اسم عائلتك{% else %}Enter family name{% endif %}" class="ra-field-input">
-                </div>
-                <div class="ra-form-field">
-                  <label class="ra-field-label">{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</label>
-                  <input type="email" name="email" required placeholder="{% if is_rtl %}ادخل بريدك الإلكتروني{% else %}Enter your email{% endif %}" class="ra-field-input">
-                </div>
-                <div class="ra-form-field">
-                  <label class="ra-field-label">{% if is_rtl %}رقم الهاتف{% else %}Phone Number{% endif %}</label>
-                  <input type="tel" name="phone" required placeholder="{% if is_rtl %}ادخل رقم هاتفك{% else %}Enter phone number{% endif %}" class="ra-field-input">
-                </div>
-                <div class="ra-form-field">
-                  <label class="ra-field-label">{% if is_rtl %}العمر{% else %}Age{% endif %}</label>
-                  <input type="number" name="age" placeholder="{% if is_rtl %}ادخل عمرك{% else %}Enter your age{% endif %}" class="ra-field-input">
-                </div>
-                <div class="ra-form-field">
-                  <label class="ra-field-label">{% if is_rtl %}البلد{% else %}Country{% endif %}</label>
-                  <input type="text" name="country" required placeholder="{% if is_rtl %}ادخل اسم بلدك{% else %}Enter country{% endif %}" class="ra-field-input">
-                </div>
-                <div class="ra-form-field">
-                  <label class="ra-field-label">{% if is_rtl %}اليوم{% else %}Day{% endif %}</label>
-                  <select name="day" required class="ra-field-select">
-                    <option value="">{% if is_rtl %}اختر اليوم{% else %}Select Day{% endif %}</option>
-                    {% if is_rtl %}
-                      <option value="السبت">السبت</option>
-                      <option value="الأحد">الأحد</option>
-                      <option value="الاثنين">الاثنين</option>
-                      <option value="الثلاثاء">الثلاثاء</option>
-                      <option value="الأربعاء">الأربعاء</option>
-                      <option value="الخميس">الخميس</option>
-                      <option value="الجمعة">الجمعة</option>
-                    {% else %}
-                      <option value="Saturday">Saturday</option>
-                      <option value="Sunday">Sunday</option>
-                      <option value="Monday">Monday</option>
-                      <option value="Tuesday">Tuesday</option>
-                      <option value="Wednesday">Wednesday</option>
-                      <option value="Thursday">Thursday</option>
-                      <option value="Friday">Friday</option>
-                    {% endif %}
-                  </select>
-                </div>  
-                <div class="ra-form-field">
-                  <label class="ra-field-label">{% if is_rtl %}الساعة{% else %}Hour{% endif %}</label>
-                  <select name="hour" required class="ra-field-select">
-                    <option value="">{% if is_rtl %}اختر الساعة{% else %}Select Hour{% endif %}</option>
-                    {% if is_rtl %}
-                      <option value="8:00 صباحًا">8:00 صباحًا</option>
-                      <option value="9:00 صباحًا">9:00 صباحًا</option>
-                      <option value="10:00 صباحًا">10:00 صباحًا</option>
-                      <option value="11:00 صباحًا">11:00 صباحًا</option>
-                      <option value="12:00 مساءً">12:00 مساءً</option>
-                      <option value="1:00 مساءً">1:00 مساءً</option>
-                      <option value="2:00 مساءً">2:00 مساءً</option>
-                      <option value="3:00 مساءً">3:00 مساءً</option>
-                      <option value="4:00 مساءً">4:00 مساءً</option>
-                      <option value="5:00 مساءً">5:00 مساءً</option>
-                      <option value="6:00 مساءً">6:00 مساءً</option>
-                      <option value="7:00 مساءً">7:00 مساءً</option>
-                      <option value="8:00 مساءً">8:00 مساءً</option>
-                      <option value="9:00 مساءً">9:00 مساءً</option>
-                      <option value="10:00 مساءً">10:00 مساءً</option>
-                      <option value="11:00 مساءً">11:00 مساءً</option>
-                    {% else %}
-                      <option value="8:00 AM">8:00 AM</option>
-                      <option value="9:00 AM">9:00 AM</option>
-                      <option value="10:00 AM">10:00 AM</option>
-                      <option value="11:00 AM">11:00 AM</option>
-                      <option value="12:00 PM">12:00 PM</option>
-                      <option value="1:00 PM">1:00 PM</option>
-                      <option value="2:00 PM">2:00 PM</option>
-                      <option value="3:00 PM">3:00 PM</option>
-                      <option value="4:00 PM">4:00 PM</option>
-                      <option value="5:00 PM">5:00 PM</option>
-                      <option value="6:00 PM">6:00 PM</option>
-                      <option value="7:00 PM">7:00 PM</option>
-                      <option value="8:00 PM">8:00 PM</option>
-                      <option value="9:00 PM">9:00 PM</option>
-                      <option value="10:00 PM">10:00 PM</option>
-                      <option value="11:00 PM">11:00 PM</option>
-                    {% endif %}
-                  </select>
-                </div>
-              </div>
-
-              <div class="ra-form-field ra-form-field-full">
-                <label class="ra-field-label">{% if is_rtl %}رسالتك{% else %}Your Message{% endif %}</label>
-                <textarea name="message" required placeholder="{% if is_rtl %}اكتب رسالتك هنا...{% else %}Write your message here...{% endif %}" class="ra-field-textarea"></textarea>
-              </div>
-
-              <input type="hidden" name="product_name" value="{{ product.name | default: product.title }}">
-              <input type="hidden" name="product_details" value="">
-              <input type="hidden" name="selected_options" value="">
-              <input type="hidden" name="price" value="{% if product.starting_price %}{{ product.starting_price | money }}{% else %}{{ product.price | money }}{% endif %}">
-
-              <div id="spinner" class="ra-form-spinner" style="display: none;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 1s linear infinite; margin: 12px auto;">
-                  <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
-                  <path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="0.8"></path>
-                </svg>
-              </div>
-
-              <button type="submit" class="ra-form-submit-btn">
-                <span>{% if is_rtl %}احجز الآن ←{% else %}Book Now →{% endif %}</span>
-              </button>
-            </form>
-          </div>
-
-        </div>
-      </div>
-
-      <style>
-        .ra-booking-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 2rem;
-          align-items: start;
-        }
-
-        @media (min-width: 992px) {
-          .ra-booking-grid.has-locations-side {
-            grid-template-columns: 1fr 1.15fr;
-          }
-        }
-
-        .ra-booking-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: var(--gl-heading, #0f172a);
-          margin-bottom: 1.25rem;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          position: relative;
-        }
-
-        .ra-booking-title::after {
-          content: '';
-          display: inline-block;
-          height: 1px;
-          flex-grow: 1;
-          background: #333333;
-          margin-inline-start: 8px;
-        }
-
-        .ra-booking-form {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
-          padding: 1.75rem;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        }
-
-        .ra-booking-form-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 1rem;
-        }
-
-        @media (min-width: 640px) {
-          .ra-booking-form-grid {
-            grid-template-columns: 1fr 1fr;
-          }
-        }
-
-        .ra-form-field {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .ra-form-field-full {
-          grid-column: 1 / -1;
-          margin-top: 0.5rem;
-        }
-
-        .ra-field-label {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: var(--gl-heading, #1e293b);
-        }
-
-        .ra-field-input,
-        .ra-field-select,
-        .ra-field-textarea {
-          width: 100%;
-          padding: 0.65rem 0.85rem;
-          font-size: 0.9rem;
-          border: 1px solid #cbd5e1;
-          border-radius: 6px;
-          background-color: #f8fafc;
-          color: #0f172a;
-          transition: all 0.2s ease;
-          font-family: inherit;
-        }
-
-        .ra-field-input:focus,
-        .ra-field-select:focus,
-        .ra-field-textarea:focus {
-          outline: none;
-          border-color: #000000;
-          background-color: #ffffff;
-          box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
-        }
-
-        .ra-field-textarea {
-          min-height: 100px;
-          resize: vertical;
-        }
-
-        .ra-form-submit-btn {
-          width: 100%;
-          margin-top: 1.25rem;
-          padding: 0.85rem 1.5rem;
-          font-size: 0.95rem;
-          font-weight: 700;
-          color: #000000;
-          background: transparent;
-          border: 1.5px solid #000000;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.25s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-
-        .ra-form-submit-btn:hover {
-          background: #000000;
-          color: #ffffff;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.15);
-        }
-      </style>
-
-      <script>
-                alert(isRTL ? "تم إرسال طلب الحجز بنجاح!" : "Booking submitted successfully!");
-                formHandler.reset();
-              })
-              .catch(err => {
-                if (spinner) spinner.style.display = "none";
-                alert(isRTL ? "تم إرسال الطلب بنجاح!" : "Request sent successfully!");
-              });
-          }
-        });
-      </script>
     {% endif %}
 
     {% if show_related and related_items.size > 0 %}

@@ -126,7 +126,7 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
   position: sticky !important;
   top: 0 !important;
-  z-index: 9999 !important;
+
   width: 100% !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -613,7 +613,7 @@
 .gl-header {
   position: sticky !important;
   top: 0 !important;
-  z-index: 9999 !important;
+
   width: 100% !important;
   background: #ffffff !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;

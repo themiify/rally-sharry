@@ -1,7 +1,7 @@
 {
     "name": "rally",
     "slug": "rally",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "description": "A luxurious makeup & cosmetics theme with pink and white palette, RTL support, and bilingual Arabic/English design.",
     "author": "GoSharry",
     "supports_rtl": true,

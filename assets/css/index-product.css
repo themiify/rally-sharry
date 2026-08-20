@@ -244,41 +244,62 @@
 
   /* Mobile filter sidebar overlay */
   .gl-filter-sidebar {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 280px;
-    height: 55vh;
-    background-color: #f9f9f9;
-    z-index: 1000;
-    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    overflow-y: auto;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    width: 300px !important;
+    max-width: 85vw !important;
+    background-color: #ffffff !important;
+    z-index: 100000 !important;
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.35s ease, visibility 0.35s ease !important;
+    overflow-y: auto !important;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.15) !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    right: 0 !important;
+    left: auto !important;
+    transform: translateX(100%) !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+
+  [dir="rtl"] .gl-filter-sidebar {
+    right: 0 !important;
+    left: auto !important;
+    transform: translateX(-100%) !important;
   }
 
   .gl-filter-sidebar.active {
-    right: 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateX(0) !important;
   }
 
   /* Overlay backdrop */
   .gl-filter-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 0.3s ease,
-      visibility 0.3s ease;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 99999 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease !important;
   }
 
   .gl-filter-overlay.active {
-    opacity: 1;
-    visibility: visible;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
   }
 
   /* Close button for mobile */

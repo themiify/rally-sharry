@@ -75,7 +75,7 @@
 }
 
 /* Mobile Layout (<640px) */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .RA_product_taps .ra-panel-body {
         display: flex !important;
         flex-direction: column !important;

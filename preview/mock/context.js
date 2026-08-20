@@ -77,34 +77,9 @@ function makeProductCard(i, locale) {
     const categorySlug = 'lipsticks';
     const categoryName = isAr ? 'أحمر الشفاه' : 'Lipsticks';
 
-    const colorPalettes = [
-        ['#E11D48', '#2563EB', '#059669'],
-        ['#111827', '#475569', '#94A3B8'],
-        ['#D97706', '#7C3AED', '#DB2777'],
-        ['#0F766E', '#C026D3', '#EA580C'],
-        ['#000000', '#78350F', '#475569'],
-        ['#F43F5E', '#8B5CF6', '#10B981']
-    ];
-    const colors = colorPalettes[i % colorPalettes.length];
-
-    const tagOptions = [
-        ['#1995', '#جديدة'],
-        ['#2024', '#ممتازة'],
-        ['#2025', '#خصم'],
-        ['#2023', '#حصري'],
-        ['#1998', '#جديدة'],
-        ['#2022', '#مستعملة']
-    ];
-    const tags = tagOptions[i % tagOptions.length];
-
     return {
         // ── DataContextBuilder fields ──────────────────────────────────────
         id: i,
-        colors: colors,
-        color_swatches: colors,
-        swatches: colors,
-        tags: tags,
-        tag_items: tags,
         type: 'simple',
         sku: `SKU-${String(i).padStart(4, '0')}`,
         name,
@@ -233,16 +208,7 @@ function makeCategoryCard(i, locale) {
     const t = isAr ? cat.ar : cat.en;
     const slug = cat.slug;
 
-    const prodOffset = (i - 1) * 3 + 1;
-    const products = [
-        makeProductCard(prodOffset, locale),
-        makeProductCard(prodOffset + 1, locale),
-        makeProductCard(prodOffset + 2, locale),
-        makeProductCard(prodOffset + 3, locale),
-    ];
-
     return {
-        id: i,
         category_id: i,
         name: t.name,
         slug,
@@ -252,8 +218,6 @@ function makeCategoryCard(i, locale) {
         meta_title: t.meta_title,
         meta_description: t.meta_description,
         meta_keywords: t.meta_keywords,
-        products: products,
-        items: products,
     };
 }
 
@@ -590,8 +554,8 @@ function makeBookingProduct(locale, bookingType) {
     } else if (type === 'event') {
         bookingConfig.event_date = isAr ? 'السبت 15 مارس 2025 — 6:00 مساءً' : 'Saturday, March 15, 2025 — 6:00 PM';
         bookingConfig.tickets = [
-            { id: 1, name: isAr ? 'تذكرة عادية' : 'General Admission', description: isAr ? 'دخول عام' : 'Standard entry', qty: 50, formatted_price_text: '99.00 SAR', formatted_price: '99.00 SAR', original_formatted_price: '149.00 SAR' },
-            { id: 2, name: isAr ? 'تذكرة VIP' : 'VIP Ticket', description: isAr ? 'مع هدية' : 'Includes gift bag', qty: 20, formatted_price_text: '249.00 SAR', formatted_price: '249.00 SAR', original_formatted_price: '' },
+            { id: 1, name: isAr ? 'تذكرة عادية' : 'General Admission', description: isAr ? 'دخول عام' : 'Standard entry', qty: 50, unit_price: 99, remaining_qty: 50, is_available: true, formatted_price_text: '99.00 SAR', formatted_price: '99.00 SAR', original_formatted_price: '149.00 SAR' },
+            { id: 2, name: isAr ? 'تذكرة VIP' : 'VIP Ticket', description: isAr ? 'مع هدية' : 'Includes gift bag', qty: 20, unit_price: 249, remaining_qty: 20, is_available: true, formatted_price_text: '249.00 SAR', formatted_price: '249.00 SAR', original_formatted_price: '' },
         ];
     } else if (type === 'rental') {
         bookingConfig.rental_slot = {
@@ -827,8 +791,6 @@ function buildContext(pageType, locale, slug, themeRoot) {
         theme: themeSettings,
         translations,
 
-        categories: resolveCategoryCards([1, 2, 3], locale),
-        products: Array.from({ length: 12 }, (_, i) => makeProductCard(i + 1, locale)),
         collections: {
             featured: { products: Array.from({ length: 8 }, (_, i) => makeProductCard(i + 1, locale)) },
             trending: { products: Array.from({ length: 8 }, (_, i) => makeProductCard(i + 5, locale)) },
