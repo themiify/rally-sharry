@@ -14,6 +14,8 @@
  *   variant_prices  – { variantId: { regular, final } }
  *   variant_images  – { variantId: [{ small_image_url, large_image_url, … }] }
  *   variant_videos  – { variantId: [...] }
+ *   variant_availability – { variantId: { available, out_of_stock } }
+ *   variant_skus    – { variantId: sku }
  *   regular         – { price, formatted_price }   (base / "from" price)
  */
 export function initConfigurableProduct() {
@@ -47,14 +49,24 @@ export function initConfigurableProduct() {
     var mainImage = document.getElementById('glMainProductImage');
     var thumbsContainer = document.querySelector('.gl-product-gallery-thumbs');
     var variantsContainer = document.querySelector('.gl-product-variants');
+    var availabilityEl = document.querySelector('[data-product-availability]');
+    var skuEl = document.querySelector('[data-product-sku]');
+    var purchaseButtons = document.querySelectorAll('[data-product-purchase-button]');
+    var originalPurchaseDisabled = Array.from(purchaseButtons, function (button) {
+        return button.disabled;
+    });
     if (!variantsContainer) return;
 
     // i18n labels passed via data-attributes on the container
     var selectLabel = variantsContainer.getAttribute('data-select-label') || 'Select';
     var selectAboveLabel = variantsContainer.getAttribute('data-select-above-label') || 'Select above option first';
+    var outOfStockLabel = variantsContainer.getAttribute('data-out-of-stock-label') || 'Out of stock';
 
     // Snapshot original gallery for reset
     var originalMainSrc = mainImage ? mainImage.src : '';
+    var originalSku = skuEl ? skuEl.textContent : '';
+    var originalAvailability = availabilityEl ? availabilityEl.textContent : '';
+    var originalAvailabilityClass = availabilityEl ? availabilityEl.className : '';
     var originalThumbs = [];
     if (thumbsContainer) {
         thumbsContainer.querySelectorAll('img').forEach(function (img) {
@@ -117,7 +129,12 @@ export function initConfigurableProduct() {
             }
 
             if (allowed.length > 0) {
-                attribute.filteredOptions.push(Object.assign({}, opt, { allowedProducts: allowed }));
+                var availableProducts = allowed.filter(isVariantAvailable);
+                attribute.filteredOptions.push(Object.assign({}, opt, {
+                    allowedProducts: allowed,
+                    availableProducts: availableProducts,
+                    disabled: availableProducts.length === 0,
+                }));
             }
         }
     }
@@ -138,13 +155,17 @@ export function initConfigurableProduct() {
             var matched = attribute.filteredOptions.find(function (o) {
                 return String(o.id) === String(optionId);
             });
-            if (matched && matched.allowedProducts) {
+            if (!matched || matched.disabled) return;
+            if (matched.availableProducts && matched.availableProducts.length) {
+                possibleOptionVariant = matched.availableProducts[0];
+            } else if (matched.allowedProducts) {
                 possibleOptionVariant = matched.allowedProducts[0];
             }
 
             attribute.selectedValue = optionId;
 
             if (attribute.nextAttribute) {
+                selectedOptionVariant = null;
                 attribute.nextAttribute.disabled = false;
                 attribute.nextAttribute.selectedValue = null;
                 fillAttributeOptions(attribute.nextAttribute);
@@ -166,7 +187,50 @@ export function initConfigurableProduct() {
 
         reloadPrice();
         reloadImages();
+        reloadVariantDetails();
         renderAttributes();
+    }
+
+    function isVariantAvailable(variantId) {
+        var availability = config.variant_availability && (
+            config.variant_availability[variantId]
+            || config.variant_availability[String(variantId)]
+        );
+
+        return availability ? availability.available !== false : true;
+    }
+
+    function reloadVariantDetails() {
+        var fullySelected = childAttributes.every(function (attribute) {
+            return Boolean(attribute.selectedValue);
+        });
+        var variantId = fullySelected ? selectedOptionVariant : null;
+        var available = variantId ? isVariantAvailable(variantId) : null;
+
+        if (skuEl) {
+            skuEl.textContent = variantId && config.variant_skus && config.variant_skus[variantId]
+                ? config.variant_skus[variantId]
+                : originalSku;
+        }
+
+        if (availabilityEl) {
+            if (!variantId) {
+                availabilityEl.textContent = originalAvailability;
+                availabilityEl.className = originalAvailabilityClass;
+            } else {
+                availabilityEl.textContent = available
+                    ? availabilityEl.dataset.inStockLabel
+                    : availabilityEl.dataset.outOfStockLabel;
+                availabilityEl.classList.toggle('in-stock', available);
+                availabilityEl.classList.toggle('out-of-stock', !available);
+            }
+        }
+
+        purchaseButtons.forEach(function (button, index) {
+            button.disabled = fullySelected
+                ? !available
+                : originalPurchaseDisabled[index];
+        });
     }
 
     // ── Price ─────────────────────────────────────────────────────────────
@@ -184,7 +248,7 @@ export function initConfigurableProduct() {
                         : (vp.regular ? vp.regular.formatted_price : priceCurrentEl.textContent);
                 }
                 if (priceOriginalEl) {
-                    if (vp.regular && vp.final && parseInt(vp.regular.price) > parseInt(vp.final.price)) {
+                    if (vp.regular && vp.final && Number(vp.regular.price) > Number(vp.final.price)) {
                         priceOriginalEl.textContent = vp.regular.formatted_price;
                         priceOriginalEl.style.display = '';
                     } else {
@@ -270,10 +334,14 @@ export function initConfigurableProduct() {
             labelRow.appendChild(valueEl);
             wrapper.appendChild(labelRow);
 
-            if (attribute.swatch_type === 'color') {
-                renderColorSwatch(wrapper, attribute);
-            } else if (attribute.swatch_type === 'image') {
+            var hasOptionVisual = attribute.filteredOptions.some(function (option) {
+                return Boolean(option.visual_url);
+            });
+
+            if (hasOptionVisual || attribute.swatch_type === 'image') {
                 renderImageSwatch(wrapper, attribute);
+            } else if (attribute.swatch_type === 'color') {
+                renderColorSwatch(wrapper, attribute);
             } else {
                 renderDropdown(wrapper, attribute);
             }
@@ -299,6 +367,7 @@ export function initConfigurableProduct() {
                 var o = document.createElement('option');
                 o.value = opt.id;
                 o.textContent = opt.label;
+                o.disabled = Boolean(opt.disabled);
                 if (String(opt.id) === String(attribute.selectedValue)) o.selected = true;
                 select.appendChild(o);
             });
@@ -331,6 +400,8 @@ export function initConfigurableProduct() {
             btn.setAttribute('aria-label', opt.label);
             btn.setAttribute('aria-pressed', String(opt.id) === String(attribute.selectedValue) ? 'true' : 'false');
             btn.className = 'gl-variant-color-btn';
+            btn.disabled = Boolean(opt.disabled);
+            btn.setAttribute('aria-disabled', opt.disabled ? 'true' : 'false');
 
             var circle = document.createElement('span');
             circle.className = 'gl-variant-color-circle';
@@ -368,23 +439,50 @@ export function initConfigurableProduct() {
         attribute.filteredOptions.forEach(function (opt) {
             var lbl = document.createElement('label');
             lbl.className = 'gl-variant-image-label';
+            lbl.setAttribute('aria-label', opt.disabled
+                ? opt.label + ' (' + outOfStockLabel + ')'
+                : opt.label);
 
             var inp = document.createElement('input');
             inp.type = 'radio'; inp.name = 'super_attribute[' + attribute.id + ']';
             inp.value = opt.id; inp.required = true;
+            inp.disabled = Boolean(opt.disabled);
             if (String(opt.id) === String(attribute.selectedValue)) inp.checked = true;
             inp.addEventListener('change', function () { configure(attribute, this.value); });
 
-            var img = document.createElement('img');
-            img.src = opt.swatch_value || '';
-            img.alt = opt.label;
-            img.className = 'gl-variant-image-img';
-
             var txt = document.createElement('span');
             txt.className = 'gl-variant-image-text';
-            txt.textContent = opt.label;
+            txt.textContent = opt.disabled
+                ? opt.label + ' (' + outOfStockLabel + ')'
+                : opt.label;
 
-            lbl.appendChild(inp); lbl.appendChild(img); lbl.appendChild(txt);
+            lbl.appendChild(inp);
+
+            var imageUrl = opt.visual_url || (attribute.swatch_type === 'image' ? opt.swatch_value : '');
+            if (imageUrl) {
+                var img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = opt.label;
+                img.className = 'gl-variant-image-img';
+                img.addEventListener('error', function () {
+                    img.remove();
+
+                    if (attribute.swatch_type === 'color') {
+                        var color = document.createElement('span');
+                        color.className = 'gl-variant-color-circle';
+                        color.style.backgroundColor = opt.swatch_value || '#e5e7eb';
+                        lbl.insertBefore(color, txt);
+                    }
+                }, { once: true });
+                lbl.appendChild(img);
+            } else if (attribute.swatch_type === 'color') {
+                var color = document.createElement('span');
+                color.className = 'gl-variant-color-circle';
+                color.style.backgroundColor = opt.swatch_value || '#e5e7eb';
+                lbl.appendChild(color);
+            }
+
+            lbl.appendChild(txt);
             box.appendChild(lbl);
         });
 

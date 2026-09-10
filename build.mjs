@@ -57,7 +57,6 @@ const isDev   = isWatch || process.argv.includes('--dev');
 const THEME_ROOT = __dirname;
 const JS_SRC     = resolve(THEME_ROOT, 'assets', 'js', 'index.js');
 const JS_OUT     = resolve(THEME_ROOT, 'assets', 'js', `${slug}.js`);
-const CSS_OUT    = resolve(THEME_ROOT, 'assets', 'css', `${slug}.css`);
 
 // ── esbuild ───────────────────────────────────────────────────────────────────
 

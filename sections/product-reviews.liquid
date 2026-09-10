@@ -1,0 +1,735 @@
+<link rel="stylesheet" href="{{ 'product-reviews.css' | asset_url }}">
+
+{% assign review_settings = product.review_settings %}
+{% assign review_ratings = product.ratings %}
+{% assign review_average = review_ratings.average | default: 0 %}
+{% assign review_total = review_ratings.total_reviews | default: product.reviews_count | default: 0 %}
+{% assign review_feedback = review_ratings.total_feedback | default: review_total %}
+{% assign review_percentage = review_ratings.percentage %}
+
+{% assign count_5 = 0 %}
+{% assign count_4 = 0 %}
+{% assign count_3 = 0 %}
+{% assign count_2 = 0 %}
+{% assign count_1 = 0 %}
+
+{% if product.reviews != blank and product.reviews.size > 0 %}
+  {% assign calc_total = product.reviews.size %}
+  {% assign calc_sum = 0 %}
+  {% for _r in product.reviews %}
+    {% assign _r_val = _r.rating | default: 5 | plus: 0 %}
+    {% assign calc_sum = calc_sum | plus: _r_val %}
+    {% if _r_val == 5 %}{% assign count_5 = count_5 | plus: 1 %}
+    {% elsif _r_val == 4 %}{% assign count_4 = count_4 | plus: 1 %}
+    {% elsif _r_val == 3 %}{% assign count_3 = count_3 | plus: 1 %}
+    {% elsif _r_val == 2 %}{% assign count_2 = count_2 | plus: 1 %}
+    {% elsif _r_val == 1 %}{% assign count_1 = count_1 | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+
+  {% if review_average == 0 or review_average == 0.0 or review_average == "0" %}
+    {% assign review_average = calc_sum | times: 1.0 | divided_by: calc_total | round: 1 %}
+  {% endif %}
+  {% if review_total == 0 or review_total == "0" %}
+    {% assign review_total = calc_total %}
+  {% endif %}
+{% endif %}
+{% assign customer_reviews_label = translations.product.customer_reviews | default: 'آراء العملاء' %}
+{% assign empty_review_label = translations.product.empty_review | default: 'لا توجد مراجعات حتى الآن، كوني أول من يراجع هذا المنتج' %}
+{% assign failed_upload_label = translations.product.failed_to_upload | default: 'فشل تحميل المرفق.' %}
+{% assign review_error_label = translations.product.review_error | default: 'تعذر إرسال مراجعتك.' %}
+{% assign review_load_error_label = translations.product.review_load_error | default: 'تعذر تحميل المراجعات.' %}
+{% assign review_translation_error_label = translations.product.review_translation_error | default: 'تعذر ترجمة المراجعة.' %}
+{% assign load_more_label = translations.product.load_more | default: 'عرض المزيد' %}
+{% assign loading_label = translations.product.loading | default: 'جاري الإرسال...' %}
+{% assign name_label = translations.product.name | default: 'الاسم' %}
+{% assign rating_label = translations.product.rating | default: 'التقييم' %}
+{% assign ratings_label = translations.product.ratings | default: 'تقييمات' %}
+{% assign submit_review_label = translations.product.submit_review | default: 'إرسال المراجعة' %}
+{% assign success_label = translations.product.review_success | default: 'تم إرسال مراجعتك بنجاح.' %}
+{% assign title_label = translations.product.title | default: 'عنوان المراجعة' %}
+{% assign comment_label = translations.product.comment | default: 'التعليق والرأي' %}
+{% assign attachments_label = translations.product.attachments | default: 'المرفقات (صور أو فيديو)' %}
+{% assign write_review_label = translations.product.write_a_review | default: 'كتابة مراجعة' %}
+{% assign cancel_label = translations.product.cancel | default: 'إلغاء' %}
+
+<div
+  id="product-reviews"
+  class="gl-product-reviews"
+  data-product-reviews
+  data-review-index-url="{{ product.actions.reviews_index_url }}"
+  data-review-store-url="{{ product.actions.reviews_store_url }}"
+  data-review-translate-url="{{ product.actions.reviews_translate_url }}"
+  data-review-enabled="{% if review_settings.enabled %}true{% else %}true{% endif %}"
+  data-review-guest-enabled="{% if review_settings.guest_enabled %}true{% else %}true{% endif %}"
+  data-review-empty-label="{{ empty_review_label }}"
+  data-review-failed-upload-label="{{ failed_upload_label }}"
+  data-review-error-label="{{ review_error_label }}"
+  data-review-load-error-label="{{ review_load_error_label }}"
+  data-review-success-label="{{ success_label }}"
+  data-review-loading-label="{{ loading_label }}"
+  data-review-load-more-label="{{ load_more_label }}"
+  data-review-rating-label="{{ rating_label }}"
+>
+  <div data-review-content>
+    <div class="gl-product-reviews-grid">
+      <!-- القائمة على اليسار (Review Cards List) -->
+      <div class="gl-product-review-list-wrap">
+        <div class="gl-product-review-list gl-product-review-cards-list" data-review-list>
+          {% if product.reviews.size > 0 %}
+            {% for review in product.reviews %}
+              {% assign r_images = nil %}
+              {% if review.images != blank and review.images.size > 0 %}
+                {% assign r_images = review.images %}
+              {% elsif review.media != blank and review.media.size > 0 %}
+                {% assign r_images = review.media %}
+              {% elsif review.attachments != blank and review.attachments.size > 0 %}
+                {% assign r_images = review.attachments %}
+              {% elsif review.photos != blank and review.photos.size > 0 %}
+                {% assign r_images = review.photos %}
+              {% elsif review.files != blank and review.files.size > 0 %}
+                {% assign r_images = review.files %}
+              {% endif %}
+
+              {% assign first_img_url = '' %}
+              {% if r_images != blank and r_images.size > 0 %}
+                {% for img in r_images limit: 1 %}
+                  {% assign first_img_url = img.url | default: img.src | default: img.image | default: img.original | default: img.thumb | default: img.path | default: img.file | default: img.link | default: img %}
+                {% endfor %}
+              {% elsif review.image != blank or review.image_url != blank or review.photo != blank or review.file_url != blank %}
+                {% assign first_img_url = review.image | default: review.image_url | default: review.photo | default: review.file_url %}
+              {% endif %}
+
+              {% assign user_avatar = review.avatar | default: review.user.avatar | default: review.profile | default: review.user.profile %}
+              {% if user_avatar == blank and first_img_url != blank and first_img_url != '[object Object]' %}
+                {% assign user_avatar = first_img_url %}
+              {% endif %}
+
+              {% assign review_rating_val = review.rating | plus: 0 %}
+
+              <article class="gl-product-review-card gl-product-review-card-item" data-review-server-card>
+                <div class="gl-product-review-card-header">
+                  <div class="gl-product-review-user-info">
+                    {% if user_avatar != blank %}
+                      <img
+                        src="{{ user_avatar }}"
+                        alt="{{ review.name }}"
+                        class="gl-product-review-user-avatar"
+                        loading="lazy"
+                        onerror="this.outerHTML='<div class=&quot;gl-product-review-user-avatar-fallback&quot;><svg width=&quot;22&quot; height=&quot;22&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;#367E18&quot; stroke-width=&quot;2&quot;><path d=&quot;M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2&quot;></path><circle cx=&quot;12&quot; cy=&quot;7&quot; r=&quot;4&quot;></circle></svg></div>';"
+                      >
+                    {% else %}
+                      <div class="gl-product-review-user-avatar-fallback">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#367E18" stroke-width="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                      </div>
+                    {% endif %}
+
+                    <div class="gl-product-review-user-details">
+                      <span class="gl-product-review-user-name">{{ review.name }}</span>
+                      {% if review.created_at != blank %}
+                        <time class="gl-product-review-card-date">{{ review.created_at }}</time>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="gl-product-review-card-stars" aria-label="{{ review_rating_val }} {{ rating_label }}">
+                    {% for i in (1..5) %}
+                      <span class="{% if review_rating_val >= i %}is-filled{% endif %}" aria-hidden="true">★</span>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div class="gl-product-review-card-body">
+                  {% if review.title != blank %}
+                    <h5 class="gl-product-review-card-title">{{ review.title }}</h5>
+                  {% endif %}
+                  <p class="gl-product-review-card-text">{{ review.comment }}</p>
+
+                  {% if r_images != blank and r_images.size > 0 %}
+                    <div class="gl-product-review-images-grid">
+                      {% for img in r_images %}
+                        {% assign img_url = img.url | default: img.src | default: img.image | default: img.original | default: img.thumb | default: img.path | default: img.file | default: img.link | default: img %}
+                        {% if img_url != blank and img_url != '[object Object]' and img_url != user_avatar %}
+                          <a href="{{ img_url }}" target="_blank" rel="noopener" class="gl-review-image-item">
+                            <img src="{{ img_url }}" alt="{{ review.title | default: review.name }}" loading="lazy">
+                          </a>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </article>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <div class="gl-product-review-empty-box" data-review-empty {% if product.reviews.size > 0 %}hidden{% endif %}>
+          <div class="gl-review-empty-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#367E18" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              <path d="M8 10h.01M12 10h.01M16 10h.01"></path>
+            </svg>
+          </div>
+          <h4 class="gl-review-empty-title">لا توجد مراجعات حتى الآن، كوني أول من يراجع هذا المنتج!</h4>
+          <p class="gl-review-empty-subtitle">كن أول من يشارك رأيه وتجربته عن هذا المنتج!</p>
+          <button type="button" class="gl-btn gl-btn-add-review gl-review-empty-btn" data-review-write>
+            {{ write_review_label | default: 'أضف مراجعة' }}
+          </button>
+        </div>
+
+        <div class="gl-product-review-load-more-wrap" style="margin-top:1.5rem;text-align:center;">
+          <button type="button" class="gl-btn gl-btn-outline" data-review-load-more hidden>
+            {{ load_more_label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ملخص التقييمات على اليمين (Right Summary Box in RTL) -->
+      <div class="gl-product-review-summary-box">
+        <div class="gl-product-review-summary-header">
+          <h3>{{ customer_reviews_label }}</h3>
+        </div>
+
+        <div class="gl-product-review-rating-row">
+          <span class="gl-product-review-rating-score" data-review-average>{{ review_average }}</span>
+          <div class="gl-product-review-rating-stars" aria-label="{{ review_average }} {{ rating_label }}">
+            {% for i in (1..5) %}
+              <span class="{% if review_average >= i %}is-filled{% endif %}" aria-hidden="true">★</span>
+            {% endfor %}
+          </div>
+          <span class="gl-product-review-rating-count">
+            (<span data-review-count>{{ review_total }}</span> {{ ratings_label }})
+          </span>
+        </div>
+
+        <div class="gl-product-review-dist-list" aria-label="{{ ratings_label }}">
+          {% for star in (5..1) %}
+            {% assign rating_percentage = review_percentage[star] %}
+            {% assign count_val = review_ratings.count[star] %}
+            {% if count_val == nil or count_val == 0 %}
+              {% if star == 5 %}{% assign count_val = count_5 %}
+              {% elsif star == 4 %}{% assign count_val = count_4 %}
+              {% elsif star == 3 %}{% assign count_val = count_3 %}
+              {% elsif star == 2 %}{% assign count_val = count_2 %}
+              {% elsif star == 1 %}{% assign count_val = count_1 %}
+              {% endif %}
+            {% endif %}
+            {% if rating_percentage == nil or rating_percentage == 0 %}
+              {% if review_total > 0 %}
+                {% assign rating_percentage = count_val | times: 100 | divided_by: review_total %}
+              {% else %}
+                {% assign rating_percentage = 0 %}
+              {% endif %}
+            {% endif %}
+            <div class="gl-product-review-dist-row">
+              <span class="gl-product-review-dist-val" data-star-count-val="{{ star }}">{{ count_val }}</span>
+              <div class="gl-product-review-dist-bar" role="progressbar">
+                <span
+                  class="gl-product-review-dist-fill"
+                  data-star-fill-val="{{ star }}"
+                  style="width:{{ rating_percentage }}%;background-color:#367E18;"
+                ></span>
+              </div>
+              <div class="gl-product-review-dist-stars">
+                {% for i in (1..5) %}
+                  <span style="color:{% if i <= star %}#fbbf24{% else %}#e5e7eb{% endif %};">★</span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="gl-product-review-actions" data-review-summary-action style="margin-top:1.5rem;">
+          <button type="button" class="gl-btn gl-btn-add-review" data-review-write>
+            {{ write_review_label | default: 'كتابة مراجعة' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form
+    class="gl-product-review-form"
+    action="{{ product.actions.reviews_store_url }}"
+    method="POST"
+    enctype="multipart/form-data"
+    data-review-form
+    hidden
+  >
+    <input type="hidden" name="_token" value="{{ csrf_token }}">
+
+    <div class="gl-product-review-form-body">
+      <!-- Star Rating Picker -->
+      <div class="gl-product-review-field gl-product-review-rating-field">
+        <label class="gl-field-label">{{ rating_label }}</label>
+        <div class="gl-product-review-stars-picker" data-review-stars-picker>
+          {% for i in (1..5) %}
+            <span class="gl-star-picker-item {% if i <= 5 %}is-selected{% endif %}" data-star-index="{{ i }}" role="button" tabindex="0" title="{{ i }} نجوم">★</span>
+          {% endfor %}
+        </div>
+        <input type="hidden" name="rating" value="5" data-review-rating-input>
+      </div>
+
+      <!-- Attachments File Upload -->
+      <div class="gl-product-review-field gl-file-upload-field">
+        <label class="gl-field-label" for="product-review-attachments-{{ product.id }}">{{ attachments_label }}</label>
+        <div class="gl-file-upload-wrapper">
+          <input
+            id="product-review-attachments-{{ product.id }}"
+            type="file"
+            name="images[]"
+            accept="image/*,video/*"
+            multiple
+            data-review-attachments
+            class="gl-file-input"
+          >
+          <div class="gl-file-upload-box" data-file-upload-box>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#367E18" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span class="gl-file-upload-text" data-file-upload-text>إرفاق صور أو فيديو (اضغط هنا لاختيار الملفات)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guest Name Field (if enabled) -->
+      <div class="gl-product-review-field" data-review-guest-name-field hidden>
+        <label class="gl-field-label" for="product-review-name-{{ product.id }}">{{ name_label }}</label>
+        <input id="product-review-name-{{ product.id }}" type="text" name="name" placeholder="ادخل اسمك" data-review-guest-name-input>
+      </div>
+
+      <!-- Title Input -->
+      <div class="gl-product-review-field">
+        <label class="gl-field-label" for="product-review-title-{{ product.id }}">{{ title_label }}</label>
+        <input id="product-review-title-{{ product.id }}" type="text" name="title" placeholder="عنوان المراجعة أو التقييم" required>
+      </div>
+
+      <!-- Comment Textarea -->
+      <div class="gl-product-review-field">
+        <label class="gl-field-label" for="product-review-comment-{{ product.id }}">{{ comment_label }}</label>
+        <textarea id="product-review-comment-{{ product.id }}" name="comment" rows="5" placeholder="اكتب رأيك وتجربتك بالتفصيل..." required></textarea>
+      </div>
+
+      <p class="gl-product-review-form-message" data-review-form-message role="alert" hidden></p>
+
+      <!-- Form Action Buttons -->
+      <div class="gl-product-review-form-actions">
+        <button type="submit" class="gl-btn gl-btn-add-review" data-review-submit style="width:auto;min-width:160px;">
+          {{ submit_review_label }}
+        </button>
+        <button type="button" class="gl-btn gl-btn-outline" data-review-cancel>
+          {{ cancel_label }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  (function() {
+    function initProductReviews() {
+      var reviewContainer = document.querySelector('[data-product-reviews]');
+      if (!reviewContainer) return;
+
+      var writeButtons = document.querySelectorAll('[data-review-write]');
+      var reviewForm = reviewContainer.querySelector('[data-review-form]');
+      var cancelBtn = reviewContainer.querySelector('[data-review-cancel]');
+      var starsPicker = reviewContainer.querySelector('[data-review-stars-picker]');
+      var ratingInput = reviewContainer.querySelector('[data-review-rating-input]');
+      var messageEl = reviewContainer.querySelector('[data-review-form-message]');
+      var fileInput = reviewContainer.querySelector('[data-review-attachments]');
+      var fileBox = reviewContainer.querySelector('[data-file-upload-box]');
+      var fileText = reviewContainer.querySelector('[data-file-upload-text]');
+
+      var fallbackSvg = '<div class="gl-product-review-user-avatar-fallback"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#367E18" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+
+      // Load reviews list from Salla API on component initialization
+      function loadReviewsFromApi() {
+        var indexUrl = reviewContainer.getAttribute('data-review-index-url');
+        if (!indexUrl) return;
+
+        fetch(indexUrl, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json, text/plain, */*'
+          }
+        })
+        .then(function(res) {
+          if (!res.ok) return null;
+          return res.json();
+        })
+        .then(function(resData) {
+          console.log('[ZAD Debug] API Fetched Reviews List:', resData);
+          if (!resData) return;
+          var reviewsList = (resData && (resData.data || resData.reviews)) || (Array.isArray(resData) ? resData : []);
+          if (!Array.isArray(reviewsList) || reviewsList.length === 0) return;
+
+          var reviewListEl = reviewContainer.querySelector('[data-review-list]');
+          var emptyBox = reviewContainer.querySelector('[data-review-empty]');
+          if (!reviewListEl) return;
+
+          var cardsHtml = '';
+          reviewsList.forEach(function(rev) {
+            var revName = rev.name || (rev.user && rev.user.name) || 'عميل';
+            var revDate = rev.created_at || '';
+            var revRating = Math.round(parseFloat(rev.rating) || 5);
+            var revTitle = rev.title || '';
+            var revComment = rev.comment || rev.content || '';
+
+            var imgs = rev.images || rev.media || rev.attachments || rev.photos || rev.files || [];
+            if (!Array.isArray(imgs) && typeof imgs === 'object') {
+              imgs = [imgs];
+            }
+            var imgUrls = [];
+            if (Array.isArray(imgs)) {
+              imgs.forEach(function(imgObj) {
+                var u = typeof imgObj === 'string' ? imgObj : (imgObj.url || imgObj.src || imgObj.image || imgObj.original || imgObj.thumb || imgObj.path || imgObj.file || imgObj.link);
+                if (u && u !== '[object Object]') {
+                  imgUrls.push(u);
+                }
+              });
+            }
+            if (imgUrls.length === 0 && (rev.image || rev.image_url || rev.photo || rev.file_url)) {
+              var singleU = rev.image || rev.image_url || rev.photo || rev.file_url;
+              if (singleU && singleU !== '[object Object]') {
+                imgUrls.push(singleU);
+              }
+            }
+
+            var userAvatar = rev.avatar || rev.profile || (rev.user && (rev.user.avatar || rev.user.profile)) || rev.user_avatar || rev.avatar_url || '';
+            if (!userAvatar && imgUrls.length > 0) {
+              userAvatar = imgUrls[0];
+            }
+
+            var starsHtml = '';
+            for (var s = 1; s <= 5; s++) {
+              starsHtml += '<span class="' + (s <= revRating ? 'is-filled' : '') + '">★</span>';
+            }
+
+            var avatarHtml = '';
+            if (userAvatar) {
+              avatarHtml = '<img src="' + userAvatar + '" alt="' + revName + '" class="gl-product-review-user-avatar" loading="lazy" onerror="this.outerHTML=\'<div class=\\&quot;gl-product-review-user-avatar-fallback\\&quot;><svg width=\\&quot;22\\&quot; height=\\&quot;22\\&quot; viewBox=\\&quot;0 0 24 24\\&quot; fill=\\&quot;none\\&quot; stroke=\\&quot;#367E18\\&quot; stroke-width=\\&quot;2\\&quot;><path d=\\&quot;M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\\&quot;></path><circle cx=\\&quot;12\\&quot; cy=\\&quot;7\\&quot; r=\\&quot;4\\&quot;></circle></svg></div>\';">';
+            } else {
+              avatarHtml = fallbackSvg;
+            }
+
+            var imagesHtml = '';
+            var bodyImgs = imgUrls.filter(function(u) { return u !== userAvatar; });
+            if (bodyImgs.length > 0) {
+              imagesHtml += '<div class="gl-product-review-images-grid">';
+              bodyImgs.forEach(function(url) {
+                imagesHtml += '<a href="' + url + '" target="_blank" rel="noopener" class="gl-review-image-item"><img src="' + url + '" alt="' + (revTitle || revName) + '" loading="lazy"></a>';
+              });
+              imagesHtml += '</div>';
+            }
+
+            cardsHtml += '<article class="gl-product-review-card gl-product-review-card-item">' +
+              '<div class="gl-product-review-card-header">' +
+                '<div class="gl-product-review-user-info">' + avatarHtml +
+                  '<div class="gl-product-review-user-details">' +
+                    '<span class="gl-product-review-user-name">' + revName + '</span>' +
+                    (revDate ? '<time class="gl-product-review-card-date">' + revDate + '</time>' : '') +
+                  '</div>' +
+                '</div>' +
+                '<div class="gl-product-review-card-stars">' + starsHtml + '</div>' +
+              '</div>' +
+              '<div class="gl-product-review-card-body">' +
+                (revTitle ? '<h5 class="gl-product-review-card-title">' + revTitle + '</h5>' : '') +
+                '<p class="gl-product-review-card-text">' + revComment + '</p>' +
+                imagesHtml +
+              '</div>' +
+            '</article>';
+          });
+
+          if (cardsHtml) {
+            reviewListEl.innerHTML = cardsHtml;
+            if (emptyBox) {
+              emptyBox.hidden = true;
+              emptyBox.style.display = 'none';
+            }
+
+            var calcTotal = reviewsList.length;
+            var calcSum = 0;
+            var starCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+            reviewsList.forEach(function(rev) {
+              var rVal = Math.min(5, Math.max(1, Math.round(parseFloat(rev.rating) || 5)));
+              calcSum += rVal;
+              starCounts[rVal] = (starCounts[rVal] || 0) + 1;
+            });
+
+            var calcAvg = (calcSum / calcTotal).toFixed(1);
+            if (calcAvg.endsWith('.0')) {
+              calcAvg = calcAvg.slice(0, -2);
+            }
+
+            var avgEls = reviewContainer.querySelectorAll('[data-review-average]');
+            avgEls.forEach(function(el) {
+              el.textContent = calcAvg;
+            });
+
+            var countEls = document.querySelectorAll('[data-review-count]');
+            countEls.forEach(function(el) {
+              el.textContent = calcTotal;
+            });
+
+            var overviewStars = reviewContainer.querySelector('.gl-product-review-rating-stars');
+            if (overviewStars) {
+              var starSpans = overviewStars.querySelectorAll('span');
+              var roundedAvg = Math.round(parseFloat(calcAvg));
+              starSpans.forEach(function(span, idx) {
+                if (idx < roundedAvg) {
+                  span.classList.add('is-filled');
+                  span.style.color = '#fbbf24';
+                } else {
+                  span.classList.remove('is-filled');
+                  span.style.color = '#e5e7eb';
+                }
+              });
+            }
+
+            for (var sNum = 1; sNum <= 5; sNum++) {
+              var cVal = starCounts[sNum] || 0;
+              var pct = Math.round((cVal / calcTotal) * 100);
+
+              var valEl = reviewContainer.querySelector('[data-star-count-val="' + sNum + '"]');
+              if (valEl) valEl.textContent = cVal;
+
+              var fillEl = reviewContainer.querySelector('[data-star-fill-val="' + sNum + '"]');
+              if (fillEl) fillEl.style.width = pct + '%';
+            }
+          }
+        })
+        .catch(function(err) {
+          console.log('[ZAD Debug] Error loading reviews from API:', err);
+        });
+      }
+
+      loadReviewsFromApi();
+
+      // Make clicking on upload box trigger file input click reliably
+      if (fileBox && fileInput) {
+        fileBox.addEventListener('click', function(e) {
+          if (e.target !== fileInput) {
+            fileInput.click();
+          }
+        });
+      }
+
+      // File Upload Label Update & Console log
+      if (fileInput && fileText) {
+        fileInput.addEventListener('change', function() {
+          console.log('[ZAD Debug] Selected files:', fileInput.files);
+          if (fileInput.files && fileInput.files.length > 0) {
+            fileText.textContent = 'تم اختيار ' + fileInput.files.length + ' ملفات';
+            fileText.style.color = '#367E18';
+            fileText.style.fontWeight = '700';
+          } else {
+            fileText.textContent = 'إرفاق صور أو فيديو (اضغط هنا لاختيار الملفات)';
+            fileText.style.color = '#6b7280';
+            fileText.style.fontWeight = 'normal';
+          }
+        });
+      }
+
+      // Toggle Form display on Write Review button click
+      writeButtons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (reviewForm) {
+            reviewForm.removeAttribute('hidden');
+            reviewForm.style.display = 'block';
+            if (messageEl) {
+              messageEl.hidden = true;
+              messageEl.style.display = 'none';
+              messageEl.textContent = '';
+            }
+            reviewForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            var input = reviewForm.querySelector('input:not([type="hidden"]), textarea');
+            if (input) {
+              setTimeout(function() { input.focus(); }, 300);
+            }
+          }
+        });
+      });
+
+      // Cancel Button Click
+      if (cancelBtn && reviewForm) {
+        cancelBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          reviewForm.style.display = 'none';
+          reviewForm.setAttribute('hidden', 'true');
+        });
+      }
+
+      // Interactive Star Rating Picker (Click + Hover)
+      if (starsPicker && ratingInput) {
+        var starItems = starsPicker.querySelectorAll('[data-star-index]');
+        var selectedRating = parseInt(ratingInput.value, 10) || 5;
+
+        function updateStarsDisplay(ratingVal) {
+          starItems.forEach(function(item) {
+            var idx = parseInt(item.getAttribute('data-star-index'), 10);
+            if (idx <= ratingVal) {
+              item.classList.add('is-selected');
+              item.style.color = '#fbbf24';
+            } else {
+              item.classList.remove('is-selected');
+              item.style.color = '#d1d5db';
+            }
+          });
+        }
+
+        updateStarsDisplay(selectedRating);
+
+        starItems.forEach(function(item) {
+          // Hover
+          item.addEventListener('mouseenter', function() {
+            var idx = parseInt(this.getAttribute('data-star-index'), 10);
+            updateStarsDisplay(idx);
+          });
+
+          // Click
+          item.addEventListener('click', function(e) {
+            e.preventDefault();
+            selectedRating = parseInt(this.getAttribute('data-star-index'), 10);
+            ratingInput.value = selectedRating;
+            updateStarsDisplay(selectedRating);
+            console.log('[ZAD Debug] Rating selected:', selectedRating);
+          });
+        });
+
+        starsPicker.addEventListener('mouseleave', function() {
+          updateStarsDisplay(selectedRating);
+        });
+      }
+
+      // AJAX Form Submit Handler
+      if (reviewForm) {
+        if (reviewForm.dataset.submitBound === 'true') return;
+        reviewForm.dataset.submitBound = 'true';
+        reviewForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var submitBtn = reviewForm.querySelector('[data-review-submit]');
+          var originalBtnText = submitBtn ? submitBtn.textContent : '';
+          
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = reviewContainer.getAttribute('data-review-loading-label') || 'جاري الإرسال...';
+          }
+
+          if (messageEl) {
+            messageEl.hidden = true;
+            messageEl.style.display = 'none';
+            messageEl.className = 'gl-product-review-form-message';
+          }
+
+          var formData = new FormData(reviewForm);
+
+          if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            console.log('[ZAD Debug] Attaching files to FormData:', fileInput.files);
+            for (var i = 0; i < fileInput.files.length; i++) {
+              var file = fileInput.files[i];
+              formData.append('images[]', file);
+              formData.append('attachments[]', file);
+              formData.append('photos[]', file);
+              formData.append('files[]', file);
+              formData.append('media[]', file);
+              if (i === 0) {
+                formData.append('image', file);
+                formData.append('attachment', file);
+              }
+            }
+          }
+
+          var targetUrl = reviewForm.action || reviewContainer.getAttribute('data-review-store-url');
+          console.log('[ZAD Debug] Submitting to URL:', targetUrl);
+
+          fetch(targetUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'Accept': 'application/json, text/plain, */*'
+            }
+          })
+          .then(function(res) {
+            return res.json().then(function(data) {
+              return { ok: res.ok, status: res.status, data: data };
+            });
+          })
+          .then(function(resObj) {
+            console.log('[ZAD Debug] API Submit Response:', resObj);
+
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalBtnText;
+            }
+
+            if (resObj.ok || (resObj.data && (resObj.data.success || resObj.data.status === 200 || resObj.data.message))) {
+              var msgText = (resObj.data && (resObj.data.message || (resObj.data.data && resObj.data.data.message))) || 'تم إرسال تقييمك بنجاح. ستظهر المراجعة بعد مراجعتها ونشرها من قبل الإدارة.';
+              if (messageEl) {
+                messageEl.textContent = msgText;
+                messageEl.style.color = '#15803d';
+                messageEl.style.backgroundColor = '#f0fdf4';
+                messageEl.style.border = '1px solid #bbf7d0';
+                messageEl.style.padding = '1rem 1.25rem';
+                messageEl.style.borderRadius = '12px';
+                messageEl.style.marginTop = '1rem';
+                messageEl.style.display = 'block';
+                messageEl.style.fontWeight = '600';
+                messageEl.removeAttribute('hidden');
+              }
+
+              reviewForm.reset();
+              if (fileText) {
+                fileText.textContent = 'إرفاق صور أو فيديو (اختياري)';
+                fileText.style.color = '#6b7280';
+                fileText.style.fontWeight = 'normal';
+              }
+              
+              setTimeout(function() {
+                reviewForm.style.display = 'none';
+                reviewForm.setAttribute('hidden', 'true');
+                if (messageEl) {
+                  messageEl.style.display = 'none';
+                  messageEl.setAttribute('hidden', 'true');
+                }
+              }, 4000);
+            } else {
+              throw new Error((resObj.data && resObj.data.message) || 'تعذر إرسال المراجعة.');
+            }
+          })
+          .catch(function(err) {
+            console.error('[ZAD Debug] Submit error:', err);
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalBtnText;
+            }
+            if (messageEl) {
+              messageEl.textContent = err.message || reviewContainer.getAttribute('data-review-error-label') || 'تعذر إرسال مراجعتك. يرجى التأكد من البيانات والمحاولة مجدداً.';
+              messageEl.style.color = '#c62828';
+              messageEl.style.backgroundColor = '#fdeded';
+              messageEl.style.padding = '0.85rem 1rem';
+              messageEl.style.borderRadius = '8px';
+              messageEl.style.marginTop = '1rem';
+              messageEl.style.display = 'block';
+              messageEl.removeAttribute('hidden');
+            }
+          });
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initProductReviews);
+    } else {
+      initProductReviews();
+    }
+  })();
+</script>

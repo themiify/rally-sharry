@@ -27,6 +27,25 @@
         "description": "Description",
         "additional_info": "Additional Info",
         "reviews": "Reviews",
+        "customer_reviews": "Customer Reviews",
+        "empty_review": "No Review found, be the first to review this product",
+        "failed_to_upload": "The attachment failed to upload",
+        "review_error": "Unable to submit your review.",
+        "review_load_error": "Unable to load reviews.",
+        "review_translation_error": "Unable to translate this review.",
+        "load_more": "Load More",
+        "name": "Name",
+        "rating": "Rating",
+        "ratings": "Ratings",
+        "submit_review": "Submit Review",
+        "review_success": "Review submitted successfully.",
+        "title": "Title",
+        "comment": "Comment",
+        "attachments": "Attachments",
+        "translate": "Translate",
+        "translating": "Translating...",
+        "write_a_review": "Write a Review",
+        "cancel": "Cancel",
         "share": "Share",
         "you_may_also_like": "You May Also Like",
         "related_products": "Related Products",
@@ -90,7 +109,7 @@
         "max_price": "Max",
         "sort_name_az": "Name A-Z",
         "show_more_options": "Show more",
-        "search_products":"Search for"
+        "search_products": "Search for"
     },
     "cart_page": {
         "shopping_cart": "Shopping Cart",
@@ -140,7 +159,50 @@
         "send_message": "Send Message",
         "phone": "Phone",
         "address": "Address",
-        "working_hours": "Working Hours"
+        "working_hours": "Working Hours",
+        "country": "Country",
+        "state": "State",
+        "city": "City",
+        "validation": {
+            "required": "This field is required.",
+            "email": "Please enter a valid email address.",
+            "url": "Please enter a valid URL.",
+            "tel": "Please enter a valid phone number.",
+            "number": "Please enter a valid number.",
+            "pattern": "Please match the requested format.",
+            "select_from_list": "Please select from the list.",
+            "select_country": "Select country",
+            "select_state": "Select state",
+            "select_city": "Select city"
+        }
+    },
+    "service_catalog": {
+        "about": {
+            "eyebrow": "About us",
+            "unavailable": "Provider profile is not available."
+        },
+        "services": {
+            "eyebrow": "Our services",
+            "view": "View service",
+            "back": "Back to services",
+            "empty": "No services are available yet.",
+            "related": "Related services",
+            "unavailable": "This service is not available."
+        },
+        "team": {
+            "eyebrow": "Our team",
+            "view": "View profile",
+            "back": "Back to team",
+            "related": "Team members",
+            "empty": "No team members are available yet.",
+            "unavailable": "This team member is not available."
+        },
+        "resume": {
+            "experience": "Experience",
+            "education": "Education",
+            "certificates": "Certificates",
+            "credential": "View credential"
+        }
     },
     "newsletter": {
         "join": "Join the Glamour Family",
@@ -189,5 +251,11 @@
         "product_spotlight_desc": "Handpicked just for you",
         "category_carousel": "Shop the Collection",
         "category_carousel_desc": "Explore our curated picks"
+    },
+    "social_embeds": {
+        "configure": "Add a handle in this section's settings to load the social profile.",
+        "view_profile": "View this profile on the social platform",
+        "embed_unavailable": "This social profile is currently unavailable. You can still visit the profile directly.",
+        "open_profile": "Open Profile"
     }
 }

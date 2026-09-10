@@ -1,0 +1,79 @@
+.gl-product-payment-methods {
+  direction: rtl;
+  width: 100%;
+  margin: 15px 0;
+}
+
+.payment-methods-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.payment-methods-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.payment-method-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: center;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.payment-method-item:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.payment-method-header {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.payment-method-header img {
+  max-height: 32px;
+  max-width: 100px;
+  object-fit: contain;
+}
+
+.payment-method-name {
+  font-weight: bold;
+  font-size: 15px;
+  color: #1f2937;
+}
+
+.payment-method-desc {
+  font-size: 16px;
+  color: #4b5563;
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+  font-weight:500
+}
+
+.payment-method-more {
+  font-size: 12px;
+  color: #e57373;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.payment-method-more:hover {
+  opacity: 0.8;
+}

@@ -133,11 +133,15 @@ function registerMockApis(app) {
     // multer.none() parses multipart/form-data fields (used by the theme's FormData sends)
     // without it, req.body.product_id is always undefined → cart mock defaults to product 1.
     let multerNone = null;
+    let reviewFormParser = null;
     try {
         const multer = require('multer');
-        multerNone = multer({ storage: multer.memoryStorage() }).none();
+        const upload = multer({ storage: multer.memoryStorage() });
+        multerNone = upload.none();
+        reviewFormParser = upload.array('attachments[]', 8);
     } catch (e) { /* multer not installed — FormData fields won't parse */ }
     const formParser = multerNone || ((req, res, next) => next());
+    reviewFormParser = reviewFormParser || formParser;
 
     // In-memory state
     let cart = freshCart();
@@ -305,28 +309,84 @@ function registerMockApis(app) {
     // ── Reviews ───────────────────────────────────────────────────────────────
 
     app.get('/api/product/:id/reviews', (req, res) => {
+        const reviews = [
+            {
+                id: 1, title: 'Amazing product!', comment: 'Really love this, will buy again.',
+                rating: 5, name: 'Sarah M.', profile: 'https://i.pravatar.cc/100?img=47', created_at: '2026-01-15',
+                images: [{ type: 'image', url: 'https://picsum.photos/seed/review-1/240/240' }],
+            },
+            {
+                id: 2, title: 'Great quality', comment: 'High quality and fast shipping.',
+                rating: 4, name: 'Nour A.', profile: null, created_at: '2026-02-20', images: [],
+            },
+            {
+                id: 3, title: 'Lovely color', comment: 'The color is exactly as shown.',
+                rating: 5, name: 'Maha K.', profile: null, created_at: '2026-03-05', images: [],
+            },
+            {
+                id: 4, title: 'Good value', comment: 'A beautiful product for the price.',
+                rating: 4, name: 'Lina R.', profile: null, created_at: '2026-03-21', images: [],
+            },
+            {
+                id: 5, title: 'Very happy', comment: 'The product arrived in perfect condition.',
+                rating: 5, name: 'Huda S.', profile: null, created_at: '2026-04-02', images: [],
+            },
+            {
+                id: 6, title: 'Works well', comment: 'It feels great and lasts all day.',
+                rating: 4, name: 'Dana A.', profile: null, created_at: '2026-04-14', images: [],
+            },
+            {
+                id: 7, title: 'Nice product', comment: 'Would recommend it to friends.',
+                rating: 3, name: 'Reem N.', profile: null, created_at: '2026-04-25', images: [],
+            },
+            {
+                id: 8, title: 'Excellent', comment: 'Everything about this order was excellent.',
+                rating: 5, name: 'Aya F.', profile: null, created_at: '2026-05-01', images: [],
+            },
+            {
+                id: 9, title: 'Fast delivery', comment: 'The delivery was quick and the packaging was secure.',
+                rating: 4, name: 'Mona T.', profile: null, created_at: '2026-05-10', images: [],
+            },
+            {
+                id: 10, title: 'Recommended', comment: 'A reliable product with a lovely finish.',
+                rating: 5, name: 'Nadia W.', profile: null, created_at: '2026-05-18', images: [],
+            },
+        ];
+        const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+        const perPage = 8;
+        const from = (page - 1) * perPage;
+        const data = reviews.slice(from, from + perPage);
+        const hasNext = from + perPage < reviews.length;
+
         res.json({
-            data: [
-                {
-                    id: 1, title: 'Amazing product!', comment: 'Really love this, will buy again.',
-                    rating: 5, name: 'Sarah M.', created_at: '2026-01-15'
-                },
-                {
-                    id: 2, title: 'Great quality', comment: 'High quality and fast shipping.',
-                    rating: 4, name: 'Nour A.', created_at: '2026-02-20'
-                },
-            ]
+            data,
+            links: {
+                next: hasNext ? `/api/product/${req.params.id}/reviews?page=${page + 1}` : null,
+            },
+            meta: {
+                current_page: page,
+                from: data.length ? from + 1 : null,
+                last_page: Math.ceil(reviews.length / perPage),
+                per_page: perPage,
+                to: data.length ? from + data.length : null,
+                total: reviews.length,
+            },
         });
     });
 
-    app.post('/api/product/:id/review', formParser, (req, res) => {
+    app.post('/api/product/:id/review', reviewFormParser, (req, res) => {
         res.json({
             data: {
-                id: 3, title: req.body.title, comment: req.body.comment,
-                rating: req.body.rating, name: 'Preview User', created_at: new Date().toISOString().slice(0, 10)
+                id: 11, title: req.body.title, comment: req.body.comment,
+                rating: req.body.rating, name: req.body.name || 'Preview User', created_at: new Date().toISOString().slice(0, 10),
+                images: [],
             },
-            message: 'Review submitted successfully.'
+            message: 'Review submitted successfully.',
         });
+    });
+
+    app.get('/api/product/:id/reviews/:review_id/translate', (req, res) => {
+        res.json({ content: 'This is the translated preview review.' });
     });
 
     // ── Categories ────────────────────────────────────────────────────────────
@@ -504,9 +564,41 @@ function registerMockApis(app) {
         res.json({ data: { max_price: 500 } });
     });
 
-    // Also handle no-category variant
-    app.get('/api/categories/max-price', (req, res) => {
-        res.json({ data: { max_price: 500 } });
+    // ── Service contact form ─────────────────────────────────────────────
+
+    app.get('/contact-us/picker/product', (req, res) => {
+        const query = String(req.query.query || '').toLowerCase();
+        const data = Array.from({ length: 20 }, (_, index) => makeProductCard(index + 1, 'en'))
+            .map((product) => ({ id: product.id, name: product.name, sku: product.sku, image: product.image }))
+            .filter((product) => !query || product.name.toLowerCase().includes(query) || product.sku.toLowerCase().includes(query));
+        res.json({ data });
+    });
+
+    app.get('/contact-us/picker/category', (req, res) => {
+        const query = String(req.query.query || '').toLowerCase();
+        const data = resolveCategoryCards([1, 2, 3, 4, 5], 'en')
+            .map((category) => ({ id: category.category_id || category.id, name: category.name, slug: category.slug, image: category.image }))
+            .filter((category) => !query || category.name.toLowerCase().includes(query) || category.slug.toLowerCase().includes(query));
+        res.json({ data });
+    });
+
+    app.post('/contact-us', formParser, (req, res) => {
+        const required = ['first_name', 'last_name', 'email', 'phone'];
+        const missing = required.find((key) => !String(req.body[key] || '').trim());
+
+        if (missing) {
+            res.status(422).json({
+                message: 'Validation failed.',
+                errors: { [missing]: [`${missing} is required.`] },
+            });
+            return;
+        }
+
+        res.json({
+            message: 'Your inquiry was received successfully.',
+            inquiry_id: Date.now(),
+            redirect_url: null,
+        });
     });
 
     // ── Booking slots (mirrors shop.booking-product.slots.index) ──────────
@@ -596,6 +688,27 @@ function registerMockApis(app) {
 
         res.json({ data: slots });
     });
+}
+
+
+return [{
+    time: `${formatTime(start)} - ${formatTime(end)}`,
+    slots: hourlySlots,
+    remaining_qty: hourlySlots.length,
+    capacity: 10,
+    is_available: true,
+}];
+    }
+
+app.get('/api/booking/:productId/slots', (req, res) => {
+    const date = req.query.date || new Date().toISOString().slice(0, 10);
+    const bookingType = req.query.booking_type || 'default';
+    const slots = bookingType === 'rental'
+        ? makeRentalSlots(date)
+        : makeFlatBookingSlots(date, bookingType);
+
+    res.json({ data: slots });
+});
 }
 
 module.exports = { registerMockApis };

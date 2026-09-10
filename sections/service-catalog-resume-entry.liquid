@@ -1,0 +1,12 @@
+<article class="service-catalog-resume__item">
+  {% if resume_entry.role != blank %}<h3>{{ resume_entry.role }}</h3>{% endif %}
+  {% if resume_entry.degree != blank %}<h3>{{ resume_entry.degree }}</h3>{% endif %}
+  {% if resume_entry.name != blank %}<h3>{{ resume_entry.name }}</h3>{% endif %}
+  {% if resume_entry.company != blank %}<p>{{ resume_entry.company }}</p>{% endif %}
+  {% if resume_entry.institution != blank %}<p>{{ resume_entry.institution }}</p>{% endif %}
+  {% if resume_entry.issuer != blank %}<p>{{ resume_entry.issuer }}</p>{% endif %}
+  {% if resume_entry.location != blank %}<p>{{ resume_entry.location }}</p>{% endif %}
+  {% if resume_entry.field_of_study != blank %}<p>{{ resume_entry.field_of_study }}</p>{% endif %}
+  {% if resume_entry.description != blank %}<div class="service-catalog-richtext">{{ resume_entry.description }}</div>{% endif %}
+  {% if resume_entry.credential_url != blank %}<a class="service-catalog-link" href="{{ resume_entry.credential_url }}" target="_blank" rel="noopener noreferrer">{{ 'service_catalog.resume.credential' | t }}</a>{% endif %}
+</article>

@@ -787,7 +787,7 @@ app.get('/customizer', (req, res) => {
     const previewUrl = `/?page=${encodeURIComponent(page)}&locale=${encodeURIComponent(locale)}${slug ? '&slug=' + encodeURIComponent(slug) : ''}`;
     ejs.renderFile(
         path.join(__dirname, 'views', 'customizer.ejs'),
-        { page, locale, slug, previewUrl, dataMode: PREVIEW_DATA_MODE, apiBase: PREVIEW_API_BASE || 'mock/local only', surfaces: ['home', 'product', 'category', 'search', 'cart', 'cms', 'custom', '404'] },
+        { page, locale, slug, previewUrl, dataMode: PREVIEW_DATA_MODE, apiBase: PREVIEW_API_BASE || 'mock/local only', surfaces: ['home', 'product', 'category', 'search', 'cart', 'services', 'service', 'team', 'team-member', 'contact-us', 'about-us', 'cms', 'custom', '404'] },
         (err, html) => {
             if (err) { res.status(500).send('<pre>' + err.message + '</pre>'); return; }
             res.setHeader('Content-Type', 'text/html; charset=utf-8');

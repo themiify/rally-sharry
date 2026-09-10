@@ -417,6 +417,15 @@
   outline: 2px solid var(--gl-primary);
 }
 
+.product-single .gl-variant-color-btn:focus-visible {
+  outline: 2px solid var(--gl-primary);
+}
+
+.product-single .gl-variant-color-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .product-single .gl-variant-color-circle {
   display: block;
   width: 100%;
@@ -435,6 +444,17 @@
   display: grid;
   gap: 0.35rem;
   cursor: pointer;
+}
+
+.product-single .gl-variant-image-label:has(input:focus-visible) {
+  border-radius: 10px;
+  outline: 2px solid var(--gl-primary);
+  outline-offset: 2px;
+}
+
+.product-single .gl-variant-image-label:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .product-single .gl-variant-image-img {

@@ -1,0 +1,6 @@
+<section class="service-catalog-resume" data-service-catalog-resume>
+  <h2>{{ 'service_catalog.resume.' | append: resume_type | t }}</h2>
+  <div class="service-catalog-resume__list">
+    {% for resume_entry in entries %}{% render 'service-catalog-resume-entry', resume_entry: resume_entry %}{% endfor %}
+  </div>
+</section>

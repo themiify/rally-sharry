@@ -1,0 +1,37 @@
+{% assign is_rtl = request.is_rtl %}
+{% assign username = section.settings.username | default: '' | strip | remove: '@' %}
+{% assign heading = section.settings.heading | default: 'Follow us on Snapchat' %}
+{% assign heading_ar = section.settings.heading_ar | default: 'تابعينا على سناب شات' %}
+{% assign display_heading = heading %}
+{% if is_rtl %}
+  {% assign display_heading = heading_ar | default: heading %}
+{% endif %}
+{% assign encoded_username = username | url_encode %}
+{% capture profile_url %}https://www.snapchat.com/@{{ encoded_username }}{% endcapture %}
+{% capture embed_url %}https://www.snapchat.com/@{{ encoded_username }}/embed{% endcapture %}
+
+<section id="social-embed-{{ section.id }}" class="gl-section gl-social-embed-section gl-social-embed-section--snapchat" aria-labelledby="social-embed-heading-{{ section.id }}">
+  <div class="gl-container">
+    <div class="gl-social-embed-card">
+      <div class="gl-section-header gl-social-embed-header">
+        <p class="gl-social-embed-eyebrow">Snapchat</p>
+        <h2 id="social-embed-heading-{{ section.id }}">{{ display_heading | escape }}</h2>
+        {% if username != blank %}
+          <a class="gl-social-embed-profile-link" href="{{ profile_url | escape }}" target="_blank" rel="noopener noreferrer">@{{ username | escape }}</a>
+        {% endif %}
+      </div>
+
+      {% if username != blank %}
+        <div class="gl-social-embed-frame gl-social-embed-frame--snapchat" data-social-embed="snapchat">
+          <blockquote class="snapchat-embed" data-snapchat-embed-width="416" data-snapchat-embed-height="692" data-snapchat-embed-url="{{ embed_url | escape }}" data-snapchat-embed-style="border-radius: 24px;" data-snapchat-embed-title="{{ display_heading | escape }}">
+            <a target="_blank" rel="noopener noreferrer" href="{{ profile_url | escape }}">{{ translations.social_embeds.view_profile | default: 'View this profile on the social network' | escape }}</a>
+          </blockquote>
+        </div>
+      {% else %}
+        <div class="gl-social-embed-empty">
+          <p>{{ translations.social_embeds.configure | default: 'Add a username in this section settings to display the social profile.' | escape }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

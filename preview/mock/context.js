@@ -334,12 +334,18 @@ function productDetailBase(card, locale) {
             { id: 1, code: 'color_family', label: isAr ? 'اللون' : 'Color', type: 'text', value: isAr ? 'أحمر كلاسيكي' : 'Classic Red', download_url: null, image_url: null },
             { id: 2, code: 'weight', label: isAr ? 'الوزن' : 'Weight', type: 'text', value: '3.5g', download_url: null, image_url: null },
         ],
-        ratings: { average: 4.5, total_reviews: 12, total_rating: 54, total_feedback: 12, percentage: [0, 0, 8, 25, 67] },
+        ratings: { average: 4.5, total_reviews: 10, total_rating: 45, total_feedback: 10, percentage: { 1: 0, 2: 0, 3: 10, 4: 40, 5: 50 } },
         reviews: [
             { id: 1, name: isAr ? 'سارة' : 'Sarah', title: isAr ? 'رائع' : 'Amazing', comment: isAr ? 'أفضل أحمر شفاه جربته!' : 'Best lipstick I have ever tried!', rating: 5, created_at: '2024-12-01' },
             { id: 2, name: isAr ? 'نورة' : 'Nora', title: isAr ? 'جيد' : 'Good quality', comment: isAr ? 'لون جميل ويدوم طويلاً' : 'Beautiful color and long-lasting', rating: 4, created_at: '2024-11-15' },
         ],
-        reviews_count: 2,
+        reviews_count: 10,
+        review_settings: { enabled: true, guest_enabled: true, translation_enabled: true },
+        actions: Object.assign({}, card.actions, {
+            reviews_index_url: `/api/product/${card.id}/reviews`,
+            reviews_store_url: `/api/product/${card.id}/review`,
+            reviews_translate_url: `/api/product/${card.id}/reviews/:reviewId/translate`,
+        }),
         meta: { title: card.name, description: 'Premium beauty product', keywords: 'beauty, lipstick' },
         add_to_cart_url: '/api/checkout/cart',
         show_quantity_box: true,
@@ -726,11 +732,79 @@ function buildSearchContext(locale) {
 /**
  * Build the full Liquid rendering context.
  *
- * @param {string} pageType  home|product|category|cart|search|cms|custom|404
+ * @param {string} pageType  home|product|category|cart|search|services|service|team|team-member|contact-us|about-us|cms|custom|404
  * @param {string} locale    en|ar
- * @param {string|null} slug  for cms/custom pages
+ * @param {string|null} slug  for service/team-member detail pages
  * @param {string} themeRoot  absolute path to the theme directory
  */
+function buildServiceCatalogContext(locale) {
+    const isRtl = locale === 'ar';
+    const profile = {
+        id: 1,
+        mode: 'team',
+        name: isRtl ? 'مكتب الخبراء' : 'Experts Office',
+        headline: isRtl ? 'حلول احترافية تناسب احتياجاتك' : 'Professional solutions for your needs',
+        bio: isRtl ? '<p>نقدم خبرات متخصصة وخدمة موثوقة لكل عميل.</p>' : '<p>We provide specialized expertise and reliable service for every client.</p>',
+        services_title: isRtl ? 'خدماتنا' : 'Our services',
+        services_intro: isRtl ? 'اكتشف خدماتنا المتخصصة.' : 'Discover our specialized services.',
+        team_title: isRtl ? 'فريقنا' : 'Our team',
+        team_intro: isRtl ? 'تعرف على فريق الخبراء.' : 'Meet our expert team.',
+        image: 'https://picsum.photos/seed/service-profile/900/700',
+        url: '/about-us',
+        services_url: '/services',
+        team_url: '/team',
+    };
+    const service = {
+        id: 1,
+        name: isRtl ? 'استشارة متخصصة' : 'Expert Consultation',
+        slug: 'expert-consultation',
+        excerpt: isRtl ? 'استشارة عملية مبنية على خبرة.' : 'Practical advice backed by experience.',
+        description: isRtl ? '<p>نساعدك على فهم خياراتك واتخاذ القرار المناسب.</p>' : '<p>We help you understand your options and make the right decision.</p>',
+        image: 'https://picsum.photos/seed/service-detail/1000/700',
+        gallery: ['https://picsum.photos/seed/service-gallery-1/700/500', 'https://picsum.photos/seed/service-gallery-2/700/500'],
+        sections: [{
+            id: 'process',
+            title: isRtl ? 'طريقة العمل' : 'Our process',
+            description: isRtl ? '<p>خطوات واضحة من البداية حتى الوصول إلى أفضل نتيجة.</p>' : '<p>Clear steps from the first conversation to the best outcome.</p>',
+            children: [
+                { id: 'discovery', title: isRtl ? 'فهم الاحتياج' : 'Discovery', description: isRtl ? '<p>نستمع إلى أهدافك.</p>' : '<p>We listen to your goals.</p>', image: 'https://picsum.photos/seed/service-child-1/600/400' },
+                { id: 'strategy', title: isRtl ? 'خطة العمل' : 'Strategy', description: isRtl ? '<p>نضع خطة قابلة للتنفيذ.</p>' : '<p>We create an actionable plan.</p>', image: 'https://picsum.photos/seed/service-child-2/600/400' },
+            ],
+        }],
+        team_members: [],
+        meta_title: isRtl ? 'استشارة متخصصة' : 'Expert Consultation',
+        meta_description: isRtl ? 'احجز استشارة متخصصة.' : 'Book an expert consultation.',
+        url: '/services/expert-consultation',
+    };
+    const member = {
+        id: 1,
+        name: isRtl ? 'أحمد العتيبي' : 'Ahmed Al-Otaibi',
+        slug: 'ahmed-al-otaibi',
+        title: isRtl ? 'مستشار أول' : 'Senior Consultant',
+        bio: isRtl ? '<p>أحمد مستشار بخبرة واسعة في مساعدة العملاء.</p>' : '<p>Ahmed is an experienced consultant who helps clients move forward with confidence.</p>',
+        bio_text: isRtl ? 'أحمد مستشار بخبرة واسعة في مساعدة العملاء.' : 'Ahmed is an experienced consultant who helps clients move forward with confidence.',
+        image: 'https://picsum.photos/seed/team-member-1/700/700',
+        highlights: isRtl ? ['خبرة واسعة', 'استشارات عملية'] : ['Extensive experience', 'Practical advice'],
+        resume: {
+            experience: [{ role: isRtl ? 'مستشار أول' : 'Senior Consultant', company: isRtl ? 'مكتب الخبراء' : 'Experts Office', location: isRtl ? 'الرياض' : 'Riyadh', description: isRtl ? '<p>قيادة مشاريع استشارية متنوعة.</p>' : '<p>Leading a range of consulting projects.</p>' }],
+            education: [{ degree: isRtl ? 'ماجستير إدارة الأعمال' : 'Master of Business Administration', institution: isRtl ? 'جامعة الملك سعود' : 'King Saud University', field_of_study: isRtl ? 'الإدارة' : 'Management', description: '' }],
+            certificates: [{ name: isRtl ? 'شهادة مستشار معتمد' : 'Certified Consultant', issuer: isRtl ? 'الهيئة المهنية' : 'Professional Board', credential_id: 'CERT-001', credential_url: 'https://example.com/certificates/001', description: '' }],
+        },
+        services: [{ id: service.id, name: service.name, slug: service.slug, url: service.url }],
+        url: '/team/ahmed-al-otaibi',
+    };
+    service.team_members = [{ id: member.id, name: member.name, slug: member.slug, title: member.title, image: member.image, url: member.url }];
+
+    return {
+        profile,
+        services: [service].map(({ description, sections, gallery, team_members, meta_title, meta_description, ...card }) => card),
+        service,
+        team: [member].map(({ resume, highlights, services, bio, bio_text, ...card }) => card),
+        team_member: member,
+        selection: { service_id: null, team_member_id: null },
+    };
+}
+
 // Default page sections per type — matches what the platform renders for a fresh install.
 // Add new section slugs here (in render order) when creating a new section for a page.
 // Exported so preview/server.js can import this as its single source of truth.
@@ -742,6 +816,12 @@ const DEFAULT_PAGE_SECTIONS = {
     category: ['G-index-banner', 'product-grid', 'category-carousel'],
     search: ['search-results'],
     cart: ['cart-page'],
+    services: ['service-catalog-services', 'contact-form'],
+    service: ['service-catalog-service', 'contact-form'],
+    team: ['service-catalog-team', 'contact-form'],
+    'team-member': ['service-catalog-team-member', 'contact-form'],
+    'contact-us': ['contact-form'],
+    'about-us': ['service-catalog-about', 'contact-form'],
     cms: ['cms-page'],
     custom: ['custom-page'],
     '404': ['page-not-found'],
@@ -816,6 +896,46 @@ function buildContext(pageType, locale, slug, themeRoot) {
             compare_store: `${BASE_URL}/api/compare`,
             compare_index: `${BASE_URL}/api/compare`,
             compare_destroy: `${BASE_URL}/api/compare`,
+            service_contact_store: `${BASE_URL}/contact-us`,
+            service_contact_products: `${BASE_URL}/contact-us/picker/product`,
+            service_contact_categories: `${BASE_URL}/contact-us/picker/category`,
+        },
+
+        contact_form: {
+            enabled: true,
+            title: isRtl ? 'تواصل معنا' : 'Contact us',
+            intro: isRtl ? 'أرسل استفسارك وسيقوم فريقنا بالتواصل معك.' : 'Send your inquiry and our team will contact you.',
+            submit_label: isRtl ? 'إرسال الاستفسار' : 'Send inquiry',
+            success_message: isRtl ? 'تم استلام استفسارك بنجاح.' : 'Your inquiry was received successfully.',
+            account_notice: isRtl ? 'سيتم إنشاء حساب عميل يمكنك الدخول إليه برمز التحقق.' : 'A customer account will be created and can be accessed using OTP login.',
+            action_url: `${BASE_URL}/contact-us`,
+            messages: {
+                submit_failed: isRtl ? 'تعذر إرسال الاستفسار.' : 'Unable to submit the inquiry.',
+                search_products: isRtl ? 'ابحث عن منتج' : 'Search products',
+                search_categories: isRtl ? 'ابحث عن تصنيف' : 'Search categories',
+                change_selection: isRtl ? 'تغيير' : 'Change',
+                searching: isRtl ? 'جارٍ البحث…' : 'Searching…',
+                no_catalog_results: isRtl ? 'لا توجد نتائج مطابقة.' : 'No matching results.',
+            },
+            phone_countries: [
+                { code: '+966', iso: 'SA' },
+                { code: '+971', iso: 'AE' },
+                { code: '+20', iso: 'EG' },
+            ],
+            services: [
+                { id: 1, name: isRtl ? 'استشارة' : 'Consultation' },
+                { id: 2, name: isRtl ? 'خدمة احترافية' : 'Professional service' },
+            ],
+            fields: [
+                { key: 'first_name', type: 'text', label: isRtl ? 'الاسم الأول' : 'First name', required: true, visible: true, input_name: 'first_name' },
+                { key: 'last_name', type: 'text', label: isRtl ? 'اسم العائلة' : 'Last name', required: true, visible: true, input_name: 'last_name' },
+                { key: 'email', type: 'email', label: isRtl ? 'البريد الإلكتروني' : 'Email', required: true, visible: true, input_name: 'email' },
+                { key: 'phone', type: 'phone', label: isRtl ? 'الهاتف' : 'Phone', required: true, visible: true, input_name: 'phone', country_code_name: 'country_code' },
+                { key: 'service_id', type: 'service', label: isRtl ? 'الخدمة' : 'Service', required: false, visible: true, input_name: 'service_id' },
+                { key: 'product_id', type: 'product', label: isRtl ? 'المنتج' : 'Product', required: false, visible: true, input_name: 'custom_fields[product_id]' },
+                { key: 'category_id', type: 'category', label: isRtl ? 'التصنيف' : 'Category', required: false, visible: true, input_name: 'custom_fields[category_id]' },
+                { key: 'message', type: 'textarea', label: isRtl ? 'الرسالة' : 'Message', required: false, visible: true, input_name: 'message' },
+            ],
         },
 
         page: {
@@ -870,6 +990,24 @@ function buildContext(pageType, locale, slug, themeRoot) {
         _layout_slots: { header: true, footer: true },
         _css_tokens: themeJson.css_tokens || {},
     };
+
+    // ServiceCatalog surface context
+    if (['services', 'service', 'team', 'team-member', 'contact-us', 'about-us'].includes(pageType)) {
+        context.service_catalog = buildServiceCatalogContext(locale);
+        if (pageType === 'service') {
+            context.service_catalog.selection.service_id = context.service_catalog.service?.id || null;
+        }
+        if (pageType === 'team-member') {
+            context.service_catalog.selection.team_member_id = context.service_catalog.team_member?.id || null;
+        }
+        context.contact_form.selected_service_id = context.service_catalog.selection.service_id;
+        context.contact_form.selected_team_member_id = context.service_catalog.selection.team_member_id;
+        context.page.title = pageType === 'service'
+            ? context.service_catalog.service?.name || context.page.title
+            : pageType === 'team-member'
+                ? context.service_catalog.team_member?.name || context.page.title
+                : context.page.title;
+    }
 
     // Surface-specific additions
     if (pageType === 'product') Object.assign(context, buildProductContext(locale, slug || 'simple'));

@@ -1,0 +1,9 @@
+<section class="service-catalog-content-section">
+  {% if content_section.title != blank %}<h2>{{ content_section.title }}</h2>{% endif %}
+  {% if content_section.description != blank %}<div class="service-catalog-richtext">{{ content_section.description }}</div>{% endif %}
+  {% if content_section.children.size > 0 %}
+    <div class="service-catalog-grid service-catalog-grid--3">
+      {% for child in content_section.children %}{% render 'service-catalog-child', child: child %}{% endfor %}
+    </div>
+  {% endif %}
+</section>

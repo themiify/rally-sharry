@@ -306,91 +306,74 @@
     </div>
   </div>
 </header>
-<div class="gl-mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+
+<!-- Mobile Menu Panel -->
 <div class="gl-mobile-menu" id="mobileMenu">
-       <a href="/" class="">
-        {% assign _logo_src = theme.store_logo %}
-        {% if _logo_src != blank %}
-          <img
-            src="{{ _logo_src }}"
-            alt="{{ theme.store_name | default: shop.name }}"
-            class="gl-logo-img"
-          >
+  <a href="/" class="">
+    {% assign _mobile_logo_src = section.settings.store_logo | default: theme.store_logo %}
+    {% if _mobile_logo_src != blank %}
+      <img
+        src="{{ _mobile_logo_src }}"
+        alt="{{ section.settings.store_name | default: theme.store_name | default: shop.name }}"
+        class="gl-logo-img"
+      >
+    {% else %}
+      <span class="gl-logo-text">
+        {% if is_rtl %}
+          {{ section.settings.store_name_ar | default: theme.store_name_ar | default: shop.name }}
         {% else %}
-          <span class="gl-logo-text">
-            {% if request.is_rtl %}
-              {{ theme.store_name_ar | default: shop.name }}
-            {% else %}
-              {{ theme.store_name | default: shop.name }}
-            {% endif %}
-          </span>
+          {{ section.settings.store_name | default: theme.store_name | default: shop.name }}
         {% endif %}
+      </span>
+    {% endif %}
+  </a>
+  <button class="gl-mobile-menu-close" aria-label="Close menu">✕</button>
+  <nav class="gl-mobile-menu-nav">
+    {% for item in header_menu %}
+      <a
+        href="{{ item.url }}"
+        {% if item.new_tab %}
+          target="_blank" rel="noopener"
+        {% endif %}
+      >
+        {{- item.title -}}
       </a>
-      <button class="gl-mobile-menu-close" aria-label="Close menu">✕</button>
-      <nav class="gl-mobile-menu-nav">
-        {% for item in menus.main %}
-          <div class="gl-mobile-nav-item">
-            <a
-              href="{{ item.url }}"
-              class="gl-mobile-nav-link"
-              {% if item.new_tab %}
-                target="_blank" rel="noopener"
-              {% endif %}
-            >
-              {{- item.title -}}
-            </a>
-            {% if item.children.size > 0 %}
-              <div class="gl-mobile-submenu">
-                {% for child in item.children %}
-                  <a
-                    href="{{ child.url }}"
-                    class="gl-mobile-submenu-link"
-                    {% if child.new_tab %}
-                      target="_blank" rel="noopener"
-                    {% endif %}
-                  >
-                    {{- child.title -}}
-                  </a>
-                {% endfor %}
-              </div>
-            {% endif %}
-          </div>
-        {% endfor %}
-      </nav>
-      <!-- Language switcher in mobile -->
-     <div class="">
-        <div class="gl-lang-dropdown">
-            <button class="gl-lang-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
-                {% if shop.locale == 'ar' %}
-                    عربي
-                {% else %}
-                    EN
-                {% endif %}
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-            </button>
-            <div class="gl-lang-dropdown-menu">
-                <a href="?locale=en" class="gl-lang-dropdown-item {% if shop.locale == 'en' %}active{% endif %}">
-                    EN
-                    {% if shop.locale == 'en' %}
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    {% endif %}
-                </a>
-                <a href="?locale=ar" class="gl-lang-dropdown-item {% if shop.locale == 'ar' %}active{% endif %}">
-                    عربي
-                    {% if shop.locale == 'ar' %}
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    {% endif %}
-                </a>
-            </div>
-        </div>
+    {% endfor %}
+  </nav>
+  <!-- Language switcher in mobile -->
+  <div class="">
+    <div class="gl-lang-dropdown">
+      <button class="gl-lang-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
+        {% if shop.locale == 'ar' %}
+          عربي
+        {% else %}
+          EN
+        {% endif %}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="gl-lang-dropdown-menu">
+        <a href="?locale=en" class="gl-lang-dropdown-item {% if shop.locale == 'en' %}active{% endif %}">
+          EN
+          {% if shop.locale == 'en' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          {% endif %}
+        </a>
+        <a href="?locale=ar" class="gl-lang-dropdown-item {% if shop.locale == 'ar' %}active{% endif %}">
+          عربي
+          {% if shop.locale == 'ar' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          {% endif %}
+        </a>
+      </div>
     </div>
-    </div>
+  </div>
+</div>
 
 <!-- Search Popup -->
 <div id="gl-search-popup" class="gl-search-popup" style="display: none;">
@@ -424,7 +407,7 @@
         <!-- Search results will be inserted here -->
       </div>
       <div class="gl-search-results-footer">
-        <a href="#" class="gl-search-view-all" id="gl-search-view-all">
+        <a href="/search" class="gl-search-view-all" id="gl-search-view-all">
           {% if shop.locale == 'ar' %}عرض جميع النتائج{% else %}View all results{% endif %}
         </a>
       </div>
@@ -604,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       const query = searchInput.value.trim();
       if (query) {
-        window.location.href = `{{ api_routes.products_index }}?search=${encodeURIComponent(query)}`;
+        window.location.href = `/search?query=${encodeURIComponent(query)}`;
       }
     });
   }

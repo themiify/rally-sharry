@@ -1,0 +1,193 @@
+.gl-social-embed-section {
+  padding-block: clamp(3rem, 7vw, 6rem);
+  background: var(--gl-bg, #fff);
+  color: var(--gl-text, #1f2937);
+}
+
+.gl-social-embed-card {
+  width: min(100%, 920px);
+  margin-inline: auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  border: 1px solid var(--gl-border, #f0e6ea);
+  border-radius: var(--gl-radius-lg, 20px);
+  background: var(--gl-bg, #fff);
+  box-shadow: var(--gl-box-shadow-light, 0 16px 40px rgb(15 23 42 / 8%));
+}
+
+.gl-social-embed-header {
+  margin-block-end: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.gl-social-embed-header h2 {
+  margin-block: .5rem 0;
+  color: var(--gl-heading, #1f2937);
+  font-family: var(--gl-font-heading, inherit);
+  font-size: clamp(1.65rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.gl-social-embed-eyebrow {
+  margin: 0;
+  color: var(--gl-primary, #e91e63);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.gl-social-embed-profile-link,
+.gl-social-embed-empty a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  margin-block-start: .9rem;
+  padding: .5rem .9rem;
+  border: 1px solid color-mix(in srgb, var(--gl-primary, #e91e63) 28%, transparent);
+  border-radius: var(--gl-radius-full, 999px);
+  color: var(--gl-primary, #e91e63);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.gl-social-embed-profile-link:hover,
+.gl-social-embed-profile-link:focus-visible,
+.gl-social-embed-empty a:hover,
+.gl-social-embed-empty a:focus-visible {
+  border-color: var(--gl-primary, #e91e63);
+  background: var(--gl-primary, #e91e63);
+  color: #fff;
+}
+
+.gl-social-embed-profile-link:focus-visible,
+.gl-social-embed-empty a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--gl-primary, #e91e63) 35%, transparent);
+  outline-offset: 3px;
+}
+
+.gl-social-embed-frame {
+  width: 100%;
+  min-height: 420px;
+  overflow: hidden;
+  border: 1px solid var(--gl-border, #f0e6ea);
+  border-radius: var(--gl-radius-lg, 20px);
+  background: var(--gl-bg-alt, #fff8fa);
+  isolation: isolate;
+}
+
+.gl-social-embed-frame iframe {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+}
+
+.gl-social-embed-frame--instagram iframe {
+  min-height: 520px;
+}
+
+.gl-social-embed-frame--facebook iframe,
+.gl-social-embed-frame--youtube iframe {
+  height: clamp(360px, 58vw, 560px);
+}
+
+.gl-social-embed-frame--x,
+.gl-social-embed-frame--tiktok,
+.gl-social-embed-frame--snapchat,
+.gl-social-embed-frame--pinterest {
+  display: flex;
+  justify-content: center;
+  min-height: 360px;
+  padding: clamp(.5rem, 2vw, 1.25rem);
+}
+
+.gl-social-embed-frame--x > *,
+.gl-social-embed-frame--tiktok > *,
+.gl-social-embed-frame--snapchat > *,
+.gl-social-embed-frame--pinterest > * {
+  max-width: 100%;
+}
+
+.gl-social-embed-frame--tiktok blockquote,
+.gl-social-embed-frame--snapchat blockquote {
+  width: 100%;
+  margin: 0;
+}
+
+.gl-social-embed-frame--pinterest > a {
+  width: 100%;
+  min-height: 320px;
+}
+
+.gl-social-embed-empty {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  padding: 2rem;
+  border: 1px dashed var(--gl-border, #f0e6ea);
+  border-radius: var(--gl-radius-lg, 20px);
+  background: var(--gl-bg-alt, #fff8fa);
+  color: var(--gl-text-light, #777);
+  text-align: center;
+}
+
+.gl-social-embed-empty p {
+  max-width: 34rem;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.gl-social-embed-section--facebook .gl-social-embed-eyebrow { color: #1877f2; }
+.gl-social-embed-section--x .gl-social-embed-eyebrow { color: var(--gl-heading, #111827); }
+.gl-social-embed-section--tiktok .gl-social-embed-eyebrow { color: #111827; }
+.gl-social-embed-section--snapchat .gl-social-embed-eyebrow { color: #b59b00; }
+.gl-social-embed-section--pinterest .gl-social-embed-eyebrow { color: #e60023; }
+.gl-social-embed-section--youtube .gl-social-embed-eyebrow { color: #ff0000; }
+
+@media (prefers-color-scheme: dark) {
+  .gl-social-embed-card,
+  .gl-social-embed-frame,
+  .gl-social-embed-empty {
+    background: var(--gl-bg, #111827);
+  }
+
+  .gl-social-embed-frame,
+  .gl-social-embed-empty {
+    border-color: var(--gl-border, #374151);
+  }
+
+  .gl-social-embed-frame--x,
+  .gl-social-embed-frame--tiktok,
+  .gl-social-embed-frame--snapchat,
+  .gl-social-embed-frame--pinterest {
+    background: var(--gl-bg-alt, #1f2937);
+  }
+}
+
+@media (max-width: 640px) {
+  .gl-social-embed-card {
+    padding: 1rem;
+  }
+
+  .gl-social-embed-frame {
+    min-height: 300px;
+  }
+
+  .gl-social-embed-frame--instagram iframe {
+    min-height: 420px;
+  }
+
+  .gl-social-embed-frame--facebook iframe,
+  .gl-social-embed-frame--youtube iframe {
+    height: 420px;
+  }
+
+  .gl-social-embed-frame--x,
+  .gl-social-embed-frame--tiktok,
+  .gl-social-embed-frame--snapchat,
+  .gl-social-embed-frame--pinterest {
+    padding: .25rem;
+  }
+}

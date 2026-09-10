@@ -20,6 +20,10 @@ import { initPriceTotals } from './price-totals.js';
 import { initProductGrid } from './product-grid.js';
 import { initProductCardHydrator } from './product-card.js';
 import { initCategoryCarousels } from './category-carousel.js';
+import { initializeContactForms } from './contact-form.js';
+import { initializeProductReviews } from './product-reviews.js';
+import { initializeServiceCatalogInteractions } from './service-catalog.js';
+import { initializeSocialEmbeds } from './social-embeds.js';
 
 // ── bootstrap ────────────────────────────────────────────────────────────
 
@@ -76,6 +80,10 @@ window.addEventListener('theme-marketplace:dynamic', function (event) {
     initProductGrid(apiClient, showToast, storefrontActions);
     initCategoryCarousels();
     initProductCardHydrator();
+    initializeContactForms(showToast);
+    initializeProductReviews(apiClient, showToast, storefrontState);
+    initializeServiceCatalogInteractions();
+    initializeSocialEmbeds();
 });
 
 storefrontActions.hydrateActionButtons();
@@ -89,6 +97,10 @@ initPriceTotals();
 initProductGrid(apiClient, showToast, storefrontActions);
 initCategoryCarousels();
 initProductCardHydrator();
+initializeContactForms(showToast);
+initializeProductReviews(apiClient, showToast, storefrontState);
+initializeServiceCatalogInteractions();
+initializeSocialEmbeds();
 
 function hydrateHeaderAuth(auth) {
     var isLoggedIn = !!(auth && auth.is_logged_in);

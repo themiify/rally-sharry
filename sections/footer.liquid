@@ -4,15 +4,15 @@
 {% endcomment %}
 
 {% assign is_rtl = request.is_rtl %}
-{% assign show_social = section.settings.show_social  %}
-{% assign show_payments = section.settings.show_payment_icons  %}
+{% assign show_social = section.settings.show_social %}
+{% assign show_payments = section.settings.show_payment_icons %}
 {% assign footer_menu = section.menu %}
 
 {% if footer_menu == blank %}
   {% assign footer_menu = menus.footer %}
 {% endif %}
-{% assign copyright_text = section.settings.copyright  %}
-{% assign copyright_text_ar = section.settings.copyright_ar  %}
+{% assign copyright_text = section.settings.copyright %}
+{% assign copyright_text_ar = section.settings.copyright_ar %}
 
 <footer class="gl-footer">
   <div class="gl-container">
@@ -40,7 +40,7 @@
           {% endif %}
         </a>
 
-        <p class="footer-description" >
+        <p class="footer-description">
           {% if is_rtl %}
             {{ theme.store_tagline_ar | default: 'وجهتك المفضلة لأرقى منتجات التجميل والعناية بالبشرة.' }}
           {% else %}
@@ -53,11 +53,16 @@
       {% for column in footer_menu %}
         <div>
           {% if column.children.size > 0 %}
-            <h4 class="menus_title" >{{ column.title }}</h4>
+            <h4 class="menus_title">{{ column.title }}</h4>
             <ul class="gl-footer-links">
               {% for item in column.children %}
                 <li>
-                  <a href="{{ item.url }}"{% if item.new_tab %} target="_blank" rel="noopener"{% endif %}>
+                  <a
+                    href="{{ item.url }}"
+                    {% if item.new_tab %}
+                      target="_blank" rel="noopener"
+                    {% endif %}
+                  >
                     {{- item.title -}}
                   </a>
                 </li>
@@ -65,8 +70,13 @@
             </ul>
           {% else %}
             <h4>
-              <a href="{{ column.url }}"{% if column.new_tab %} target="_blank" rel="noopener"{% endif %}
-                 class="gl-footer-standalone-link">
+              <a
+                href="{{ column.url }}"
+                {% if column.new_tab %}
+                  target="_blank" rel="noopener"
+                {% endif %}
+                class="gl-footer-standalone-link"
+              >
                 {{- column.title -}}
               </a>
             </h4>
@@ -75,7 +85,9 @@
       {% else %}
         <!-- Fallback: no footer menu configured yet -->
         <div>
-          <h4>{% if is_rtl %}روابط مهمة{% else %}Quick Links{% endif %}</h4>
+          <h4>
+            {% if is_rtl %}روابط مهمة{% else %}Quick Links{% endif %}
+          </h4>
           <ul class="gl-footer-links">
             <li>
               <a href="/page/about-us">
@@ -107,7 +119,9 @@
       {% endfor %}
       <div>
            {% if show_social %}
-            <h4 class="menus_title" >{%- if is_rtl %}تابعنا على{% else %}Follow us on{% endif -%}</h4>
+            <h4 class="menus_title">
+            {%- if is_rtl %}تابعنا على{% else %}Follow us on{% endif -%}
+          </h4>
           <div class="gl-footer-social">
             {% assign wa_url = theme.social_whatsapp | default: section.settings.social_whatsapp %}
             {% if wa_url != blank or theme.social_whatsapp == blank %}
@@ -172,32 +186,45 @@
   <!-- Bottom Bar -->
   <div class="gl-footer-bottom">
     <div class="gl-container gl-footer-bottom-wrapper">
-      <span class="footer-copy-right" >
+      <span class="footer-copy-right">
         {% if is_rtl %} {{ copyright_text_ar }}{% else %}{{ copyright_text }}{% endif %}
       </span>
-  
+
       {% if show_payments %}
+        {% assign methods = payment_methods | default: shop.payment_methods %}
         <div class="gl-footer-payment">
-          <svg
-            viewBox="0 0 38 24"
-            width="38"
-            height="24"
-            xmlns="http://www.w3.org/2000/svg"
-            role="img"
-            aria-labelledby="pi-visa"
-          >
-            <title id="pi-visa">Visa</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><path d="M28.3 10.1H28c-.4 1-.7 1.5-1 3h1.9c-.3-1.5-.3-2.2-.6-3zm2.9 5.9h-1.7c-.1 0-.1 0-.2-.1l-.2-.9-.1-.2h-2.4c-.1 0-.2 0-.2.2l-.3.9c0 .1-.1.1-.1.1h-2.1l.2-.5L27 8.7c0-.5.3-.7.8-.7h1.5c.1 0 .2 0 .2.2l1.4 6.5c.1.4.2.7.2 1.1.1.1.1.1.1.2z" fill="#142688"></path>
-          </svg>
-          <svg
-            viewBox="0 0 38 24"
-            width="38"
-            height="24"
-            xmlns="http://www.w3.org/2000/svg"
-            role="img"
-            aria-labelledby="pi-master"
-          >
-            <title id="pi-master">Mastercard</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><circle fill="#EB001B" cx="15" cy="12" r="7"></circle><circle fill="#F79E1B" cx="23" cy="12" r="7"></circle><path fill="#FF5F00" d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.2 3-3.3 3-5.7z"></path>
-          </svg>
+          {% if methods.size > 0 %}
+            {% for method in methods %}
+              <div class="payment-method-item" title="{{ method.title }}">
+                {% if method.image != blank %}
+                  <img src="{{ method.image }}" alt="{{ method.title }}" loading="lazy">
+                {% else %}
+                  <span>{{ method.title }}</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <svg
+              viewBox="0 0 38 24"
+              width="38"
+              height="24"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-labelledby="pi-visa"
+            >
+              <title id="pi-visa">Visa</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><path d="M28.3 10.1H28c-.4 1-.7 1.5-1 3h1.9c-.3-1.5-.3-2.2-.6-3zm2.9 5.9h-1.7c-.1 0-.1 0-.2-.1l-.2-.9-.1-.2h-2.4c-.1 0-.2 0-.2.2l-.3.9c0 .1-.1.1-.1.1h-2.1l.2-.5L27 8.7c0-.5.3-.7.8-.7h1.5c.1 0 .2 0 .2.2l1.4 6.5c.1.4.2.7.2 1.1.1.1.1.1.1.2z" fill="#142688"></path>
+            </svg>
+            <svg
+              viewBox="0 0 38 24"
+              width="38"
+              height="24"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-labelledby="pi-master"
+            >
+              <title id="pi-master">Mastercard</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><circle fill="#EB001B" cx="15" cy="12" r="7"></circle><circle fill="#F79E1B" cx="23" cy="12" r="7"></circle><path fill="#FF5F00" d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.2 3-3.3 3-5.7z"></path>
+            </svg>
+          {% endif %}
         </div>
       {% endif %}
     </div>

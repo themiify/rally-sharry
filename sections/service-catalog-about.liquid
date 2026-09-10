@@ -1,0 +1,31 @@
+{% if service_catalog.profile.name != blank %}
+<section class="gl-section service-catalog-section service-catalog-about" data-service-catalog-surface="about-us">
+  <div class="gl-container">
+    <div class="service-catalog-about__layout">
+      {% if section.settings.show_image != false and service_catalog.profile.image != blank %}<img class="service-catalog-about__image" src="{{ service_catalog.profile.image }}" alt="{{ service_catalog.profile.name }}">{% endif %}
+      <div>
+        <p class="service-catalog-eyebrow">{{ 'service_catalog.about.eyebrow' | t }}</p>
+        <h1>{{ service_catalog.profile.name }}</h1>
+        {% if section.settings.show_headline != false and service_catalog.profile.headline != blank %}<p class="service-catalog-lead">{{ service_catalog.profile.headline }}</p>{% endif %}
+        {% if service_catalog.profile.bio != blank %}<div class="service-catalog-richtext">{{ service_catalog.profile.bio }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% else %}
+<section class="gl-section service-catalog-section"><div class="gl-container"><p class="service-catalog-empty">{{ 'service_catalog.about.unavailable' | t }}</p></div></section>
+{% endif %}
+
+{% schema %}
+{
+  "name": { "en": "About Provider", "ar": "نبذة عن مقدم الخدمة" },
+  "category": "service-catalog",
+  "reusable": false,
+  "page_types": ["about-us"],
+  "settings": [
+    { "type": "checkbox", "id": "show_image", "label": "Show provider image", "label_ar": "إظهار صورة مقدم الخدمة", "default": true },
+    { "type": "checkbox", "id": "show_headline", "label": "Show headline", "label_ar": "إظهار العنوان الفرعي", "default": true }
+  ],
+  "defaults": { "show_image": true, "show_headline": true }
+}
+{% endschema %}

@@ -27,6 +27,25 @@
         "description": "الوصف",
         "additional_info": "معلومات إضافية",
         "reviews": "التقييمات",
+        "customer_reviews": "آراء العملاء",
+        "empty_review": "لا توجد مراجعات حتى الآن، كوني أول من يراجع هذا المنتج",
+        "failed_to_upload": "فشل رفع المرفق",
+        "review_error": "تعذر إرسال تقييمك.",
+        "review_load_error": "تعذر تحميل التقييمات.",
+        "review_translation_error": "تعذرت ترجمة هذه المراجعة.",
+        "load_more": "تحميل المزيد",
+        "name": "الاسم",
+        "rating": "التقييم",
+        "ratings": "التقييمات",
+        "submit_review": "إرسال المراجعة",
+        "review_success": "تم إرسال المراجعة بنجاح.",
+        "title": "العنوان",
+        "comment": "التعليق",
+        "attachments": "المرفقات",
+        "translate": "ترجمة",
+        "translating": "جارٍ الترجمة...",
+        "write_a_review": "إضافة تعليق وتقييم",
+        "cancel": "إلغاء",
         "share": "مشاركة",
         "you_may_also_like": "منتجات قد تعجبك",
         "related_products": "منتجات ذات صلة",
@@ -90,7 +109,7 @@
         "max_price": "الأقصى",
         "sort_name_az": "الاسم أ-ي",
         "show_more_options": "عرض المزيد",
-        "search_products":"بحث عن"
+        "search_products": "بحث عن"
     },
     "cart_page": {
         "shopping_cart": "سلة التسوق",
@@ -140,7 +159,50 @@
         "send_message": "إرسال",
         "phone": "الهاتف",
         "address": "العنوان",
-        "working_hours": "ساعات العمل"
+        "working_hours": "ساعات العمل",
+        "country": "الدولة",
+        "state": "المنطقة",
+        "city": "المدينة",
+        "validation": {
+            "required": "هذا الحقل مطلوب.",
+            "email": "يرجى إدخال بريد إلكتروني صحيح.",
+            "url": "يرجى إدخال رابط صحيح.",
+            "tel": "يرجى إدخال رقم هاتف صحيح.",
+            "number": "يرجى إدخال رقم صحيح.",
+            "pattern": "يرجى مطابقة التنسيق المطلوب.",
+            "select_from_list": "يرجى الاختيار من القائمة.",
+            "select_country": "اختر الدولة",
+            "select_state": "اختر المنطقة",
+            "select_city": "اختر المدينة"
+        }
+    },
+    "service_catalog": {
+        "about": {
+            "eyebrow": "من نحن",
+            "unavailable": "ملف مقدم الخدمة غير متاح."
+        },
+        "services": {
+            "eyebrow": "خدماتنا",
+            "view": "عرض الخدمة",
+            "back": "العودة إلى الخدمات",
+            "empty": "لا توجد خدمات متاحة حالياً.",
+            "related": "الخدمات ذات الصلة",
+            "unavailable": "هذه الخدمة غير متاحة."
+        },
+        "team": {
+            "eyebrow": "فريقنا",
+            "view": "عرض الملف",
+            "back": "العودة إلى الفريق",
+            "related": "أعضاء الفريق",
+            "empty": "لا يوجد أعضاء فريق متاحون حالياً.",
+            "unavailable": "عضو الفريق هذا غير متاح."
+        },
+        "resume": {
+            "experience": "الخبرة",
+            "education": "التعليم",
+            "certificates": "الشهادات",
+            "credential": "عرض الاعتماد"
+        }
     },
     "newsletter": {
         "join": "انضمي لعائلتنا",
@@ -189,5 +251,11 @@
         "product_spotlight_desc": "اختيار خاص لكِ",
         "category_carousel": "تسوق المجموعة",
         "category_carousel_desc": "استكشفي مختاراتنا المميزة"
+    },
+    "social_embeds": {
+        "configure": "أضيفي اسم المستخدم من إعدادات هذا القسم لعرض الملف الاجتماعي.",
+        "view_profile": "عرض هذا الملف على الشبكة الاجتماعية",
+        "embed_unavailable": "هذا الملف الاجتماعي غير متاح حالياً. يمكنك زيارة الملف مباشرة.",
+        "open_profile": "فتح الملف"
     }
 }

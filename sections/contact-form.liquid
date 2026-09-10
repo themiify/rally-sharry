@@ -1,0 +1,223 @@
+{% comment %}
+Reusable ServiceCatalog contact form.
+The platform stores the inquiry before returning redirect_url.
+Styles target stable sharry-contact-* IDs, classes, and data attributes.
+{% endcomment %}
+
+{% if contact_form.enabled %}
+<section
+  id="sharry-contact-section-{{ section.id }}"
+  class="gl-section sharry-contact-section sharry-contact-section--{{ section.settings.layout }}"
+  data-sharry-contact-section
+  data-sharry-section-id="{{ section.id }}"
+>
+  <div class="gl-container sharry-contact-section__container">
+    <div class="sharry-contact-section__shell">
+      {% if section.settings.show_title != false and contact_form.title != blank %}
+        <h2 id="sharry-contact-title-{{ section.id }}" class="sharry-contact-section__title">{{ contact_form.title }}</h2>
+      {% endif %}
+
+      {% if section.settings.show_intro != false and contact_form.intro != blank %}
+        <p id="sharry-contact-intro-{{ section.id }}" class="sharry-contact-section__intro">{{ contact_form.intro }}</p>
+      {% endif %}
+
+      <div
+        id="sharry-contact-feedback-{{ section.id }}"
+        class="sharry-contact-form__feedback"
+        data-sharry-contact-feedback
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
+
+      <form
+        id="sharry-contact-form-{{ section.id }}"
+        class="sharry-contact-form"
+        action="{{ contact_form.action_url }}"
+        method="post"
+        enctype="multipart/form-data"
+        data-sharry-contact-form
+        data-sharry-contact-action="{{ api_routes.service_contact_store }}"
+        data-sharry-contact-products="{{ api_routes.service_contact_products }}"
+        data-sharry-contact-categories="{{ api_routes.service_contact_categories }}"
+        data-sharry-catalog-change="{{ contact_form.messages.change_selection }}"
+        data-sharry-catalog-searching="{{ contact_form.messages.searching }}"
+        data-sharry-catalog-empty="{{ contact_form.messages.no_catalog_results }}"
+        data-sharry-contact-success="{{ contact_form.success_message }}"
+        data-sharry-contact-failed="{{ contact_form.messages.submit_failed }}"
+        data-sharry-message-required="{{ 'contact.validation.required' | t }}"
+        data-sharry-message-email="{{ 'contact.validation.email' | t }}"
+        data-sharry-message-url="{{ 'contact.validation.url' | t }}"
+        data-sharry-message-tel="{{ 'contact.validation.tel' | t }}"
+        data-sharry-message-number="{{ 'contact.validation.number' | t }}"
+        data-sharry-message-pattern="{{ 'contact.validation.pattern' | t }}"
+        data-sharry-message-select-from-list="{{ 'contact.validation.select_from_list' | t }}"
+      >
+        <input type="hidden" name="_token" value="{{ csrf_token }}">
+        {% if contact_form.selected_team_member_id != blank %}
+          <input type="hidden" name="team_member_id" value="{{ contact_form.selected_team_member_id }}">
+        {% endif %}
+
+        <div id="sharry-contact-fields-{{ section.id }}" class="sharry-contact-form__fields" data-sharry-contact-fields>
+          {% for field in contact_form.fields %}
+            {% assign render_field = field.visible %}
+            {% if field.type == 'service' and contact_form.services.size == 0 %}{% assign render_field = false %}{% endif %}
+            {% if render_field %}
+              {% assign field_id = 'sharry-contact-field-' | append: section.id | append: '-' | append: field.key %}
+
+              {% if field.type == 'address' %}
+                <fieldset
+                  id="{{ field_id }}"
+                  class="sharry-contact-form__field sharry-contact-form__field--address sharry-contact-form__field--full"
+                  data-sharry-contact-field="{{ field.key }}"
+                  data-sharry-location
+                  data-sharry-location-countries="{{ contact_form.location.countries_url }}"
+                  data-sharry-location-states="{{ contact_form.location.states_url }}"
+                  data-sharry-location-cities="{{ contact_form.location.cities_url }}"
+                  data-sharry-location-locale="{% if request.is_rtl %}ar{% else %}en{% endif %}"
+                  data-sharry-location-select-hint="{{ 'contact.validation.select_from_list' | t }}"
+                >
+                  <legend class="sharry-contact-form__label">
+                    {{ field.label }}{% if field.required %}<span aria-hidden="true"> *</span>{% endif %}
+                  </legend>
+                  <div class="sharry-contact-form__address-grid">
+                    <label for="{{ field_id }}-country" class="sharry-contact-form__address-item">
+                      <span>{{ 'contact.country' | t }}</span>
+                      <input id="{{ field_id }}-country" class="sharry-contact-form__control" type="text" autocomplete="off" placeholder="{{ 'contact.validation.select_country' | t }}" data-sharry-location-search="country" {% if field.required %}required aria-required="true"{% endif %}>
+                      <input type="hidden" name="{{ field.address_names.country }}" data-sharry-location-value="country">
+                      <div class="sharry-contact-form__catalog-results" data-sharry-location-results="country" hidden></div>
+                    </label>
+                    <label for="{{ field_id }}-state" class="sharry-contact-form__address-item">
+                      <span>{{ 'contact.state' | t }}</span>
+                      <input id="{{ field_id }}-state" class="sharry-contact-form__control" type="text" autocomplete="off" placeholder="{{ 'contact.validation.select_state' | t }}" data-sharry-location-search="state" {% if field.required %}required aria-required="true"{% endif %}>
+                      <input type="hidden" name="{{ field.address_names.state }}" data-sharry-location-value="state">
+                      <div class="sharry-contact-form__catalog-results" data-sharry-location-results="state" hidden></div>
+                    </label>
+                    <label for="{{ field_id }}-city" class="sharry-contact-form__address-item">
+                      <span>{{ 'contact.city' | t }}</span>
+                      <input id="{{ field_id }}-city" class="sharry-contact-form__control" type="text" autocomplete="off" placeholder="{{ 'contact.validation.select_city' | t }}" data-sharry-location-search="city" {% if field.required %}required aria-required="true"{% endif %}>
+                      <input type="hidden" name="{{ field.address_names.city }}" data-sharry-location-value="city">
+                      <div class="sharry-contact-form__catalog-results" data-sharry-location-results="city" hidden></div>
+                    </label>
+                  </div>
+                </fieldset>
+              {% elsif field.type == 'checkbox' %}
+                <label
+                  id="{{ field_id }}"
+                  class="sharry-contact-form__field sharry-contact-form__field--checkbox"
+                  data-sharry-contact-field="{{ field.key }}"
+                >
+                  <input type="checkbox" name="{{ field.input_name }}" value="1" {% if field.required %}required aria-required="true"{% endif %}>
+                  <span>{{ field.label }}{% if field.required %}<span aria-hidden="true"> *</span>{% endif %}</span>
+                </label>
+              {% else %}
+                <div
+                  id="{{ field_id }}"
+                  class="sharry-contact-form__field{% if field.type == 'textarea' %} sharry-contact-form__field--full{% endif %}"
+                  data-sharry-contact-field="{{ field.key }}"
+                  data-sharry-contact-field-type="{{ field.type }}"
+                >
+                  <label for="{{ field_id }}-input" class="sharry-contact-form__label">
+                    {{ field.label }}{% if field.required %}<span aria-hidden="true"> *</span>{% endif %}
+                  </label>
+
+                  {% if field.type == 'textarea' %}
+                    <textarea id="{{ field_id }}-input" class="sharry-contact-form__control sharry-contact-form__textarea" name="{{ field.input_name }}" rows="5" maxlength="10000" {% if field.required %}required aria-required="true"{% endif %}></textarea>
+                  {% elsif field.type == 'service' %}
+                    {% if contact_form.services.size > 0 %}
+                      <select id="{{ field_id }}-input" class="sharry-contact-form__control sharry-contact-form__select" name="{{ field.input_name }}" {% if field.required %}required aria-required="true"{% endif %}>
+                        <option value="">{% if request.is_rtl %}اختر خدمة{% else %}Choose a service{% endif %}</option>
+                        {% for service in contact_form.services %}<option value="{{ service.id }}"{% if service.id == contact_form.selected_service_id %} selected{% endif %}>{{ service.name }}</option>{% endfor %}
+                      </select>
+                    {% endif %}
+                  {% elsif field.type == 'select' %}
+                    <select id="{{ field_id }}-input" class="sharry-contact-form__control sharry-contact-form__select" name="{{ field.input_name }}" {% if field.required %}required aria-required="true"{% endif %}>
+                      <option value="">{% if request.is_rtl %}اختر{% else %}Choose{% endif %}</option>
+                      {% for option in field.options %}<option value="{{ option.value }}">{{ option.label }}</option>{% endfor %}
+                    </select>
+                  {% elsif field.type == 'product' or field.type == 'category' %}
+                    <div
+                      class="sharry-contact-form__catalog-picker"
+                      data-sharry-catalog-picker
+                      data-picker-type="{{ field.type }}"
+                      data-picker-url="{% if field.type == 'product' %}{{ api_routes.service_contact_products }}{% else %}{{ api_routes.service_contact_categories }}{% endif %}"
+                    >
+                      <input id="{{ field_id }}-input" class="sharry-contact-form__control" type="search" autocomplete="off" placeholder="{% if field.type == 'product' %}{{ contact_form.messages.search_products }}{% else %}{{ contact_form.messages.search_categories }}{% endif %}" data-sharry-catalog-search {% if field.required %}required aria-required="true"{% endif %}>
+                      <input type="hidden" name="{{ field.input_name }}" data-sharry-catalog-value>
+                      <div class="sharry-contact-form__catalog-selected" data-sharry-catalog-selected hidden></div>
+                      <div class="sharry-contact-form__catalog-results" data-sharry-catalog-results hidden></div>
+                    </div>
+                  {% elsif field.type == 'phone' %}
+                    <div class="sharry-contact-form__phone">
+                      <select id="{{ field_id }}-country-code" class="sharry-contact-form__control sharry-contact-form__country-code" name="{{ field.country_code_name }}" aria-label="{% if request.is_rtl %}مفتاح الدولة{% else %}Country code{% endif %}">
+                        {% for country in contact_form.phone_countries %}<option value="{{ country.code }}"{% if country.code == '+966' %} selected{% endif %}>{{ country.iso }} {{ country.code }}</option>{% endfor %}
+                      </select>
+                      <input id="{{ field_id }}-input" class="sharry-contact-form__control" type="tel" name="{{ field.input_name }}" inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15" {% if field.required %}required aria-required="true"{% endif %}>
+                    </div>
+                  {% else %}
+                    <input
+                      id="{{ field_id }}-input"
+                      class="sharry-contact-form__control"
+                      type="{% if field.type == 'number' %}number{% elsif field.type == 'date' %}date{% elsif field.type == 'time' %}time{% elsif field.type == 'email' %}email{% elsif field.type == 'url' %}url{% elsif field.type == 'color' %}color{% elsif field.type == 'file' %}file{% elsif field.type == 'phone' %}tel{% else %}text{% endif %}"
+                      name="{{ field.input_name }}"
+                      {% if field.type == 'number' and field.min != blank %}min="{{ field.min }}"{% endif %}
+                      {% if field.type == 'number' and field.max != blank %}max="{{ field.max }}"{% endif %}
+                      {% if field.type == 'file' and field.accept != blank %}accept="{{ field.accept }}"{% endif %}
+                      {% if field.type == 'phone' %}inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15"{% endif %}
+                      {% if field.required %}required aria-required="true"{% endif %}
+                    >
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <label class="sharry-contact-form__honeypot" aria-hidden="true">
+          <span>Website</span>
+          <input type="text" name="website" tabindex="-1" autocomplete="off">
+        </label>
+
+        {% if section.settings.show_account_notice != false and contact_form.account_notice != blank %}
+          <p id="sharry-contact-notice-{{ section.id }}" class="sharry-contact-form__notice">{{ contact_form.account_notice }}</p>
+        {% endif %}
+
+        <button id="sharry-contact-submit-{{ section.id }}" class="sharry-contact-form__submit" type="submit" data-sharry-contact-submit>
+          <span data-sharry-contact-submit-label>{{ contact_form.submit_label }}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% schema %}
+{
+  "name": { "en": "Contact Form", "ar": "نموذج التواصل" },
+  "category": "forms",
+  "reusable": true,
+  "page_types": ["home", "product", "category", "search", "cart", "services", "service", "team", "team-member", "contact-us", "about-us", "cms", "custom", "404"],
+  "settings": [
+    { "type": "checkbox", "id": "show_title", "label": "Show title", "label_ar": "إظهار العنوان", "default": true },
+    { "type": "checkbox", "id": "show_intro", "label": "Show introduction", "label_ar": "إظهار المقدمة", "default": true },
+    { "type": "checkbox", "id": "show_account_notice", "label": "Show account notice", "label_ar": "إظهار تنبيه إنشاء الحساب", "default": true },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "label_ar": "التخطيط",
+      "default": "card",
+      "options": [
+        { "value": "card", "label": "Card", "label_ar": "بطاقة" },
+        { "value": "plain", "label": "Plain", "label_ar": "بسيط" }
+      ]
+    }
+  ],
+  "defaults": {
+    "show_title": true,
+    "show_intro": true,
+    "show_account_notice": true,
+    "layout": "card"
+  }
+}
+{% endschema %}

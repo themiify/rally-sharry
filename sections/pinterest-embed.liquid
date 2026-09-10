@@ -1,0 +1,34 @@
+{% assign is_rtl = request.is_rtl %}
+{% assign username = section.settings.username | default: '' | strip | remove: '@' %}
+{% assign heading = section.settings.heading | default: 'Follow us on Pinterest' %}
+{% assign heading_ar = section.settings.heading_ar | default: 'تابعينا على بينتريست' %}
+{% assign display_heading = heading %}
+{% if is_rtl %}
+  {% assign display_heading = heading_ar | default: heading %}
+{% endif %}
+{% assign encoded_username = username | url_encode %}
+{% capture profile_url %}https://www.pinterest.com/{{ encoded_username }}/{% endcapture %}
+
+<section id="social-embed-{{ section.id }}" class="gl-section gl-social-embed-section gl-social-embed-section--pinterest" aria-labelledby="social-embed-heading-{{ section.id }}">
+  <div class="gl-container">
+    <div class="gl-social-embed-card">
+      <div class="gl-section-header gl-social-embed-header">
+        <p class="gl-social-embed-eyebrow">Pinterest</p>
+        <h2 id="social-embed-heading-{{ section.id }}">{{ display_heading | escape }}</h2>
+        {% if username != blank %}
+          <a class="gl-social-embed-profile-link" href="{{ profile_url | escape }}" target="_blank" rel="noopener noreferrer">{{ username | escape }}</a>
+        {% endif %}
+      </div>
+
+      {% if username != blank %}
+        <div class="gl-social-embed-frame gl-social-embed-frame--pinterest" data-social-embed="pinterest">
+          <a data-pin-do="embedUser" data-pin-board-width="700" data-pin-scale-height="520" data-pin-scale-width="100" href="{{ profile_url | escape }}">{{ translations.social_embeds.view_profile | default: 'View this profile on the social network' | escape }}</a>
+        </div>
+      {% else %}
+        <div class="gl-social-embed-empty">
+          <p>{{ translations.social_embeds.configure | default: 'Add a username in this section settings to display the social profile.' | escape }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

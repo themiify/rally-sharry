@@ -46,9 +46,11 @@
             {% if request.is_rtl %}
               {% assign main_title = image.main_title_ar | default: image.main_title_en %}
               {% assign sub_title = image.sub_title_ar | default: image.sub_title_en %}
+              {% assign slide_btn_text = image.button_text_ar | default: image.button_text_en | default: image.button_text %}
             {% else %}
               {% assign main_title = image.main_title_en | default: image.main_title_ar %}
               {% assign sub_title = image.sub_title_en | default: image.sub_title_ar %}
+              {% assign slide_btn_text = image.button_text_en | default: image.button_text_ar | default: image.button_text %}
             {% endif %}
             <div class="swiper-slide sf__slide">
               <div class="sf__content">
@@ -60,7 +62,7 @@
                 {% endif %}
                 {% if image.is_button %}
                   <a href="{{ image.button_url }}" class="sf__btn" style="color: {{ image.button_text_color | default: '#000000' }}; background-color: {{ image.button_bg_color | default: '#ffffff' }};">
-                    <span>{{ image.button_text }}</span>
+                    <span>{{ slide_btn_text }}</span>
                     <i class="sicon-arrow-left sf__btn-icon"></i>
                   </a>
                 {% endif %}

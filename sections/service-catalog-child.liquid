@@ -1,0 +1,7 @@
+<article class="service-catalog-card service-catalog-child-card">
+  {% if child.image != blank %}<img src="{{ child.image }}" alt="{{ child.title }}" loading="lazy">{% endif %}
+  <div class="service-catalog-card__body">
+    {% if child.title != blank %}<h3>{{ child.title }}</h3>{% endif %}
+    {% if child.description != blank %}<div class="service-catalog-richtext">{{ child.description }}</div>{% endif %}
+  </div>
+</article>

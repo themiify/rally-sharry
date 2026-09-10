@@ -1,0 +1,47 @@
+{% if service_catalog.team_member %}
+<section class="gl-section service-catalog-section service-catalog-team-member" data-service-catalog-surface="team-member">
+  <div class="gl-container">
+    <a class="service-catalog-link" href="{{ service_catalog.profile.team_url }}">{{ 'service_catalog.team.back' | t }}</a>
+    <div class="service-catalog-detail-hero">
+      {% if section.settings.show_image != false and service_catalog.team_member.image != blank %}<img src="{{ service_catalog.team_member.image }}" alt="{{ service_catalog.team_member.name }}">{% endif %}
+      <div class="service-catalog-detail-hero__content">
+        <h1>{{ service_catalog.team_member.name }}</h1>
+        {% if service_catalog.team_member.title != blank %}<p class="service-catalog-lead">{{ service_catalog.team_member.title }}</p>{% endif %}
+        {% if service_catalog.team_member.bio != blank %}<div class="service-catalog-richtext">{{ service_catalog.team_member.bio }}</div>{% endif %}
+        {% if service_catalog.team_member.highlights.size > 0 %}<ul class="service-catalog-highlights">{% for highlight in service_catalog.team_member.highlights %}<li>{{ highlight }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+
+    {% if section.settings.show_resume != false and service_catalog.team_member.resume %}
+      {% for resume_type in 'experience,education,certificates' | split: ',' %}
+        {% assign entries = service_catalog.team_member.resume[resume_type] %}
+        {% if entries.size > 0 %}{% render 'service-catalog-resume', entries: entries, resume_type: resume_type %}{% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% if section.settings.show_services != false and service_catalog.team_member.services.size > 0 %}
+      <section class="service-catalog-related">
+        <h2>{{ 'service_catalog.services.related' | t }}</h2>
+        <div class="service-catalog-inline-links">{% for service in service_catalog.team_member.services %}<a href="{{ service.url }}">{{ service.name }}</a>{% endfor %}</div>
+      </section>
+    {% endif %}
+  </div>
+</section>
+{% else %}
+<section class="gl-section service-catalog-section"><div class="gl-container"><p class="service-catalog-empty">{{ 'service_catalog.team.unavailable' | t }}</p></div></section>
+{% endif %}
+
+{% schema %}
+{
+  "name": { "en": "Team Member", "ar": "عضو الفريق" },
+  "category": "service-catalog",
+  "reusable": false,
+  "page_types": ["team-member"],
+  "settings": [
+    { "type": "checkbox", "id": "show_image", "label": "Show member image", "label_ar": "إظهار صورة العضو", "default": true },
+    { "type": "checkbox", "id": "show_resume", "label": "Show resume", "label_ar": "إظهار السيرة الذاتية", "default": true },
+    { "type": "checkbox", "id": "show_services", "label": "Show services", "label_ar": "إظهار الخدمات", "default": true }
+  ],
+  "defaults": { "show_image": true, "show_resume": true, "show_services": true }
+}
+{% endschema %}

@@ -788,8 +788,13 @@ export function closeQuickViewModal() {
   modal.classList.remove("is-active");
   document.body.style.overflow = "";
 }
-window.addEventListener('load', function () {
+function dismissPageLoader() {
   var loader = document.getElementById('gl-page-loader');
   if (!loader) return;
   loader.classList.add('gl-hidden');
-});
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', dismissPageLoader);
+} else {
+  dismissPageLoader();
+}

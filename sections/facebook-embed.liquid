@@ -1,0 +1,36 @@
+{% assign is_rtl = request.is_rtl %}
+{% assign username = section.settings.username | default: '' | strip | remove: '@' %}
+{% assign heading = section.settings.heading | default: 'Follow us on Facebook' %}
+{% assign heading_ar = section.settings.heading_ar | default: 'تابعينا على فيسبوك' %}
+{% assign display_heading = heading %}
+{% if is_rtl %}
+  {% assign display_heading = heading_ar | default: heading %}
+{% endif %}
+{% assign encoded_username = username | url_encode %}
+{% capture profile_url %}https://www.facebook.com/{{ encoded_username }}{% endcapture %}
+{% assign encoded_profile_url = profile_url | url_encode %}
+{% capture embed_url %}https://www.facebook.com/plugins/page.php?href={{ encoded_profile_url }}&tabs=timeline&width=500&height=560&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&lazy=true{% endcapture %}
+
+<section id="social-embed-{{ section.id }}" class="gl-section gl-social-embed-section gl-social-embed-section--facebook" aria-labelledby="social-embed-heading-{{ section.id }}">
+  <div class="gl-container">
+    <div class="gl-social-embed-card">
+      <div class="gl-section-header gl-social-embed-header">
+        <p class="gl-social-embed-eyebrow">Facebook</p>
+        <h2 id="social-embed-heading-{{ section.id }}">{{ display_heading | escape }}</h2>
+        {% if username != blank %}
+          <a class="gl-social-embed-profile-link" href="{{ profile_url | escape }}" target="_blank" rel="noopener noreferrer">{{ username | escape }}</a>
+        {% endif %}
+      </div>
+
+      {% if username != blank %}
+        <div class="gl-social-embed-frame gl-social-embed-frame--facebook">
+          <iframe src="{{ embed_url | escape }}" title="{{ display_heading | escape }}" width="500" height="560" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" style="border: none; overflow: hidden;" scrolling="no" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen="true"></iframe>
+        </div>
+      {% else %}
+        <div class="gl-social-embed-empty">
+          <p>{{ translations.social_embeds.configure | default: 'Add a username in this section settings to display the social profile.' | escape }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

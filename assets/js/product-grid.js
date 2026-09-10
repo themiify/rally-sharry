@@ -338,8 +338,8 @@ export function initProductGrid(apiClient, showToast, storefrontActions) {
   }
 
   function wireProductSearch() {
-    var searchForm = dom("gl-product-search-form");
-    var searchInput = dom("gl-product-search");
+    var searchForm = dom("gl-catalog-search-form");
+    var searchInput = dom("gl-catalog-search");
     if (!searchInput) {
       return;
     }
@@ -352,14 +352,6 @@ export function initProductGrid(apiClient, showToast, storefrontActions) {
         applySearchQuery(searchInput.value);
       });
     }
-
-    searchInput.addEventListener("input", function () {
-      clearTimeout(searchDebounceTimer);
-      var value = this.value;
-      searchDebounceTimer = setTimeout(function () {
-        applySearchQuery(value);
-      }, 350);
-    });
   }
 
   function applySearchQuery(value) {

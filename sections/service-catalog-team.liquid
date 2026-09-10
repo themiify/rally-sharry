@@ -1,0 +1,42 @@
+{% if service_catalog.profile.name != blank or service_catalog.team.size > 0 %}
+<section class="gl-section service-catalog-section service-catalog-team" data-service-catalog-surface="team">
+  <div class="gl-container">
+    <header class="service-catalog-heading">
+      <p class="service-catalog-eyebrow">{{ 'service_catalog.team.eyebrow' | t }}</p>
+      <h1>{{ service_catalog.profile.team_title | default: service_catalog.profile.name }}</h1>
+      {% if service_catalog.profile.team_intro != blank %}<p>{{ service_catalog.profile.team_intro }}</p>{% endif %}
+    </header>
+    {% if service_catalog.team.size > 0 %}
+      <div class="service-catalog-grid service-catalog-grid--{{ section.settings.columns }}">
+        {% for member in service_catalog.team %}
+          <article class="service-catalog-card service-catalog-member-card">
+            {% if section.settings.show_images != false and member.image != blank %}<img src="{{ member.image }}" alt="{{ member.name }}" loading="lazy">{% endif %}
+            <div class="service-catalog-card__body">
+              <h2><a href="{{ member.url }}">{{ member.name }}</a></h2>
+              {% if member.title != blank %}<p>{{ member.title }}</p>{% endif %}
+              {% if member.bio_text != blank %}<p>{{ member.bio_text | truncate: 150 }}</p>{% endif %}
+              <a class="service-catalog-link" href="{{ member.url }}">{{ 'service_catalog.team.view' | t }}</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="service-catalog-empty">{{ 'service_catalog.team.empty' | t }}</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% schema %}
+{
+  "name": { "en": "Team Listing", "ar": "قائمة الفريق" },
+  "category": "service-catalog",
+  "reusable": false,
+  "page_types": ["team"],
+  "settings": [
+    { "type": "checkbox", "id": "show_images", "label": "Show member images", "label_ar": "إظهار صور الأعضاء", "default": true },
+    { "type": "select", "id": "columns", "label": "Columns", "label_ar": "الأعمدة", "default": "3", "options": [{ "value": "2", "label": "Two", "label_ar": "اثنان" }, { "value": "3", "label": "Three", "label_ar": "ثلاثة" }, { "value": "4", "label": "Four", "label_ar": "أربعة" }] }
+  ],
+  "defaults": { "show_images": true, "columns": "3" }
+}
+{% endschema %}

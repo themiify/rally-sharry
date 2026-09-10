@@ -1,0 +1,54 @@
+{% if service_catalog.service %}
+<section class="gl-section service-catalog-section service-catalog-service" data-service-catalog-surface="service">
+  <div class="gl-container">
+    <a class="service-catalog-link" href="{{ service_catalog.profile.services_url }}">{{ 'service_catalog.services.back' | t }}</a>
+    <div class="service-catalog-detail-hero">
+      {% if section.settings.show_image != false and service_catalog.service.image != blank %}<img src="{{ service_catalog.service.image }}" alt="{{ service_catalog.service.name }}">{% endif %}
+      <div class="service-catalog-detail-hero__content">
+        <h1>{{ service_catalog.service.name }}</h1>
+        {% if service_catalog.service.excerpt != blank %}<p class="service-catalog-lead">{{ service_catalog.service.excerpt }}</p>{% endif %}
+        {% if service_catalog.service.description != blank %}<div class="service-catalog-richtext">{{ service_catalog.service.description }}</div>{% endif %}
+      </div>
+    </div>
+
+    {% if section.settings.show_gallery != false and service_catalog.service.gallery.size > 0 %}
+      <div class="service-catalog-gallery" data-service-catalog-gallery>
+        {% for image in service_catalog.service.gallery %}<img src="{{ image }}" alt="{{ service_catalog.service.name }}" loading="lazy" tabindex="0" role="button" data-service-catalog-gallery-image>{% endfor %}
+      </div>
+    {% endif %}
+
+    {% if section.settings.show_sections != false and service_catalog.service.sections.size > 0 %}
+      <div class="service-catalog-content-sections">
+        {% for content_section in service_catalog.service.sections %}
+          {% render 'service-catalog-section', content_section: content_section %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if section.settings.show_team != false and service_catalog.service.team_members.size > 0 %}
+      <section class="service-catalog-related">
+        <h2>{{ 'service_catalog.team.related' | t }}</h2>
+        <div class="service-catalog-inline-links">{% for member in service_catalog.service.team_members %}<a href="{{ member.url }}">{{ member.name }}</a>{% endfor %}</div>
+      </section>
+    {% endif %}
+  </div>
+</section>
+{% else %}
+<section class="gl-section service-catalog-section"><div class="gl-container"><p class="service-catalog-empty">{{ 'service_catalog.services.unavailable' | t }}</p></div></section>
+{% endif %}
+
+{% schema %}
+{
+  "name": { "en": "Service Detail", "ar": "تفاصيل الخدمة" },
+  "category": "service-catalog",
+  "reusable": false,
+  "page_types": ["service"],
+  "settings": [
+    { "type": "checkbox", "id": "show_image", "label": "Show service image", "label_ar": "إظهار صورة الخدمة", "default": true },
+    { "type": "checkbox", "id": "show_gallery", "label": "Show gallery", "label_ar": "إظهار المعرض", "default": true },
+    { "type": "checkbox", "id": "show_sections", "label": "Show service sections", "label_ar": "إظهار أقسام الخدمة", "default": true },
+    { "type": "checkbox", "id": "show_team", "label": "Show team members", "label_ar": "إظهار أعضاء الفريق", "default": true }
+  ],
+  "defaults": { "show_image": true, "show_gallery": true, "show_sections": true, "show_team": true }
+}
+{% endschema %}
