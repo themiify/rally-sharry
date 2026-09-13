@@ -1422,7 +1422,7 @@ button {
 /* ---- Footer ---- */
 .gl-footer {
   background: var(--gl-background_footer_color) !important;
-  padding-top: 4rem;
+
 }
 
 .gl-footer-grid {

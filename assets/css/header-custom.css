@@ -408,7 +408,7 @@
   .gl-logo-mobile .gl-logo-img,
   .gl-logo-mobile img {
     max-height: 42px !important;
-    width: auto !important;
+    width: 120px !important;
     object-fit: contain !important;
   }
 

@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="{{ 'RA_about_us.css' | asset_url }}">
 
 {% assign c = section.settings %}
 
@@ -27,8 +26,8 @@
         </span>
         {% for word in words %}
           {% if forloop.index > 2 %}
-            {% assign delay = forloop.index0 | minus: 2 | times: 100 %}
-            <span class="fade-word sfa__word" style="color: {{ c.description_color | default: '#000000' }}; transition-delay: {{ delay }}ms;">
+            {% assign delay = forloop.index0 | minus: 2 | times: 120 %}
+            <span class="fade-word sfa__word" style="color: {{ c.description_color | default: '#000000' }}; --word-delay: {{ delay }}ms;">
               {{ word }}&nbsp;
             </span>
           {% endif %}
@@ -43,22 +42,26 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const sectionEl = document.querySelector(".sf-{{ section.id }}");
-    if (!sectionEl) return;
-    const container = sectionEl.querySelector(".fade-container");
-    if (!container) return;
-    const words = container.querySelectorAll(".fade-word");
+    var isMobile = window.matchMedia("(pointer: coarse)").matches;
+    if (isMobile) return; // CSS keyframe handles mobile
 
+    var sectionEl = document.querySelector(".sf-{{ section.id }}");
+    if (!sectionEl) return;
+    var container = sectionEl.querySelector(".fade-container");
+    if (!container) return;
+    var words = container.querySelectorAll(".fade-word");
+
+    // Desktop: hover behaviour
     container.addEventListener("mouseenter", function () {
       words.forEach(function (word, i) {
-        word.style.transitionDelay = `${i * 100}ms`;
+        word.style.transitionDelay = (i * 100) + "ms";
       });
     });
 
     container.addEventListener("mouseleave", function () {
-      const total = words.length;
+      var total = words.length;
       words.forEach(function (word, i) {
-        word.style.transitionDelay = `${(total - i - 1) * 100}ms`;
+        word.style.transitionDelay = ((total - i - 1) * 100) + "ms";
       });
     });
   });

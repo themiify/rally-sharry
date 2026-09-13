@@ -108,12 +108,37 @@
 .sfa__word {
   opacity: 0.5;
   display: inline-block;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
+  transition-delay: var(--word-delay, 0ms);
 }
 
+/* Desktop: show on hover */
 .fade-container:hover .fade-word {
   opacity: 1;
 }
+
+/* Mobile: auto-play once with staggered keyframe animation */
+@keyframes sfa-word-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (pointer: coarse) {
+  .fade-word,
+  .sfa__word {
+    opacity: 0;
+    animation: sfa-word-in 0.5s ease forwards;
+    animation-delay: var(--word-delay, 0ms);
+    /* disable hover transition on mobile */
+    transition: none;
+  }
+
+  /* Keep .is-visible rule as safety fallback */
+  .fade-container.is-visible .fade-word {
+    opacity: 1;
+  }
+}
+
 
 /* Decorative Borders */
 .sfa__border-v {
