@@ -419,19 +419,286 @@
 let searchTimeout;
 let currentSearchQuery = '';
 
+function formatCurrencyAmount(amount, currencyCode) {
+  if (amount === undefined || amount === null || amount === '') return '';
+  if (typeof amount === 'string') {
+    const trimmed = amount.trim();
+    if (trimmed.includes('ر.س') || trimmed.includes('SAR') || /[\$\€\£\¥]/.test(trimmed)) {
+      return trimmed;
+    }
+  }
+  const num = parseFloat(amount);
+  if (isNaN(num)) return '';
+  const formattedNum = num.toFixed(2);
+  const defaultCurrency = '{{ shop.currency | default: "SAR" }}';
+  const code = (currencyCode || defaultCurrency || 'SAR').trim();
+  const isAr = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar' || '{{ shop.locale }}' === 'ar';
+  if (!code) return formattedNum;
+  if (code.toUpperCase() === 'SAR') {
+    return isAr ? `${formattedNum} ر.س` : `${formattedNum} SAR`;
+  }
+  return isAr ? `${formattedNum} ${code}` : `${code} ${formattedNum}`;
+}
+
+function extractProductPrice(product) {
+  if (!product) return '';
+
+  const currency = product.currency || '{{ shop.currency | default: "SAR" }}';
+
+  // 1. Direct formatted string properties
+  if (typeof product.formatted_price === 'string' && product.formatted_price.trim()) {
+    return product.formatted_price.trim();
+  }
+  if (typeof product.formated_price === 'string' && product.formated_price.trim()) {
+    return product.formated_price.trim();
+  }
+  if (typeof product.formatted_sale_price === 'string' && product.formatted_sale_price.trim()) {
+    return product.formatted_sale_price.trim();
+  }
+  if (typeof product.price_formatted === 'string' && product.price_formatted.trim()) {
+    return product.price_formatted.trim();
+  }
+  if (typeof product.price_text === 'string' && product.price_text.trim()) {
+    return product.price_text.trim();
+  }
+
+  // 2. prices object structure (Salla / marketplace format)
+  if (product.prices && typeof product.prices === 'object') {
+    const finalPrice = product.prices.final || product.prices.final_price;
+    if (finalPrice) {
+      if (typeof finalPrice === 'string') {
+        const fmt = formatCurrencyAmount(finalPrice, currency);
+        if (fmt) return fmt;
+      } else if (typeof finalPrice === 'object') {
+        if (finalPrice.formatted_price) return finalPrice.formatted_price;
+        if (finalPrice.formated_price) return finalPrice.formated_price;
+        if (finalPrice.formatted) return finalPrice.formatted;
+        if (finalPrice.price !== undefined && finalPrice.price !== null) {
+          const formatted = formatCurrencyAmount(finalPrice.price, currency);
+          if (formatted) return formatted;
+        }
+        if (finalPrice.amount !== undefined && finalPrice.amount !== null) {
+          const formatted = formatCurrencyAmount(finalPrice.amount, currency);
+          if (formatted) return formatted;
+        }
+      }
+    }
+    const regularPrice = product.prices.regular || product.prices.regular_price;
+    if (regularPrice) {
+      if (typeof regularPrice === 'string') {
+        const fmt = formatCurrencyAmount(regularPrice, currency);
+        if (fmt) return fmt;
+      } else if (typeof regularPrice === 'object') {
+        if (regularPrice.formatted_price) return regularPrice.formatted_price;
+        if (regularPrice.formated_price) return regularPrice.formated_price;
+        if (regularPrice.formatted) return regularPrice.formatted;
+        if (regularPrice.price !== undefined && regularPrice.price !== null) {
+          const formatted = formatCurrencyAmount(regularPrice.price, currency);
+          if (formatted) return formatted;
+        }
+        if (regularPrice.amount !== undefined && regularPrice.amount !== null) {
+          const formatted = formatCurrencyAmount(regularPrice.amount, currency);
+          if (formatted) return formatted;
+        }
+      }
+    }
+    if (product.prices.min_price !== undefined && product.prices.min_price !== null) {
+      const minFormatted = formatCurrencyAmount(product.prices.min_price, currency);
+      if (minFormatted) return minFormatted;
+    }
+  }
+
+  // 3. special_price (discounted price)
+  if (product.special_price !== undefined && product.special_price !== null) {
+    if (typeof product.special_price === 'object') {
+      if (product.special_price.formatted_price) return product.special_price.formatted_price;
+      if (product.special_price.formated_price) return product.special_price.formated_price;
+      if (product.special_price.formatted) return product.special_price.formatted;
+      if (product.special_price.price !== undefined && product.special_price.price !== null) {
+        const formatted = formatCurrencyAmount(product.special_price.price, currency);
+        if (formatted) return formatted;
+      }
+      if (product.special_price.amount !== undefined && product.special_price.amount !== null) {
+        const formatted = formatCurrencyAmount(product.special_price.amount, currency);
+        if (formatted) return formatted;
+      }
+    } else {
+      const formatted = formatCurrencyAmount(product.special_price, currency);
+      if (formatted) return formatted;
+    }
+  }
+
+  // 4. sale_price
+  if (product.sale_price !== undefined && product.sale_price !== null) {
+    if (typeof product.sale_price === 'object') {
+      if (product.sale_price.formatted_price) return product.sale_price.formatted_price;
+      if (product.sale_price.formatted) return product.sale_price.formatted;
+      if (product.sale_price.price !== undefined && product.sale_price.price !== null) {
+        const formatted = formatCurrencyAmount(product.sale_price.price, currency);
+        if (formatted) return formatted;
+      }
+    } else {
+      const formatted = formatCurrencyAmount(product.sale_price, currency);
+      if (formatted) return formatted;
+    }
+  }
+
+  // 5. final_price
+  if (product.final_price !== undefined && product.final_price !== null) {
+    if (typeof product.final_price === 'object') {
+      if (product.final_price.formatted_price) return product.final_price.formatted_price;
+      if (product.final_price.formatted) return product.final_price.formatted;
+      if (product.final_price.price !== undefined) {
+        const formatted = formatCurrencyAmount(product.final_price.price, currency);
+        if (formatted) return formatted;
+      }
+    } else {
+      const formatted = formatCurrencyAmount(product.final_price, currency);
+      if (formatted) return formatted;
+    }
+  }
+
+  // 6. Direct price property
+  if (product.price !== undefined && product.price !== null) {
+    if (typeof product.price === 'object') {
+      if (product.price.formatted_price) return product.price.formatted_price;
+      if (product.price.formated_price) return product.price.formated_price;
+      if (product.price.formatted) return product.price.formatted;
+      if (product.price.price !== undefined && product.price.price !== null) {
+        const formatted = formatCurrencyAmount(product.price.price, currency);
+        if (formatted) return formatted;
+      }
+      if (product.price.amount !== undefined && product.price.amount !== null) {
+        const formatted = formatCurrencyAmount(product.price.amount, currency);
+        if (formatted) return formatted;
+      }
+    } else {
+      const formatted = formatCurrencyAmount(product.price, currency);
+      if (formatted) return formatted;
+    }
+  }
+
+  // 7. formatted_regular_price fallback
+  if (typeof product.formatted_regular_price === 'string' && product.formatted_regular_price.trim()) {
+    return product.formatted_regular_price.trim();
+  }
+  if (typeof product.formated_regular_price === 'string' && product.formated_regular_price.trim()) {
+    return product.formated_regular_price.trim();
+  }
+
+  // 8. Regular price (raw numeric/string)
+  if (product.regular_price !== undefined && product.regular_price !== null && typeof product.regular_price !== 'object') {
+    const formatted = formatCurrencyAmount(product.regular_price, currency);
+    if (formatted) return formatted;
+  }
+
+  // 9. min_price
+  if (product.min_price !== undefined && product.min_price !== null) {
+    const formatted = formatCurrencyAmount(product.min_price, currency);
+    if (formatted) return formatted;
+  }
+
+  // 10. price_html string
+  if (typeof product.price_html === 'string' && product.price_html.trim()) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = product.price_html;
+    const txt = (tmp.textContent || tmp.innerText || '').trim();
+    if (txt) return txt;
+  }
+
+  return '';
+}
+
+function extractProductOldPrice(product, currentPrice) {
+  if (!product) return '';
+  let old = '';
+  const currency = product.currency || '{{ shop.currency | default: "SAR" }}';
+  if (product.prices && typeof product.prices === 'object') {
+    const reg = product.prices.regular || product.prices.regular_price;
+    if (reg) {
+      if (typeof reg === 'string') old = formatCurrencyAmount(reg, currency);
+      else if (reg.formatted_price) old = reg.formatted_price;
+      else if (reg.formated_price) old = reg.formated_price;
+      else if (reg.formatted) old = reg.formatted;
+      else if (reg.price !== undefined && reg.price !== null) old = formatCurrencyAmount(reg.price, currency);
+      else if (reg.amount !== undefined && reg.amount !== null) old = formatCurrencyAmount(reg.amount, currency);
+    }
+  }
+  if (!old) {
+    if (product.formatted_regular_price) old = product.formatted_regular_price;
+    else if (product.formated_regular_price) old = product.formated_regular_price;
+    else if (product.regular_price !== undefined && product.regular_price !== null && (product.special_price || product.sale_price || product.on_sale || product.is_on_sale)) {
+      if (typeof product.regular_price === 'object') {
+        if (product.regular_price.formatted_price) old = product.regular_price.formatted_price;
+        else if (product.regular_price.formatted) old = product.regular_price.formatted;
+        else if (product.regular_price.price !== undefined) old = formatCurrencyAmount(product.regular_price.price, currency);
+      } else {
+        old = formatCurrencyAmount(product.regular_price, currency);
+      }
+    } else if (product.price !== undefined && (product.special_price || product.sale_price)) {
+      const orig = typeof product.price === 'object' ? (product.price.price || product.price.amount) : product.price;
+      const spec = typeof product.special_price === 'object' ? (product.special_price.price || product.special_price.amount) : product.special_price;
+      const sale = typeof product.sale_price === 'object' ? (product.sale_price.price || product.sale_price.amount) : product.sale_price;
+      const discountVal = spec !== undefined ? spec : sale;
+      if (orig && discountVal && parseFloat(orig) > parseFloat(discountVal)) {
+        old = formatCurrencyAmount(orig, currency);
+      }
+    }
+  }
+  if (old && old.trim() !== (currentPrice || '').trim()) {
+    return old.trim();
+  }
+  return '';
+}
+
+function resolveProductImage(product) {
+  if (product.image && typeof product.image === 'string') return product.image;
+  if (product.featured_image && typeof product.featured_image === 'string') return product.featured_image;
+  if (product.base_image) {
+    if (typeof product.base_image === 'string') return product.base_image;
+    if (product.base_image.small_image_url) return product.base_image.small_image_url;
+    if (product.base_image.medium_image_url) return product.base_image.medium_image_url;
+    if (product.base_image.large_image_url) return product.base_image.large_image_url;
+    if (product.base_image.original_image_url) return product.base_image.original_image_url;
+    if (product.base_image.small_url) return product.base_image.small_url;
+    if (product.base_image.medium_url) return product.base_image.medium_url;
+    if (product.base_image.url) return product.base_image.url;
+  }
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    const first = product.images[0];
+    if (typeof first === 'string') return first;
+    if (first && first.small_image_url) return first.small_image_url;
+    if (first && first.medium_image_url) return first.medium_image_url;
+    if (first && first.url) return first.url;
+  }
+  return '/placeholder-product.jpg';
+}
+
+function resolveProductUrl(product) {
+  let url = product.url_key || product.url || product.product_url || product.permalink || '';
+  if (!url && product.slug) url = product.slug;
+  if (!url && product.id) url = `products/${product.id}`;
+  if (!url) return '#';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/')) return url;
+  return '/' + url;
+}
+
 function openSearchPopup() {
   const popup = document.getElementById('gl-search-popup');
   const searchInput = document.getElementById('gl-product-search');
+  if (!popup) return;
   popup.style.display = 'flex';
   setTimeout(() => {
     popup.classList.add('active');
-    searchInput.focus();
+    if (searchInput) searchInput.focus();
   }, 10);
   document.body.style.overflow = 'hidden';
 }
 
 function closeSearchPopup() {
   const popup = document.getElementById('gl-search-popup');
+  if (!popup) return;
   popup.classList.remove('active');
   setTimeout(() => {
     popup.style.display = 'none';
@@ -445,14 +712,13 @@ function clearSearchResults() {
   const resultsList = document.getElementById('gl-search-results-list');
   const searchInput = document.getElementById('gl-product-search');
   
-  resultsContainer.style.display = 'none';
-  resultsList.innerHTML = '';
-  searchInput.value = '';
+  if (resultsContainer) resultsContainer.style.display = 'none';
+  if (resultsList) resultsList.innerHTML = '';
+  if (searchInput) searchInput.value = '';
   currentSearchQuery = '';
 }
 
 function performSearch(query) {
-  // Trim whitespace and check if query has actual content
   const trimmedQuery = query.trim();
   
   if (!trimmedQuery || trimmedQuery.length < 2) {
@@ -460,18 +726,14 @@ function performSearch(query) {
     return;
   }
 
-  // Show loading state
   showSearchLoading();
 
-  // Clear previous timeout
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
 
-  // Debounce search
   searchTimeout = setTimeout(async () => {
     try {
-      // Use the theme's API routes for products
       const apiProductsUrl = '{{ api_routes.products_index }}';
       const response = await fetch(`${apiProductsUrl}?query=${encodeURIComponent(trimmedQuery)}&limit=5`);
       
@@ -481,30 +743,33 @@ function performSearch(query) {
       
       const data = await response.json();
       
-      // Debug: Log the API response structure
-      console.log('Search API Response:', data);
+      let products = [];
+      if (Array.isArray(data)) {
+        products = data;
+      } else if (data && Array.isArray(data.data)) {
+        products = data.data;
+      } else if (data && data.data && Array.isArray(data.data.data)) {
+        products = data.data.data;
+      } else if (data && Array.isArray(data.products)) {
+        products = data.products;
+      }
       
-      // Transform API data to match expected format
-      const products = data.data || data.products || data || [];
       const results = products.map(product => {
-        const mappedProduct = {
+        const price = extractProductPrice(product);
+        const oldPrice = extractProductOldPrice(product, price);
+        return {
           id: product.id,
-          name: product.name || product.title || product.name,
-          price: product.price ? (product.formatted_price || `${product.currency || ''}${product.price}`) : 'Price not available',
-          image: product.image || product.featured_image || product.base_image?.small_image_url || '/placeholder-product.jpg',
-          url: product.url_key || product.url || product.product_url || product.permalink
+          name: product.name || product.title || '',
+          price: price,
+          oldPrice: oldPrice,
+          image: resolveProductImage(product),
+          url: resolveProductUrl(product)
         };
-        
-        // Debug: Log each mapped product
-        console.log('Mapped Product:', mappedProduct);
-        
-        return mappedProduct;
       });
       
       displaySearchResults(results, trimmedQuery);
     } catch (error) {
       console.error('Search error:', error);
-      // Show error state
       displaySearchResults([], trimmedQuery);
     }
   }, 300);
@@ -515,9 +780,9 @@ function showSearchLoading() {
   const resultsList = document.getElementById('gl-search-results-list');
   const resultsCount = document.querySelector('.gl-search-results-count');
   
-  resultsContainer.style.display = 'block';
-  resultsCount.textContent = '{% if shop.locale == "ar" %}جاري البحث...{% else %}Searching...{% endif %}';
-  resultsList.innerHTML = '<div class="gl-search-loading"><div class="gl-spinner"></div></div>';
+  if (resultsContainer) resultsContainer.style.display = 'block';
+  if (resultsCount) resultsCount.textContent = '{% if shop.locale == "ar" %}جاري البحث...{% else %}Searching...{% endif %}';
+  if (resultsList) resultsList.innerHTML = '<div class="gl-search-loading"><div class="gl-spinner"></div></div>';
 }
 
 function displaySearchResults(results, query) {
@@ -528,18 +793,31 @@ function displaySearchResults(results, query) {
   
   currentSearchQuery = query;
   
+  if (!resultsContainer || !resultsList) return;
+
   if (results.length === 0) {
-    resultsCount.textContent = '{% if shop.locale == "ar" %}لا توجد نتائج{% else %}No results found{% endif %}';
+    if (resultsCount) resultsCount.textContent = '{% if shop.locale == "ar" %}لا توجد نتائج{% else %}No results found{% endif %}';
     resultsList.innerHTML = '<div class="gl-search-no-results">{% if shop.locale == "ar" %}لا توجد منتجات مطابقة لبحثك{% else %}No products match your search{% endif %}</div>';
-    viewAllLink.style.display = 'none';
+    if (viewAllLink) viewAllLink.style.display = 'none';
   } else {
     const resultText = results.length === 1 
       ? '{% if shop.locale == "ar" %}نتيجة واحدة{% else %}1 result{% endif %}'
       : `{% if shop.locale == "ar" %}${results.length} نتائج{% else %}${results.length} results{% endif %}`;
-    resultsCount.textContent = resultText;
+    if (resultsCount) resultsCount.textContent = resultText;
     
+    const isAr = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar' || '{{ shop.locale }}' === 'ar';
+    const priceUnavailableText = isAr ? 'السعر غير متوفر' : 'Price not available';
     let resultsHTML = '';
     results.forEach(product => {
+      let priceDisplay = '';
+      if (product.price) {
+        priceDisplay = `<span class="gl-search-result-price-current" style="font-weight: 700; color: var(--gl-primary, #e91e63);">${product.price}</span>`;
+        if (product.oldPrice) {
+          priceDisplay += ` <span class="gl-search-result-price-old" style="text-decoration: line-through; opacity: 0.6; font-size: 0.85em; margin-inline-start: 6px; color: #888;">${product.oldPrice}</span>`;
+        }
+      } else {
+        priceDisplay = `<span class="gl-search-result-price-unavailable" style="font-size: 0.9em; opacity: 0.7;">${priceUnavailableText}</span>`;
+      }
       resultsHTML += `
         <div class="gl-search-result-item">
           <div class="gl-search-result-image">
@@ -547,16 +825,18 @@ function displaySearchResults(results, query) {
           </div>
           <div class="gl-search-result-info">
             <h4 class="gl-search-result-name">${product.name}</h4>
-            <p class="gl-search-result-price">${product.price}</p>
+            <p class="gl-search-result-price">${priceDisplay}</p>
           </div>
-          <a href="/${product.url}" class="gl-search-result-link"></a>
+          <a href="${product.url}" class="gl-search-result-link"></a>
         </div>
       `;
     });
     
     resultsList.innerHTML = resultsHTML;
-    viewAllLink.style.display = 'block';
-    viewAllLink.href = '/';
+    if (viewAllLink) {
+      viewAllLink.style.display = 'block';
+      viewAllLink.href = `/search?query=${encodeURIComponent(query)}`;
+    }
   }
   
   resultsContainer.style.display = 'block';
@@ -564,32 +844,43 @@ function displaySearchResults(results, query) {
 
 function hideSearchResults() {
   const resultsContainer = document.getElementById('gl-search-results');
-  resultsContainer.style.display = 'none';
+  if (resultsContainer) resultsContainer.style.display = 'none';
 }
 
 // Add click event to search button
 document.addEventListener('DOMContentLoaded', function() {
-  const searchBtn = document.querySelector('.gl-header-action-btn[aria-label="Search"]');
+  const searchBtns = document.querySelectorAll('.gl-header-action-btn[aria-label="Search"], .gl-header-action-btn[aria-label="البحث"], [data-search-toggle]');
   const searchInput = document.getElementById('gl-product-search');
   
-  if (searchBtn) {
-    searchBtn.addEventListener('click', openSearchPopup);
+  if (searchBtns.length > 0) {
+    searchBtns.forEach(btn => btn.addEventListener('click', openSearchPopup));
   }
   
   if (searchInput) {
-    // Handle search input
     searchInput.addEventListener('input', function(e) {
       performSearch(e.target.value);
     });
-    
-    // Handle form submission
-    document.getElementById('gl-product-search-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const query = searchInput.value.trim();
-      if (query) {
-        window.location.href = `/search?query=${encodeURIComponent(query)}`;
+
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        if (query) {
+          window.location.href = `/search?query=${encodeURIComponent(query)}`;
+        }
       }
     });
+    
+    const form = document.getElementById('gl-product-search-form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        if (query) {
+          window.location.href = `/search?query=${encodeURIComponent(query)}`;
+        }
+      });
+    }
   }
   
   // Close popup on ESC key
