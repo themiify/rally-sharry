@@ -65,36 +65,7 @@
           </span>
     </div>
     <div class="">
-        <div class="gl-lang-dropdown">
-            <button class="gl-lang-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
-                {% if shop.locale == 'ar' %}
-                    عربي
-                {% else %}
-                    EN
-                {% endif %}
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-            </button>
-            <div class="gl-lang-dropdown-menu">
-                <a href="?locale=en" class="gl-lang-dropdown-item {% if shop.locale == 'en' %}active{% endif %}">
-                    EN
-                    {% if shop.locale == 'en' %}
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    {% endif %}
-                </a>
-                <a href="?locale=ar" class="gl-lang-dropdown-item {% if shop.locale == 'ar' %}active{% endif %}">
-                    عربي
-                    {% if shop.locale == 'ar' %}
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    {% endif %}
-                </a>
-            </div>
-        </div>
+        {% render 'channel-switchers', shop: shop, request: request %}
     </div>
   </div>
 </div>
@@ -340,38 +311,9 @@
       </a>
     {% endfor %}
   </nav>
-  <!-- Language switcher in mobile -->
+  <!-- Language / currency switchers in mobile -->
   <div class="">
-    <div class="gl-lang-dropdown">
-      <button class="gl-lang-dropdown-toggle" aria-expanded="false" aria-haspopup="true">
-        {% if shop.locale == 'ar' %}
-          عربي
-        {% else %}
-          EN
-        {% endif %}
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </button>
-      <div class="gl-lang-dropdown-menu">
-        <a href="?locale=en" class="gl-lang-dropdown-item {% if shop.locale == 'en' %}active{% endif %}">
-          EN
-          {% if shop.locale == 'en' %}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          {% endif %}
-        </a>
-        <a href="?locale=ar" class="gl-lang-dropdown-item {% if shop.locale == 'ar' %}active{% endif %}">
-          عربي
-          {% if shop.locale == 'ar' %}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          {% endif %}
-        </a>
-      </div>
-    </div>
+    {% render 'channel-switchers', shop: shop, request: request %}
   </div>
 </div>
 

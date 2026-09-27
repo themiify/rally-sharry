@@ -172,10 +172,10 @@ export function initCartPage(apiClient, showToastFn, updateCartCountFn) {
             '<input type="number" value="' + item.quantity + '" min="1" data-cart-qty-input="' + item.id + '" style="width:50px;text-align:center;">' +
             '<button type="button" data-cart-qty-plus="' + item.id + '">+</button>' +
             "</div>" +
-            '<span class="gl-cart-item-total-mobile" style="font-weight:700;">' + esc(item.formatted_total) + "</span>" +
+            '<span class="gs-price gl-cart-item-total-mobile" style="font-weight:700;">' + esc(item.formatted_total) + "</span>" +
             "</div>" +
             "</td>" +
-            '<td class="gl-cart-item-total-desktop" style="font-weight:700;">' + esc(item.formatted_total) + "</td>" +
+            '<td class="gs-price gl-cart-item-total-desktop" style="font-weight:700;">' + esc(item.formatted_total) + "</td>" +
             "<td>" +
             '<button class="btn-remove" type="button" data-cart-remove="' + item.id + '" style="border:none;cursor:pointer;font-size:1.1rem;" title="' + esc(t.remove_item) + '">✕</button>' +
             "</td>" +
@@ -186,15 +186,45 @@ export function initCartPage(apiClient, showToastFn, updateCartCountFn) {
 
     var discountRow = "";
 
-    if (cart.discount_amount && cart.discount_amount !== 0) {
+    if (cart.discount_amount && parseFloat(cart.discount_amount) > 0) {
+      var appliedDiscounts =
+        cart.applied_discounts && typeof cart.applied_discounts === "object"
+          ? cart.applied_discounts
+          : {};
+      var discountNames = Object.keys(appliedDiscounts);
+      var breakdownHtml = "";
+
+      if (discountNames.length > 0) {
+        breakdownHtml =
+          '<div class="gl-cart-discount-breakdown">' +
+          discountNames
+            .map(function (name) {
+              return (
+                '<div class="gl-cart-summary-row gl-cart-discount-item">' +
+                "<span>" +
+                esc(name) +
+                "</span>" +
+                '<span class="gs-price">- ' +
+                esc(appliedDiscounts[name]) +
+                "</span>" +
+                "</div>"
+              );
+            })
+            .join("") +
+          "</div>";
+      }
+
       discountRow =
-        '<div class="gl-cart-summary-row" style="color:var(--gl-success);">' +
+        '<div class="gl-cart-discount-block">' +
+        '<div class="gl-cart-summary-row gl-cart-discount-total">' +
         "<span>" +
         esc(t.discount) +
         "</span>" +
-        "<span>" +
+        '<span class="gs-price">- ' +
         esc(cart.formatted_discount_amount) +
         "</span>" +
+        "</div>" +
+        breakdownHtml +
         "</div>";
     }
 
@@ -206,7 +236,7 @@ export function initCartPage(apiClient, showToastFn, updateCartCountFn) {
         "<span>" +
         esc(t.tax) +
         "</span>" +
-        "<span>" +
+        '<span class="gs-price">' +
         esc(cart.formatted_tax_total) +
         "</span>" +
         "</div>";
@@ -214,7 +244,7 @@ export function initCartPage(apiClient, showToastFn, updateCartCountFn) {
 
     var shippingValue =
       cart.shipping_amount > 0
-        ? esc(cart.formatted_shipping_amount)
+        ? '<span class="gs-price">' + esc(cart.formatted_shipping_amount) + "</span>"
         : esc(t.shipping_at_checkout);
 
     var couponHtml = "";
@@ -274,7 +304,7 @@ export function initCartPage(apiClient, showToastFn, updateCartCountFn) {
         "<span>" +
         esc(t.subtotal) +
         "</span>" +
-        "<span>" +
+        '<span class="gs-price">' +
         esc(cart.formatted_sub_total) +
         "</span>" +
         "</div>" +
@@ -293,7 +323,7 @@ export function initCartPage(apiClient, showToastFn, updateCartCountFn) {
         "<span>" +
         esc(t.grand_total) +
         "</span>" +
-        "<span>" +
+        '<span class="gs-price">' +
         esc(cart.formatted_grand_total) +
         "</span>" +
         "</div>" +

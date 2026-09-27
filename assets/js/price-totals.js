@@ -5,8 +5,20 @@
  * a total display element whenever the user changes selections or quantities.
  */
 
+/** Mirrors CurrencyLabel::SAR_SYMBOL + isolateBidi() for client-side totals. */
+var SAR_SYMBOL = '\u00EA';
+var BIDI_LRI = '\u2066';
+var BIDI_PDI = '\u2069';
+
 function fmt(amount, currency) {
-    return parseFloat(amount).toFixed(2) + ' ' + (currency || 'SAR');
+    var code = String(currency || 'SAR').toUpperCase();
+    var value = parseFloat(amount).toFixed(2);
+
+    if (code !== 'SAR') {
+        return value + ' ' + code;
+    }
+
+    return BIDI_LRI + SAR_SYMBOL + ' ' + value + BIDI_PDI;
 }
 
 // ── Bundle ────────────────────────────────────────────────────────────────

@@ -222,7 +222,7 @@ export function initProductGrid(apiClient, showToast, storefrontActions) {
     params.set("limit", String(state.limit));
 
     // Price range
-    if (state.priceMax > 0 && state.priceMin >= 0) {
+    if (state.priceMin > 0 || (state.priceMax > 0 && state.priceMax < state.priceMaxCap)) {
       params.set("price", state.priceMin + "," + state.priceMax);
     }
 
@@ -282,7 +282,7 @@ export function initProductGrid(apiClient, showToast, storefrontActions) {
       params.set("orientation", productCardOrientation);
     }
 
-    if (state.priceMax > 0) {
+    if (state.priceMin > 0 || (state.priceMax > 0 && state.priceMax < state.priceMaxCap)) {
       params.set("price", state.priceMin + "," + state.priceMax);
     }
 
@@ -1038,7 +1038,7 @@ export function initProductGrid(apiClient, showToast, storefrontActions) {
       // Reset filter state
       state.filters = {};
       state.priceMin = 0;
-      state.priceMax = state.priceMaxCap;
+      state.priceMax = 0;
 
       // Uncheck all checkboxes
       var filterGroups = dom("gl-filter-groups");
@@ -1065,9 +1065,20 @@ export function initProductGrid(apiClient, showToast, storefrontActions) {
         rangeMax.value = String(cap);
       }
 
-      // Re-trigger fill update
-      if (rangeMin) {
-        rangeMin.dispatchEvent(new Event("input"));
+      // Reset the visible fill and values without starting a second debounced request.
+      clearTimeout(priceDebounceTimer);
+      var fillEl = document.getElementById("gl-price-slider-fill");
+      var valMinEl = document.getElementById("gl-price-val-min");
+      var valMaxEl = document.getElementById("gl-price-val-max");
+      if (fillEl) {
+        fillEl.style.left = "0%";
+        fillEl.style.width = "100%";
+      }
+      if (valMinEl) {
+        valMinEl.textContent = formatPrice(0);
+      }
+      if (valMaxEl) {
+        valMaxEl.textContent = formatPrice(cap);
       }
 
       updateClearFiltersVisibility();

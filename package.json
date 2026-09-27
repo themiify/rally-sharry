@@ -1,6 +1,6 @@
 {
     "name": "theme-template",
-    "version": "1.0.0",
+    "version": "5.0.0",
     "private": true,
     "description": "Theme template build tooling. Run 'npm install' once from this directory, then use the commands below.",
     "scripts": {

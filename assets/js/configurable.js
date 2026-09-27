@@ -61,6 +61,7 @@ export function initConfigurableProduct() {
     var selectLabel = variantsContainer.getAttribute('data-select-label') || 'Select';
     var selectAboveLabel = variantsContainer.getAttribute('data-select-above-label') || 'Select above option first';
     var outOfStockLabel = variantsContainer.getAttribute('data-out-of-stock-label') || 'Out of stock';
+    var clearSelectionLabel = variantsContainer.getAttribute('data-clear-selection-label') || 'Clear selection';
 
     // Snapshot original gallery for reset
     var originalMainSrc = mainImage ? mainImage.src : '';
@@ -312,6 +313,7 @@ export function initConfigurableProduct() {
         childAttributes.forEach(function (attribute) {
             var wrapper = document.createElement('div');
             wrapper.className = 'gl-variant-attribute';
+            wrapper.id = 'gl-variant-attribute-' + attribute.id;
 
             // سطر الـ label + القيمة المختارة
             var labelRow = document.createElement('div');
@@ -332,6 +334,19 @@ export function initConfigurableProduct() {
 
             labelRow.appendChild(labelEl);
             labelRow.appendChild(valueEl);
+            if (attribute.selectedValue) {
+                var clearButton = document.createElement('button');
+                clearButton.type = 'button';
+                clearButton.textContent = clearSelectionLabel;
+                clearButton.setAttribute('aria-label', clearSelectionLabel + ': ' + attribute.label);
+                clearButton.addEventListener('click', function () {
+                    configure(attribute, '');
+                    var updatedWrapper = document.getElementById(wrapper.id);
+                    var firstOption = updatedWrapper.querySelector('input:enabled, select:enabled, button:enabled');
+                    if (firstOption) firstOption.focus();
+                });
+                labelRow.appendChild(clearButton);
+            }
             wrapper.appendChild(labelRow);
 
             var hasOptionVisual = attribute.filteredOptions.some(function (option) {

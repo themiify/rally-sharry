@@ -1,0 +1,84 @@
+/**
+ * Saudi Riyal (SAR) new symbol — U+00EA rendered by SaudiRiyalSymbol font.
+ * Portable theme copy: data-URI only so ThemeAssetController combined CSS works.
+ * Package: @abdulrysr/saudi-riyal-new-symbol-font (MIT)
+ * @see https://github.com/abdulrysrr/new-saudi-riyal-symbol
+ */
+@font-face {
+    font-family: 'SaudiRiyalSymbol';
+    src: url('data:font/truetype;charset=utf-8;base64,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') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+00EA;
+}
+
+:root {
+    --gs-sar-font-stack: 'SaudiRiyalSymbol', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+}
+
+.icon-saudi_riyal,
+.saudi-riyal,
+.gs-sar {
+    font-family: var(--gs-sar-font-stack) !important;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+/* Price surfaces — !important beats theme Google font stacks */
+.gs-price,
+.gs-price *,
+.gs-pdp-price,
+.gs-pdp-price *,
+.gs-collection-card__price,
+.gs-category-price-range,
+.gs-category-price-range *,
+.gl-product-info-price,
+.gl-product-info-price *,
+.gl-product-card-price,
+.gl-product-card-price *,
+.gl-quick-view-price,
+.gl-quick-view-price *,
+.gl-spotlight-product-price,
+.gl-spotlight-product-price *,
+.price-cart,
+[class*='price'],
+[class*='Price'],
+.final-price,
+.regular-price,
+.price-label,
+.gl-cart-item-total-mobile,
+.gl-cart-item-total-desktop,
+.gl-cart-summary-row > span:last-child,
+.gl-cart-discount-item > span:last-child,
+.gl-cart-discount-total > span:last-child {
+    font-family: var(--gs-sar-font-stack) !important;
+    text-transform: none !important;
+}
+
+.gs-price,
+.gs-price *,
+.gs-pdp-price,
+.gs-pdp-price *,
+.gs-collection-card__price,
+.gs-category-price-range,
+.gs-category-price-range *,
+.gl-product-info-price,
+.gl-product-info-price *,
+.gl-product-card-price,
+.gl-product-card-price *,
+.gl-quick-view-price,
+.gl-quick-view-price *,
+.gl-spotlight-product-price,
+.gl-spotlight-product-price *,
+.price-cart,
+[class*='price'],
+[class*='Price'],
+.final-price,
+.regular-price,
+.price-label,
+.gl-cart-item-total-mobile,
+.gl-cart-item-total-desktop {
+    direction: ltr;
+    unicode-bidi: isolate;
+}

@@ -54,6 +54,7 @@
         "sale": "Sale",
         "preview_product": "Product",
         "select_option": "Select",
+        "clear_selection": "Clear selection",
         "required": "Required",
         "add_to_wishlist": "Add to Wishlist",
         "remove_from_wishlist": "Remove from Wishlist",

@@ -10,6 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { formatMoney } = require('./currency');
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -91,8 +92,8 @@ function makeProductCard(i, locale) {
         special_price: price,
         special_price_from: null,
         special_price_to: null,
-        formatted_price: `${price} SAR`,
-        formatted_regular_price: `${regular} SAR`,
+        formatted_price: formatMoney(price),
+        formatted_regular_price: formatMoney(regular),
         avg_rating: 4.5,
         reviews_count: 10 + i,
         description,
@@ -125,12 +126,12 @@ function makeProductCard(i, locale) {
         url_key: slug,
         is_saleable: true,
         is_wishlist: false,
-        min_price: `${price} SAR`,
+        min_price: formatMoney(price),
         base_image: baseImage,
         images: [baseImage],
         prices: {
-            regular_price: { price: regular, formatted_price: `${regular} SAR` },
-            final_price: { price, formatted_price: `${price} SAR` },
+            regular_price: { price: regular, formatted_price: formatMoney(regular) },
+            final_price: { price, formatted_price: formatMoney(price) },
         },
         ratings: { average: 4.5, total: 10 + i },
         reviews: { total: 10 + i },
@@ -424,8 +425,8 @@ function makeConfigurableProduct(locale) {
     [201, 202, 203, 204, 205, 206].forEach(vid => {
         const p = 49.99 + (vid - 200) * 5;
         config.variant_prices[vid] = {
-            regular: { price: p + 20, formatted_price: `${(p + 20).toFixed(2)} SAR` },
-            final: { price: p, formatted_price: `${p.toFixed(2)} SAR` },
+            regular: { price: p + 20, formatted_price: formatMoney(p + 20) },
+            final: { price: p, formatted_price: formatMoney(p) },
         };
         config.variant_images[vid] = [
             { small_image_url: `https://picsum.photos/seed/v${vid}/120/120`, medium_image_url: `https://picsum.photos/seed/v${vid}/400/400`, large_image_url: `https://picsum.photos/seed/v${vid}/600/600`, original_image_url: `https://picsum.photos/seed/v${vid}/800/800` },
@@ -456,22 +457,22 @@ function makeBundleProduct(locale) {
             {
                 id: 1, label: isAr ? 'أحمر الشفاه' : 'Lipstick', type: 'select', is_required: true, sort_order: 1,
                 products: [
-                    { id: 1, qty: 1, name: isAr ? 'أحمر كلاسيكي' : 'Classic Red', product_id: 50, is_default: true, in_stock: true, inventory: 10, price: { regular: { price: 49.99, formatted_price: '49.99 SAR' }, final: { price: 49.99, formatted_price: '49.99 SAR' } } },
-                    { id: 2, qty: 1, name: isAr ? 'وردي ناعم' : 'Soft Pink', product_id: 51, is_default: false, in_stock: true, inventory: 8, price: { regular: { price: 39.99, formatted_price: '39.99 SAR' }, final: { price: 39.99, formatted_price: '39.99 SAR' } } },
+                    { id: 1, qty: 1, name: isAr ? 'أحمر كلاسيكي' : 'Classic Red', product_id: 50, is_default: true, in_stock: true, inventory: 10, price: { regular: { price: 49.99, formatted_price: formatMoney(49.99) }, final: { price: 49.99, formatted_price: formatMoney(49.99) } } },
+                    { id: 2, qty: 1, name: isAr ? 'وردي ناعم' : 'Soft Pink', product_id: 51, is_default: false, in_stock: true, inventory: 8, price: { regular: { price: 39.99, formatted_price: formatMoney(39.99) }, final: { price: 39.99, formatted_price: formatMoney(39.99) } } },
                 ],
             },
             {
                 id: 2, label: isAr ? 'كريم أساس' : 'Foundation', type: 'radio', is_required: true, sort_order: 2,
                 products: [
-                    { id: 3, qty: 1, name: isAr ? 'فاتح' : 'Light', product_id: 52, is_default: true, in_stock: true, inventory: 5, price: { regular: { price: 79.99, formatted_price: '79.99 SAR' }, final: { price: 59.99, formatted_price: '59.99 SAR' } } },
-                    { id: 4, qty: 1, name: isAr ? 'متوسط' : 'Medium', product_id: 53, is_default: false, in_stock: true, inventory: 7, price: { regular: { price: 79.99, formatted_price: '79.99 SAR' }, final: { price: 59.99, formatted_price: '59.99 SAR' } } },
+                    { id: 3, qty: 1, name: isAr ? 'فاتح' : 'Light', product_id: 52, is_default: true, in_stock: true, inventory: 5, price: { regular: { price: 79.99, formatted_price: formatMoney(79.99) }, final: { price: 59.99, formatted_price: formatMoney(59.99) } } },
+                    { id: 4, qty: 1, name: isAr ? 'متوسط' : 'Medium', product_id: 53, is_default: false, in_stock: true, inventory: 7, price: { regular: { price: 79.99, formatted_price: formatMoney(79.99) }, final: { price: 59.99, formatted_price: formatMoney(59.99) } } },
                 ],
             },
             {
                 id: 3, label: isAr ? 'إضافات' : 'Extras', type: 'checkbox', is_required: false, sort_order: 3,
                 products: [
-                    { id: 5, qty: 1, name: isAr ? 'ماسكارا' : 'Mascara', product_id: 54, is_default: false, in_stock: true, inventory: 12, price: { regular: { price: 29.99, formatted_price: '29.99 SAR' }, final: { price: 29.99, formatted_price: '29.99 SAR' } } },
-                    { id: 6, qty: 1, name: isAr ? 'محدد عيون' : 'Eyeliner', product_id: 55, is_default: true, in_stock: true, inventory: 15, price: { regular: { price: 19.99, formatted_price: '19.99 SAR' }, final: { price: 19.99, formatted_price: '19.99 SAR' } } },
+                    { id: 5, qty: 1, name: isAr ? 'ماسكارا' : 'Mascara', product_id: 54, is_default: false, in_stock: true, inventory: 12, price: { regular: { price: 29.99, formatted_price: formatMoney(29.99) }, final: { price: 29.99, formatted_price: formatMoney(29.99) } } },
+                    { id: 6, qty: 1, name: isAr ? 'محدد عيون' : 'Eyeliner', product_id: 55, is_default: true, in_stock: true, inventory: 15, price: { regular: { price: 19.99, formatted_price: formatMoney(19.99) }, final: { price: 19.99, formatted_price: formatMoney(19.99) } } },
                 ],
             },
         ],
@@ -492,9 +493,9 @@ function makeGroupedProduct(locale) {
     const product = productDetailBase(card, locale);
     product.show_quantity_box = false;
     product.grouped_products = [
-        Object.assign({}, makeProductCard(60, locale), { name: isAr ? 'غسول الوجه' : 'Face Wash', price: 35.00, formatted_price: '35.00 SAR', default_qty: 1, associated_product_id: 60 }),
-        Object.assign({}, makeProductCard(61, locale), { name: isAr ? 'تونر' : 'Toner', price: 45.00, formatted_price: '45.00 SAR', default_qty: 1, associated_product_id: 61 }),
-        Object.assign({}, makeProductCard(62, locale), { name: isAr ? 'مرطب' : 'Moisturizer', price: 65.00, formatted_price: '65.00 SAR', default_qty: 0, associated_product_id: 62 }),
+        Object.assign({}, makeProductCard(60, locale), { name: isAr ? 'غسول الوجه' : 'Face Wash', price: 35.00, formatted_price: formatMoney(35.00), default_qty: 1, associated_product_id: 60 }),
+        Object.assign({}, makeProductCard(61, locale), { name: isAr ? 'تونر' : 'Toner', price: 45.00, formatted_price: formatMoney(45.00), default_qty: 1, associated_product_id: 61 }),
+        Object.assign({}, makeProductCard(62, locale), { name: isAr ? 'مرطب' : 'Moisturizer', price: 65.00, formatted_price: formatMoney(65.00), default_qty: 0, associated_product_id: 62 }),
     ];
     return product;
 }
@@ -513,8 +514,8 @@ function makeDownloadableProduct(locale) {
     product.show_quantity_box = false;
     product.downloadable = {
         links: [
-            { id: 1, title: isAr ? 'الكتاب الكامل' : 'Full Guide (PDF)', price: 29.99, formatted_price: '29.99 SAR', has_sample: true, sample_url: '#sample-1' },
-            { id: 2, title: isAr ? 'فيديو تعليمي' : 'Video Tutorial', price: 19.99, formatted_price: '19.99 SAR', has_sample: false, sample_url: null },
+            { id: 1, title: isAr ? 'الكتاب الكامل' : 'Full Guide (PDF)', price: 29.99, formatted_price: formatMoney(29.99), has_sample: true, sample_url: '#sample-1' },
+            { id: 2, title: isAr ? 'فيديو تعليمي' : 'Video Tutorial', price: 19.99, formatted_price: formatMoney(19.99), has_sample: false, sample_url: null },
         ],
         samples: [
             { id: 1, title: isAr ? 'معاينة الفصل الأول' : 'Chapter 1 Preview', download_url: '#download-sample-1' },
@@ -560,13 +561,13 @@ function makeBookingProduct(locale, bookingType) {
     } else if (type === 'event') {
         bookingConfig.event_date = isAr ? 'السبت 15 مارس 2025 — 6:00 مساءً' : 'Saturday, March 15, 2025 — 6:00 PM';
         bookingConfig.tickets = [
-            { id: 1, name: isAr ? 'تذكرة عادية' : 'General Admission', description: isAr ? 'دخول عام' : 'Standard entry', qty: 50, unit_price: 99, remaining_qty: 50, is_available: true, formatted_price_text: '99.00 SAR', formatted_price: '99.00 SAR', original_formatted_price: '149.00 SAR' },
-            { id: 2, name: isAr ? 'تذكرة VIP' : 'VIP Ticket', description: isAr ? 'مع هدية' : 'Includes gift bag', qty: 20, unit_price: 249, remaining_qty: 20, is_available: true, formatted_price_text: '249.00 SAR', formatted_price: '249.00 SAR', original_formatted_price: '' },
+            { id: 1, name: isAr ? 'تذكرة عادية' : 'General Admission', description: isAr ? 'دخول عام' : 'Standard entry', qty: 50, unit_price: 99, remaining_qty: 50, is_available: true, formatted_price_text: formatMoney(99), formatted_price: formatMoney(99), original_formatted_price: formatMoney(149) },
+            { id: 2, name: isAr ? 'تذكرة VIP' : 'VIP Ticket', description: isAr ? 'مع هدية' : 'Includes gift bag', qty: 20, unit_price: 249, remaining_qty: 20, is_available: true, formatted_price_text: formatMoney(249), formatted_price: formatMoney(249), original_formatted_price: '' },
         ];
     } else if (type === 'rental') {
         bookingConfig.rental_slot = {
             renting_type: 'daily_hourly', daily_price: 150, hourly_price: 25,
-            formatted_daily_price: '150.00 SAR', formatted_hourly_price: '25.00 SAR', same_slot_all_days: true,
+            formatted_daily_price: formatMoney(150), formatted_hourly_price: formatMoney(25), same_slot_all_days: true,
         };
     } else if (type === 'table') {
         bookingConfig.today_slots_text = isAr ? '2 طاولات متاحة' : '2 tables available today';
@@ -600,16 +601,16 @@ function makeCustomizableProduct(locale) {
             max_characters: null, supported_file_extensions: '',
             items: [
                 { id: 10, label: isAr ? 'عادي' : 'Standard', price: 0, formatted_price: '' },
-                { id: 11, label: isAr ? 'فاخر' : 'Luxury Box', price: 25.00, formatted_price: '25.00 SAR' },
-                { id: 12, label: isAr ? 'هدية' : 'Gift Wrap', price: 15.00, formatted_price: '15.00 SAR' },
+                { id: 11, label: isAr ? 'فاخر' : 'Luxury Box', price: 25.00, formatted_price: formatMoney(25) },
+                { id: 12, label: isAr ? 'هدية' : 'Gift Wrap', price: 15.00, formatted_price: formatMoney(15) },
             ],
         },
         {
             id: 3, label: isAr ? 'ملحقات إضافية' : 'Add-ons', type: 'checkbox', is_required: false,
             max_characters: null, supported_file_extensions: '',
             items: [
-                { id: 20, label: isAr ? 'مرآة صغيرة' : 'Mini Mirror', price: 10.00, formatted_price: '10.00 SAR' },
-                { id: 21, label: isAr ? 'محدد شفاه' : 'Lip Liner', price: 20.00, formatted_price: '20.00 SAR' },
+                { id: 20, label: isAr ? 'مرآة صغيرة' : 'Mini Mirror', price: 10.00, formatted_price: formatMoney(10) },
+                { id: 21, label: isAr ? 'محدد شفاه' : 'Lip Liner', price: 20.00, formatted_price: formatMoney(20) },
             ],
         },
     ];
@@ -865,7 +866,20 @@ function buildContext(pageType, locale, slug, themeRoot) {
             domain: `localhost:${process.env.PREVIEW_PORT || 3060}`,
             locale,
             currency: 'SAR',
+            currency_meta: JSON.stringify({
+                code: 'SAR',
+                symbol: '\u00EA',
+                currency_position: 'left_with_space',
+            }),
             rtl: isRtl,
+            locales: [
+                { code: 'en', name: 'English', direction: 'ltr', logo_url: null },
+                { code: 'ar', name: 'العربية', direction: 'rtl', logo_url: null },
+            ],
+            currencies: [
+                { code: 'SAR', name: locale === 'ar' ? 'الريال السعودي' : 'Saudi Riyal', symbol: '\u00EA' },
+                { code: 'USD', name: 'US Dollar', symbol: '$' },
+            ],
         },
 
         theme: themeSettings,
@@ -1017,4 +1031,4 @@ function buildContext(pageType, locale, slug, themeRoot) {
     return context;
 }
 
-module.exports = { buildContext, makeProductCard, makeCategoryCard, resolveCategoryCards, MOCK_BLOGS, makeBlogCard, mockResolveBlogCards, MOCK_CATEGORIES, PRODUCT_TYPE_BUILDERS, DEFAULT_PAGE_SECTIONS };
+module.exports = { buildContext, makeProductCard, makeCategoryCard, resolveCategoryCards, MOCK_BLOGS, makeBlogCard, mockResolveBlogCards, MOCK_CATEGORIES, PRODUCT_TYPE_BUILDERS, DEFAULT_PAGE_SECTIONS, formatMoney };

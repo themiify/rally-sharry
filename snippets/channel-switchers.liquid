@@ -1,0 +1,85 @@
+{% comment %}
+  Channel language + currency switchers.
+  Driven by shop.locales / shop.currencies from DataContextBuilder.
+  Hidden automatically when the channel has only one option.
+{% endcomment %}
+
+{% assign current_locale_label = shop.locale | upcase %}
+{% for locale in shop.locales %}
+  {% if locale.code == shop.locale %}
+    {% assign current_locale_label = locale.name %}
+  {% endif %}
+{% endfor %}
+
+{% assign current_currency_label = shop.currency %}
+{% for currency in shop.currencies %}
+  {% if currency.code == shop.currency %}
+    {% assign current_currency_label = currency.symbol | append: ' ' | append: currency.code %}
+  {% endif %}
+{% endfor %}
+
+<div class="gl-channel-switchers">
+  {% if shop.currencies.size > 1 %}
+    <div class="gl-lang-dropdown gl-currency-dropdown">
+      <button
+        type="button"
+        class="gl-lang-dropdown-toggle gs-price"
+        aria-expanded="false"
+        aria-haspopup="true"
+        aria-label="{% if request.is_rtl %}العملة{% else %}Currency{% endif %}"
+      >
+        {{ current_currency_label }}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="gl-lang-dropdown-menu">
+        {% for currency in shop.currencies %}
+          <a
+            href="?currency={{ currency.code }}"
+            class="gl-lang-dropdown-item gs-price {% if currency.code == shop.currency %}active{% endif %}"
+          >
+            <span>{{ currency.symbol }} {{ currency.code }}</span>
+            {% if currency.code == shop.currency %}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if shop.locales.size > 1 %}
+    <div class="gl-lang-dropdown">
+      <button
+        type="button"
+        class="gl-lang-dropdown-toggle"
+        aria-expanded="false"
+        aria-haspopup="true"
+        aria-label="{% if request.is_rtl %}اللغة{% else %}Language{% endif %}"
+      >
+        {{ current_locale_label }}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="gl-lang-dropdown-menu">
+        {% for locale in shop.locales %}
+          <a
+            href="?locale={{ locale.code }}"
+            class="gl-lang-dropdown-item {% if locale.code == shop.locale %}active{% endif %}"
+          >
+            <span>{{ locale.name }}</span>
+            {% if locale.code == shop.locale %}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>

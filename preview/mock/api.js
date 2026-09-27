@@ -11,11 +11,12 @@
  */
 
 const { makeProductCard, resolveCategoryCards } = require('./context');
+const { formatMoney } = require('./currency');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function fmt(amount) {
-    return `${parseFloat(amount).toFixed(2)} SAR`;
+    return formatMoney(amount);
 }
 
 function makeCartItem(productId, qty, locale) {
@@ -45,7 +46,9 @@ function makeCartItem(productId, qty, locale) {
 
 function recalcCart(cart) {
     const subTotal = cart.items.reduce((sum, item) => sum + item.total, 0);
-    const discount = cart.coupon_code ? parseFloat((subTotal * 0.10).toFixed(2)) : 0;
+    const couponMeta = cart.coupon_code ? VALID_COUPONS[cart.coupon_code] : null;
+    const rate = couponMeta ? couponMeta.discount : (cart.coupon_code ? 0.10 : 0);
+    const discount = rate > 0 ? parseFloat((subTotal * rate).toFixed(2)) : 0;
     const grand = parseFloat((subTotal - discount).toFixed(2));
 
     cart.items_count = cart.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -56,6 +59,12 @@ function recalcCart(cart) {
     cart.formatted_sub_total_incl_tax = fmt(subTotal);
     cart.discount_amount = discount;
     cart.formatted_discount_amount = fmt(discount);
+    cart.applied_discounts =
+        discount > 0 && couponMeta
+            ? { [couponMeta.label]: fmt(discount) }
+            : discount > 0 && cart.coupon_code
+              ? { [cart.coupon_code]: fmt(discount) }
+              : {};
     cart.grand_total = grand;
     cart.formatted_grand_total = fmt(grand);
 }
@@ -68,6 +77,7 @@ function freshCart() {
         items_count: 0,
         items_qty: 0,
         applied_taxes: [],
+        applied_discounts: {},
         tax_total: 0,
         formatted_tax_total: fmt(0),
         sub_total: 0,
@@ -688,27 +698,6 @@ function registerMockApis(app) {
 
         res.json({ data: slots });
     });
-}
-
-
-return [{
-    time: `${formatTime(start)} - ${formatTime(end)}`,
-    slots: hourlySlots,
-    remaining_qty: hourlySlots.length,
-    capacity: 10,
-    is_available: true,
-}];
-    }
-
-app.get('/api/booking/:productId/slots', (req, res) => {
-    const date = req.query.date || new Date().toISOString().slice(0, 10);
-    const bookingType = req.query.booking_type || 'default';
-    const slots = bookingType === 'rental'
-        ? makeRentalSlots(date)
-        : makeFlatBookingSlots(date, bookingType);
-
-    res.json({ data: slots });
-});
 }
 
 module.exports = { registerMockApis };
