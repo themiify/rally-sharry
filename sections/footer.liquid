@@ -55,14 +55,18 @@
             target="_blank"
             rel="noopener noreferrer"
           >
+          {%- if shop.business_platform.logo != blank -%}
             <img
               src="{{ shop.business_platform.logo }}"
-              alt="{{ shop.business_platform.label }}"
+              alt="{{ shop.business_platform.label }}"  
               width="32"
               height="32"
               loading="lazy"
             >
             <span>{{ shop.business_platform.label }}</span>
+          {%- else -%}
+            <span>{{ shop.business_platform.label }}</span>
+          {%- endif -%}
           </a>
         {% endif %}
       </div>
@@ -215,8 +219,7 @@
           <ul class="gl-footer-payment" aria-label="{% if is_rtl %}طرق الدفع المقبولة{% else %}Accepted payment methods{% endif %}">
             {% for icon in shop.footer_payments %}
               <li class="gl-footer-payment-chip">
-                {%- if icon.image  != blank -%}
-                  
+                {%- if icon.image  != blank -%}   
                   <img
                     src="{{ icon.image }}"
                     alt="{{ icon.title }}"
