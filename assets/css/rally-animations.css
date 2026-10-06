@@ -1,0 +1,547 @@
+/**
+ * ============================================================================
+ * Rally Theme — Ultra-Smooth & Elegant Animations System (rally-animations.css)
+ * ============================================================================
+ */
+
+:root {
+  --ra-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ra-ease-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+  --ra-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Keyframes ────────────────────────────────────────────────────────────── */
+@keyframes raFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes raScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes raSlideInStart {
+  0% {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes raSlideInEnd {
+  0% {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes raExpandLine {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* ── Section Titles: Animated Expanding Accent Line ───────────────────────── */
+.ral__title,
+.rafaq__title,
+.rar__title,
+.rablog__title,
+.sfa__title {
+  position: relative;
+}
+
+.ral__title::before,
+.rafaq__title::before,
+.rar__title::before,
+.rablog__title::before,
+.sfa__title::before {
+  transform-origin: right center;
+  transition: transform 700ms var(--ra-ease-out);
+}
+
+[dir="ltr"] .ral__title::before,
+[dir="ltr"] .rafaq__title::before,
+[dir="ltr"] .rar__title::before,
+[dir="ltr"] .rablog__title::before,
+[dir="ltr"] .sfa__title::before {
+  transform-origin: left center;
+}
+
+.ra-animate-in .ral__title::before,
+.ra-animate-in .rafaq__title::before,
+.ra-animate-in .rar__title::before,
+.ra-animate-in .rablog__title::before,
+.ra-animate-in .sfa__title::before {
+  animation: raExpandLine 700ms var(--ra-ease-out) both;
+}
+
+/* ── Scroll Entrance for Sections Below The Fold ─────────────────────────── */
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 800ms var(--ra-ease-out),
+              transform 800ms var(--ra-ease-out);
+  will-change: opacity, transform;
+}
+
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-animate-in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* ── Section Titles Entrance ─────────────────────────────────────────────── */
+[data-ra-section].ra-anim-init .sfa__title,
+[data-ra-section].ra-anim-init .sfc__header,
+[data-ra-section].ra-anim-init .rac__header,
+[data-ra-section].ra-anim-init .rab__header,
+[data-ra-section].ra-anim-init .ras__header,
+[data-ra-section].ra-anim-init .raf__header,
+[data-ra-section].ra-anim-init .ral__header,
+[data-ra-section].ra-anim-init .rafaq__header-top,
+[data-ra-section].ra-anim-init .rar__header,
+[data-ra-section].ra-anim-init .ralo__header,
+[data-ra-section].ra-anim-init .rablog__header,
+[data-ra-section].ra-anim-init .ra-tabs-header {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 700ms var(--ra-ease-out),
+              transform 700ms var(--ra-ease-out);
+}
+
+[data-ra-section].ra-animate-in .sfa__title,
+[data-ra-section].ra-animate-in .sfc__header,
+[data-ra-section].ra-animate-in .rac__header,
+[data-ra-section].ra-animate-in .rab__header,
+[data-ra-section].ra-animate-in .ras__header,
+[data-ra-section].ra-animate-in .raf__header,
+[data-ra-section].ra-animate-in .ral__header,
+[data-ra-section].ra-animate-in .rafaq__header-top,
+[data-ra-section].ra-animate-in .rar__header,
+[data-ra-section].ra-animate-in .ralo__header,
+[data-ra-section].ra-animate-in .rablog__header,
+[data-ra-section].ra-animate-in .ra-tabs-header {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* ── Staggered Repeater Items Reveal ─────────────────────────────────────── */
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .sfc__card,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .sfc__slide,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .rac__slide,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .rab__item,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .ras__card,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .raf__col--left .raf__text,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .raf__col--right .raf__text,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .ral__tab-btn,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .rafaq__item,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .rar__slide,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .ralo__slide,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .ralo__count-item,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .rablog__slide,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .ra-tab-btn,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .s-product-card-entry,
+[data-ra-section]:not([data-ra-section="main-banner"]).ra-anim-init .ra-mobile-card-item {
+  opacity: 0;
+  transform: translateY(22px) scale(0.97);
+  transition: opacity 700ms var(--ra-ease-out),
+              transform 700ms var(--ra-ease-out),
+              box-shadow 350ms ease,
+              border-color 350ms ease;
+  transition-delay: calc(var(--ra-idx, 0) * 80ms + 100ms);
+  will-change: opacity, transform;
+}
+
+[data-ra-section].ra-animate-in .sfc__card,
+[data-ra-section].ra-animate-in .sfc__slide,
+[data-ra-section].ra-animate-in .rac__slide,
+[data-ra-section].ra-animate-in .rab__item,
+[data-ra-section].ra-animate-in .ras__card,
+[data-ra-section].ra-animate-in .raf__col--left .raf__text,
+[data-ra-section].ra-animate-in .raf__col--right .raf__text,
+[data-ra-section].ra-animate-in .ral__tab-btn,
+[data-ra-section].ra-animate-in .rafaq__item,
+[data-ra-section].ra-animate-in .rar__slide,
+[data-ra-section].ra-animate-in .ralo__slide,
+[data-ra-section].ra-animate-in .ralo__count-item,
+[data-ra-section].ra-animate-in .rablog__slide,
+[data-ra-section].ra-animate-in .ra-tab-btn,
+[data-ra-section].ra-animate-in .s-product-card-entry,
+[data-ra-section].ra-animate-in .ra-mobile-card-item {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+/* ── Section 1: Main Banner (.sf-main-banner) ────────────────────────────── */
+/* Never disappears: smoothly flows in on initial paint */
+.sf-main-banner,
+[data-ra-section="main-banner"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.sf-main-banner .sf__content .sf__title {
+  animation: raFadeUp 750ms var(--ra-ease-out) 100ms both;
+}
+
+.sf-main-banner .sf__content .sf__subtitle {
+  animation: raFadeUp 750ms var(--ra-ease-out) 220ms both;
+}
+
+.sf-main-banner .sf__content .sf__btn {
+  animation: raFadeUp 750ms var(--ra-ease-out) 340ms both;
+}
+
+.sf-main-banner .sf__button-wrapper {
+  animation: raFadeUp 750ms var(--ra-ease-out) 420ms both;
+}
+
+.sf-main-banner .sf__tab-item {
+  animation: raFadeUp 750ms var(--ra-ease-out) 250ms both;
+}
+
+/* Smooth reveal when changing slides in Swiper */
+.sf-main-banner .swiper-slide:not(.swiper-slide-active):not(:first-child) .sf__content .sf__title,
+.sf-main-banner .swiper-slide:not(.swiper-slide-active):not(:first-child) .sf__content .sf__subtitle,
+.sf-main-banner .swiper-slide:not(.swiper-slide-active):not(:first-child) .sf__content .sf__btn {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.sf-main-banner .swiper-slide.swiper-slide-active .sf__content .sf__title {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms var(--ra-ease-out) 60ms, transform 500ms var(--ra-ease-out) 60ms;
+}
+
+.sf-main-banner .swiper-slide.swiper-slide-active .sf__content .sf__subtitle {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms var(--ra-ease-out) 140ms, transform 500ms var(--ra-ease-out) 140ms;
+}
+
+.sf-main-banner .swiper-slide.swiper-slide-active .sf__content .sf__btn {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms var(--ra-ease-out) 220ms, transform 500ms var(--ra-ease-out) 220ms;
+}
+
+.sf-main-banner .sf__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.sf-main-banner .sf__btn .sf__btn-icon {
+  transition: transform 300ms var(--ra-ease-out);
+}
+
+.sf-main-banner .sf__btn:hover .sf__btn-icon {
+  transform: translateX(-4px);
+}
+
+[dir="ltr"] .sf-main-banner .sf__btn:hover .sf__btn-icon {
+  transform: translateX(4px);
+}
+
+.sf-main-banner .sf__button-wrapper {
+  transition: background-color 300ms ease, border-color 300ms ease, transform 300ms ease;
+}
+
+.sf-main-banner .sf__button-wrapper:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.sf-main-banner .sf__tab-item {
+  transition: all 300ms var(--ra-ease-out);
+}
+
+.sf-main-banner .sf__tab-item:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateX(-3px);
+}
+
+[dir="ltr"] .sf-main-banner .sf__tab-item:hover {
+  transform: translateX(3px);
+}
+
+/* ── Section 2: About Us (.sfa-about-us) ─────────────────────────────────── */
+.sfa-about-us .sfa__border-v {
+  height: 0;
+  transition: height 900ms var(--ra-ease-out) 300ms;
+}
+
+.sfa-about-us .sfa__border-h {
+  width: 0;
+  transition: width 900ms var(--ra-ease-out) 450ms;
+}
+
+.sfa-about-us.ra-animate-in .sfa__border-v {
+  height: 80% !important;
+}
+
+.sfa-about-us.ra-animate-in .sfa__border-h {
+  width: 80% !important;
+}
+
+.sfa-about-us .fade-container:hover .fade-word {
+  opacity: 1 !important;
+}
+
+/* ── Section 3: Categories (.sf-categories) ──────────────────────────────── */
+.sf-categories .sfc__card {
+  transition: transform 350ms var(--ra-ease-out), box-shadow 350ms var(--ra-ease-out);
+}
+
+.sf-categories .sfc__card:hover {
+  transform: translateY(-5px);
+}
+
+.sf-categories .sfc__card:hover .sfc__image-box {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.sf-categories .sfc__img {
+  transition: transform 500ms var(--ra-ease-out);
+}
+
+.sf-categories .sfc__card:hover .sfc__img {
+  transform: scale(1.08);
+}
+
+/* ── Section 4: Cinema Slider (.rac-cinema) ──────────────────────────────── */
+.rac-cinema .rac__active-title,
+.rac-cinema .rac__btn {
+  opacity: 1;
+}
+
+.rac-cinema .rac__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.rac-cinema .rac__card-inner {
+  transition: transform 350ms var(--ra-ease-out), box-shadow 350ms var(--ra-ease-out);
+}
+
+.rac-cinema .rac__slide:hover .rac__card-inner {
+  transform: scale(1.03);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Section 5: Brands (.rab-brands) ─────────────────────────────────────── */
+.rab-brands .rab__item .rab__link {
+  transition: transform 300ms var(--ra-ease-out);
+}
+
+.rab-brands .rab__item:hover .rab__link {
+  transform: scale(1.05);
+}
+
+/* ── Section 6: Statistics (.ras-statistics) ─────────────────────────────── */
+.ras-statistics .ras__card {
+  transition: transform 350ms var(--ra-ease-out);
+}
+
+.ras-statistics .ras__card:hover {
+  transform: translateY(-4px) scale(1.03);
+}
+
+.ras-statistics .ras__icon-box img {
+  transition: transform 350ms var(--ra-ease-bounce);
+}
+
+.ras-statistics .ras__card:hover .ras__icon-box img {
+  transform: scale(1.15) rotate(-3deg);
+}
+
+/* ── Section 7: Product Features (.raf-feature) ──────────────────────────── */
+.raf-feature.ra-animate-in .raf__product-img {
+  animation: raScaleIn 800ms var(--ra-ease-out) 200ms both;
+}
+
+.raf-feature .raf__text {
+  transition: transform 300ms var(--ra-ease-out);
+  cursor: default;
+}
+
+.raf-feature .raf__text:hover {
+  transform: translateX(-4px);
+}
+
+[dir="ltr"] .raf-feature .raf__text:hover {
+  transform: translateX(4px);
+}
+
+.raf-feature .raf__text span {
+  display: inline-block;
+  transition: transform 300ms var(--ra-ease-bounce);
+}
+
+.raf-feature .raf__text:hover span {
+  transform: scale(1.2);
+}
+
+/* ── Section 8: Locations / Maps (.ral-locations) ────────────────────────── */
+.ral-locations .ral__tab-btn {
+  transition: transform 300ms var(--ra-ease-out), box-shadow 300ms ease;
+}
+
+.ral-locations .ral__tab-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.ral-locations .ral__rating .star {
+  transition: transform 300ms var(--ra-ease-bounce);
+}
+
+.ral-locations .ral__tab-btn:hover .ral__rating .star {
+  transform: scale(1.15);
+}
+
+/* ── Section 9: FAQ (.rafaq-section) ─────────────────────────────────────── */
+.rafaq-section .rafaq__header {
+  transition: background-color 300ms ease;
+}
+
+.rafaq-section .rafaq__header:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.rafaq-section .rafaq__header .rafaq__icon {
+  transition: transform 350ms var(--ra-ease-out);
+}
+
+.rafaq-section .rafaq__header--open .rafaq__icon {
+  transform: rotate(180deg);
+}
+
+/* ── Section 10: Customer Reviews (.rar-reviews) ─────────────────────────── */
+.rar-reviews .rar__card {
+  transition: transform 350ms var(--ra-ease-out), box-shadow 350ms var(--ra-ease-out);
+}
+
+.rar-reviews .rar__card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.rar-reviews .rar__avatar {
+  transition: transform 300ms var(--ra-ease-bounce);
+}
+
+.rar-reviews .rar__card:hover .rar__avatar {
+  transform: scale(1.1);
+}
+
+/* ── Section 11: Limited Offers (.ralo-limited-offers) ────────────────────── */
+.ralo-limited-offers .ralo__offer-content {
+  transition: transform 350ms var(--ra-ease-out), box-shadow 350ms var(--ra-ease-out);
+}
+
+.ralo-limited-offers .ralo__offer-content:hover {
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+}
+
+.ralo-limited-offers .ralo__media-obj {
+  transition: transform 600ms var(--ra-ease-out);
+}
+
+.ralo-limited-offers .ralo__offer-content:hover .ralo__media-obj {
+  transform: scale(1.04);
+}
+
+.ralo-limited-offers .ralo__count-item {
+  transition: transform 300ms var(--ra-ease-bounce);
+}
+
+.ralo-limited-offers .ralo__count-item:hover {
+  transform: scale(1.08);
+}
+
+.ralo-limited-offers .ralo__btn {
+  transition: transform 300ms var(--ra-ease-out), box-shadow 350ms ease;
+}
+
+.ralo-limited-offers .ralo__btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Section 12: Blog Articles (.rablog-section) ─────────────────────────── */
+.rablog-section .rablog__card {
+  transition: transform 350ms var(--ra-ease-out), box-shadow 350ms var(--ra-ease-out);
+}
+
+.rablog-section .rablog__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.1);
+}
+
+.rablog-section .rablog__img {
+  transition: transform 500ms var(--ra-ease-out);
+}
+
+.rablog-section .rablog__card:hover .rablog__img {
+  transform: scale(1.06);
+}
+
+.rablog-section .rablog__read-more i {
+  transition: transform 300ms var(--ra-ease-out);
+}
+
+.rablog-section .rablog__card:hover .rablog__read-more i {
+  transform: translateX(-4px);
+}
+
+[dir="ltr"] .rablog-section .rablog__card:hover .rablog__read-more i {
+  transform: translateX(4px);
+}
+
+/* ── Section 13: Product Tabs (.RA_product_taps) ─────────────────────────── */
+.RA_product_taps .s-product-card-entry {
+  transition: transform 300ms var(--ra-ease-out), box-shadow 300ms var(--ra-ease-out);
+}
+
+.RA_product_taps .s-product-card-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.RA_product_taps .ra-preview-col {
+  transition: transform 400ms var(--ra-ease-out);
+}
+
+/* ── Accessibility & Reduced Motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

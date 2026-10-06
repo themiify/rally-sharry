@@ -34,7 +34,7 @@
   {% assign has_custom_locs = false %}
 {% endif %}
 
-<section class="ral-locations ral-{{ section.id | default: 'single' }} gl-container {% if c.margin_switch %}ral-locations--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="locations" class="ral-locations ral-{{ section.id | default: 'single' }} gl-container {% if c.margin_switch %}ral-locations--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   {% if title_text != blank %}
     <h2 class="ral__title">
       {{ title_text }}
@@ -59,7 +59,8 @@
             class="ral__tab-btn {% if forloop.first %}ral__tab-btn--active{% endif %}"
             role="tab" 
             aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-            data-tab="tab-{{ section.id | default: 'single' }}-{{ forloop.index }}">
+            data-tab="tab-{{ section.id | default: 'single' }}-{{ forloop.index }}"
+            style="--ra-idx: {{ forloop.index0 }};">
             
             {% if locate.location_image != blank %}
               <div class="ral__img-wrap">

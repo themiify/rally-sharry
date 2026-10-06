@@ -2,7 +2,7 @@
 
 {% assign c = section.settings %}
 
-<section class="sf-categories sf-{{ section.id }} {% if c.margin_switch %}sf-categories--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="categories" class="sf-categories sf-{{ section.id }} {% if c.margin_switch %}sf-categories--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   <div class="sfc__container gl-container">
     <div class="sfc__wrapper">
       {% if c.slider_option %}
@@ -14,7 +14,7 @@
               {% else %}
                 {% assign cat_name = item.categ_name_en | default: item.categ_name_ar %}
               {% endif %}
-              <div class="swiper-slide sfc__slide">
+              <div class="swiper-slide sfc__slide" style="--ra-idx: {{ forloop.index0 }};">
                 <a href="{{ item.categ_url | default: '#' }}" class="sfc__card">
                   {% assign mod = forloop.index | modulo: 2 %}
                   <div class="sfc__image-box {% if mod == 0 %}sfc__image-box--even{% else %}sfc__image-box--odd{% endif %}">
@@ -39,7 +39,7 @@
             {% else %}
               {% assign cat_name = item.categ_name_en | default: item.categ_name_ar %}
             {% endif %}
-            <a href="{{ item.categ_url | default: '#' }}" class="sfc__card">
+            <a href="{{ item.categ_url | default: '#' }}" class="sfc__card" style="--ra-idx: {{ forloop.index0 }};">
               {% assign mod = forloop.index | modulo: 2 %}
               <div class="sfc__image-box {% if mod == 0 %}sfc__image-box--even{% else %}sfc__image-box--odd{% endif %}">
                 <img src="{{ item.categ_img }}" alt="{{ cat_name | escape }}" class="sfc__img" loading="lazy">

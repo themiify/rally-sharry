@@ -1,4 +1,6 @@
 
+<link rel="stylesheet" href="{{ 'RA_about_us.css' | asset_url }}">
+
 {% assign c = section.settings %}
 
 {% if request.is_rtl %}
@@ -11,7 +13,7 @@
 
 {% assign words = discription | split: ' ' %}
 
-<section class="sfa-about-us sf-{{ section.id }} {% if c.margin_switch %}sfa-about-us--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="about-us" class="sfa-about-us sf-{{ section.id }} {% if c.margin_switch %}sfa-about-us--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   <div class="sfa__container gl-container">
     <div class="sfa__title-wrap">
       <h2 class="sfa__title" style="color: {{ c.tittle_color | default: '#000000' }};">

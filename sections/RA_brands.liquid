@@ -2,7 +2,7 @@
 
 {% assign c = section.settings %}
 
-<section class="rab-brands rab-{{ section.id }} {% if c.margin_switch %}rab-brands--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="brands" class="rab-brands rab-{{ section.id }} {% if c.margin_switch %}rab-brands--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   <div class="rab__container gl-container">
     {% assign quantity = c.brandsss.size %}
     <div class="rab__loop-slide">
@@ -10,7 +10,7 @@
         <div class="rab__list">
           {% for brand in c.brandsss %}
             {% assign brand_name = brand.brand_name_en | default: brand.brand_name_ar %}
-            <div class="rab__item" style="--position: {{ forloop.index }};">
+            <div class="rab__item" style="--position: {{ forloop.index }}; --ra-idx: {{ forloop.index0 }};">
               <a href="{{ brand.brand_url | default: '#' }}" class="rab__link">
                 <!-- English Brand Name Text (Default View) -->
                 {% if brand_name != blank %}

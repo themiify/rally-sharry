@@ -810,8 +810,21 @@ function buildServiceCatalogContext(locale) {
 // Add new section slugs here (in render order) when creating a new section for a page.
 // Exported so preview/server.js can import this as its single source of truth.
 const DEFAULT_PAGE_SECTIONS = {
-    home: ['sp-product-special', 'sp-interactive-gallery', 'G-Categories', 'G-FAQ', 'G-Interactive-banner', 'G-category-cards', 'image-gallery',
-        'featured-categories', 'sub-banner', 'promotions-banner', 'video-banner', 'G-Value_Propositions', 'testimonials', 'brands-carousel', 'featured-products', 'newsletter'],
+    home: [
+        'RA_main-banner',
+        'RA_about_us',
+        'RA_categories',
+        'RA_cenima_slider',
+        'RA_brands',
+        'RA_statistics',
+        'RA_feature',
+        'RA_locations',
+        'RA_faq',
+        'RA_reviews',
+        'RA_limited_offers',
+        'RA_blogs',
+        'RA_product_taps'
+    ],
 
     product: ['product-detail'],
     category: ['G-index-banner', 'product-grid', 'category-carousel'],

@@ -14,7 +14,7 @@
 {% assign video_url = c.video_link | default: 'https://files.catbox.moe/3xlvx9.mp4' %}
 {% assign end_date = c.limited_offers | default: '2026-12-31T23:59' %}
 
-<section class="ralo-limited-offers ralo-{{ section.id }} gl-container {% if c.margin_switch %}ralo-limited-offers--no-margin{% endif %}"
+<section data-ra-section="limited-offers" class="ralo-limited-offers ralo-{{ section.id }} gl-container {% if c.margin_switch %}ralo-limited-offers--no-margin{% endif %}"
          style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   
   <div class="ralo__wrapper {% if c.is_switch %}ralo__wrapper--reverse{% endif %}">
@@ -29,14 +29,14 @@
           {% endif %}
           {% if resolved_products != blank and resolved_products.size > 0 %}
             {% for prod in resolved_products %}
-              <div class="swiper-slide ralo__slide">
+              <div class="swiper-slide ralo__slide" style="--ra-idx: {{ forloop.index0 }};">
                 {% include 'product-card', product_card_item: prod %}
               </div>
             {% endfor %}
           {% else %}
             <!-- Demo Product Cards when no specific products selected -->
             {% for i in (1..4) %}
-              <div class="swiper-slide ralo__slide">
+              <div class="swiper-slide ralo__slide" style="--ra-idx: {{ forloop.index0 }};">
                 {% include 'product-card' %}
               </div>
             {% endfor %}
@@ -70,19 +70,19 @@
 
         <!-- Countdown Timer Component -->
         <div class="ralo__countdown" data-end-date="{{ end_date }}">
-          <div class="ralo__count-item">
+          <div class="ralo__count-item" style="--ra-idx: 0;">
             <div class="ralo__count-val count-days">00</div>
             <div class="ralo__count-lbl">أيام</div>
           </div>
-          <div class="ralo__count-item">
+          <div class="ralo__count-item" style="--ra-idx: 1;">
             <div class="ralo__count-val count-hours">00</div>
             <div class="ralo__count-lbl">ساعات</div>
           </div>
-          <div class="ralo__count-item">
+          <div class="ralo__count-item" style="--ra-idx: 2;">
             <div class="ralo__count-val count-mins">00</div>
             <div class="ralo__count-lbl">دقائق</div>
           </div>
-          <div class="ralo__count-item">
+          <div class="ralo__count-item" style="--ra-idx: 3;">
             <div class="ralo__count-val count-secs">00</div>
             <div class="ralo__count-lbl">ثواني</div>
           </div>

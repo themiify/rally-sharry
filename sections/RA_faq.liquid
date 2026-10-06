@@ -11,7 +11,7 @@
   {% assign title_text = c.faq_title_en | default: c.faq_title_ar %}
 {% endif %}
 
-<section class="rafaq-section rafaq-{{ section.id }} gl-container {% if c.margin_switch %}rafaq-section--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="faq" class="rafaq-section rafaq-{{ section.id }} gl-container {% if c.margin_switch %}rafaq-section--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   {% if title_text != blank %}
     <h2 class="rafaq__title">
       {{ title_text }}
@@ -30,7 +30,7 @@
 
       {% assign num = forloop.index %}
 
-      <div class="rafaq__item">
+      <div class="rafaq__item" style="--ra-idx: {{ forloop.index0 }};">
         <!-- FAQ Header -->
         <button 
           type="button" 

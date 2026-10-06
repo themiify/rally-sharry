@@ -8,7 +8,7 @@
   {% assign title_text = c.blog_title_en | default: c.blog_title_ar %}
 {% endif %}
 
-<section class="rablog-section rablog-{{ section.id }} gl-container {% if c.margin_switch %}rablog-section--no-margin{% endif %}"
+<section data-ra-section="blogs" class="rablog-section rablog-{{ section.id }} gl-container {% if c.margin_switch %}rablog-section--no-margin{% endif %}"
          style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   
   {% if title_text != blank %}
@@ -31,7 +31,7 @@
             {% assign art_url = article.url | default: '#' %}
             {% assign art_img = article.image.url | default: article.image %}
 
-            <div class="swiper-slide rablog__slide">
+            <div class="swiper-slide rablog__slide" style="--ra-idx: {{ forloop.index0 }};">
               <div class="rablog__card">
                 <div class="RA_blog_content">
                   <a href="{{ art_url }}" class="rablog__img-link">
@@ -62,7 +62,7 @@
           {% assign demo_titles = "أفضل الطرق للعناية بسيارتك في فصل الصيف|5 نصائح هامة قبل شراء سيارة مستعملة بالتقسيط|دليل استئجار السيارات الفخمة والمغريات المفاجئة|مقارنة بين أحدث موديلات بورش وسوبرا لعام 2025" | split: "|" %}
           {% assign demo_imgs = "https://cdn.salla.sa/form-builder/0caObcp4ISzrn6ExskIH6Xg74IpSUgqzbuAuNtuD.jpg|https://cdn.salla.sa/form-builder/DjbyxEXJDWfRSu7eJO0jtuouAteua86IJi82Sgoq.jpg|https://cdn.salla.sa/form-builder/WcHkC7zApnrILIZC4veXokCjfuq5tz3YSWfBZcUt.png|https://cdn.salla.sa/form-builder/oUpcRrUsoIlorJH4wtZG5cUmG6sp5rkER7bBEcVn.png" | split: "|" %}
           {% for i in (0..3) %}
-            <div class="swiper-slide rablog__slide">
+            <div class="swiper-slide rablog__slide" style="--ra-idx: {{ forloop.index0 }};">
               <div class="rablog__card">
                 <div class="RA_blog_content">
                   <a href="#" class="rablog__img-link">

@@ -9,7 +9,7 @@
   {% assign categories_list = categories %}
 {% endif %}
 
-<section class="RA_product_taps RA_product_taps-{{ section.id }} {% if c.margin_switch %}mb-0{% else %}mb-10{% endif %}"
+<section data-ra-section="product-tabs" class="RA_product_taps RA_product_taps-{{ section.id }} {% if c.margin_switch %}mb-0{% else %}mb-10{% endif %}"
          style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   <div class="gl-container container">
 
@@ -18,7 +18,8 @@
       {% for item in categories_list %}
         <button type="button" 
                 class="s-tabs-header-item ra-tab-btn {% if forloop.first %}active{% endif %}" 
-                data-target="tab-panel-{{ section.id }}-{{ forloop.index }}">
+                data-target="tab-panel-{{ section.id }}-{{ forloop.index }}"
+                style="--ra-idx: {{ forloop.index0 }};">
           <span class="whitespace-nowrap font-bold text-base px-4 py-2 cursor-pointer">{{ item.name | default: item.title }}</span>
         </button>
       {% endfor %}
@@ -56,7 +57,7 @@
                     <div class="s-product-card-entry {% if forloop.first %}active{% endif %}"
                          data-image-src="{{ p_img }}"
                          data-product-url="{{ p_url }}"
-                         style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px; cursor: pointer; background: #ffffff;">
+                         style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px; cursor: pointer; background: #ffffff; --ra-idx: {{ forloop.index0 }};">
                       <div class="s-product-card-image" style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
                         <a href="{{ p_url }}">
                           <img src="{{ p_img }}" alt="{{ prod.name | escape }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
@@ -86,7 +87,7 @@
                     <div class="s-product-card-entry ra-mobile-card-item {% if forloop.first %}active{% endif %}"
                          data-image-src="{{ p_img }}"
                          data-product-url="{{ p_url }}"
-                         style="flex: 0 0 135px; width: 135px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 8px; background: #ffffff; cursor: pointer;">
+                         style="flex: 0 0 135px; width: 135px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 8px; background: #ffffff; cursor: pointer; --ra-idx: {{ forloop.index0 }};">
                       <div class="s-product-card-image" style="width: 100%; height: 95px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;">
                         <img src="{{ p_img }}" alt="{{ prod.name | escape }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
                       </div>

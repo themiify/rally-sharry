@@ -4,7 +4,7 @@
 {% assign des_color = c.des_color | default: '#ffffff' %}
 {% assign bg_image = c.img_bg | default: 'https://cdn.salla.sa/form-builder/DjbyxEXJDWfRSu7eJO0jtuouAteua86IJi82Sgoq.jpg' %}
 
-<section class="ras-statistics ras-{{ section.id }} gl-container {% if c.margin_switch %}ras-statistics--no-margin{% endif %}" style="background-image: url('{{ bg_image }}'); {% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="statistics" class="ras-statistics ras-{{ section.id }} gl-container {% if c.margin_switch %}ras-statistics--no-margin{% endif %}" style="background-image: url('{{ bg_image }}'); {% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   <div class="ras__overlay"></div>
   
   <div class="ras__wrapper {% if c.is_cointaner %}gl-container{% else %}ras__wrapper--full{% endif %}">
@@ -16,7 +16,7 @@
           {% assign des_text = item.des_en | default: item.des_ar %}
         {% endif %}
         
-        <div class="ras__card">
+        <div class="ras__card" style="--ra-idx: {{ forloop.index0 }};">
           <!-- Desktop Icon Image -->
           {% if item.img_icon != blank %}
             <div class="ras__icon-box ras__icon-box--desktop">

@@ -11,7 +11,7 @@
   {% assign title_text = c.reviews_title_en | default: c.reviews_title_ar %}
 {% endif %}
 
-<section class="rar-reviews rar-{{ section.id }} gl-container {% if c.margin_switch %}rar-reviews--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="reviews" class="rar-reviews rar-{{ section.id }} gl-container {% if c.margin_switch %}rar-reviews--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   {% if title_text != blank %}
     <h2 class="rar__title">
       {{ title_text }}
@@ -32,7 +32,7 @@
             {% assign cus_job = item.job_en | default: item.job_ar %}
           {% endif %}
 
-          <div class="swiper-slide rar__slide">
+          <div class="swiper-slide rar__slide" style="--ra-idx: {{ forloop.index0 }};">
             <div class="rar__card">
               <!-- Rating Stars -->
               <div class="rar__rating">

@@ -24,6 +24,7 @@ import { initializeContactForms } from './contact-form.js';
 import { initializeProductReviews } from './product-reviews.js';
 import { initializeServiceCatalogInteractions } from './service-catalog.js';
 import { initializeSocialEmbeds } from './social-embeds.js';
+import { initRallyAnimations } from './rally-animations.js';
 
 // ── bootstrap ────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ window.addEventListener('theme-marketplace:dynamic', function (event) {
     initializeProductReviews(apiClient, showToast, storefrontState);
     initializeServiceCatalogInteractions();
     initializeSocialEmbeds();
+    initRallyAnimations();
 });
 
 storefrontActions.hydrateActionButtons();
@@ -101,6 +103,7 @@ initializeContactForms(showToast);
 initializeProductReviews(apiClient, showToast, storefrontState);
 initializeServiceCatalogInteractions();
 initializeSocialEmbeds();
+initRallyAnimations();
 
 function hydrateHeaderAuth(auth) {
     var isLoggedIn = !!(auth && auth.is_logged_in);

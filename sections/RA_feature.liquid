@@ -3,7 +3,7 @@
 {% assign c = section.settings %}
 {% assign text_color = c.text_color | default: '#000000' %}
 
-<section class="raf-feature raf-{{ section.id }} {% if c.margin_switch %}raf-feature--no-margin{% endif %}"
+<section data-ra-section="feature" class="raf-feature raf-{{ section.id }} {% if c.margin_switch %}raf-feature--no-margin{% endif %}"
          style="{% if c.is_bg_color %}background-color: {{ c.bg_color | default: '#ffffff' }};{% else %}background-image: url('{{ c.background_image }}');{% endif %}; {% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
 
   <div class="raf__container gl-container">
@@ -18,7 +18,7 @@
         {% endif %}
         
         {% if f_text != blank %}
-          <p class="raf__text" style="color: {{ text_color }}; --features-color: {{ text_color }};">
+          <p class="raf__text" style="color: {{ text_color }}; --features-color: {{ text_color }}; --ra-idx: {{ forloop.index0 }};">
             <span style="color: {{ text_color }};">0{{ forloop.index }}</span>
             {{ f_text }}
           </p>
@@ -44,7 +44,8 @@
 
         {% if f_text != blank %}
           {% assign num = forloop.index | plus: 3 %}
-          <p class="raf__text" style="color: {{ text_color }}; --features-color: {{ text_color }};">
+          {% assign item_idx = forloop.index0 | plus: 3 %}
+          <p class="raf__text" style="color: {{ text_color }}; --features-color: {{ text_color }}; --ra-idx: {{ item_idx }};">
             <span style="color: {{ text_color }};">0{{ num }}</span>
             {{ f_text }}
           </p>

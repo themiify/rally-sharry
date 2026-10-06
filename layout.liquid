@@ -40,6 +40,7 @@
 
     <link rel="stylesheet" href="https://unpkg.com/sal.js@0.8.5/dist/sal.css">
     <link rel="stylesheet" href="{{ 'product-card-custom.css' | asset_url }}">
+    <link rel="stylesheet" href="{{ 'rally-animations.css' | asset_url }}">
 
     <script src="https://unpkg.com/sal.js@0.8.5/dist/sal.js" defer></script>
 
@@ -380,10 +381,106 @@
 
     <!-- Footer Section -->
     {{ content_for_footer }}
+    <script src="{{ 'rally.js' | asset_url }}" defer></script>
     <script>
-   sal({
-    once: false
-  });
-</script>
+      (function() {
+        function initRally() {
+          if (window.__rallyAnimInitialized) return;
+          window.__rallyAnimInitialized = true;
+          var sectionSelectors = [
+            '[data-ra-section]',
+            '.sf-main-banner', '.sfa-about-us', '.sf-categories', '.rac-cinema',
+            '.rab-brands', '.ras-statistics', '.raf-feature', '.ral-locations',
+            '.rafaq-section', '.rar-reviews', '.ralo-limited-offers', '.rablog-section', '.RA_product_taps'
+          ];
+          var repeaterSelectors = [
+            '.sfc__card', '.sfc__slide', '.rac__slide', '.rab__item', '.ras__card',
+            '.raf__col--left .raf__text', '.raf__col--right .raf__text', '.ral__tab-btn',
+            '.rafaq__item', '.rar__slide', '.ralo__slide', '.ralo__count-item',
+            '.rablog__slide', '.ra-tab-btn', '.s-product-card-entry', '.ra-mobile-card-item'
+          ];
+          function setupRepeaters(sec) {
+            if (!sec) return;
+            repeaterSelectors.forEach(function(sel) {
+              var items = sec.querySelectorAll(sel);
+              items.forEach(function(item, idx) {
+                if (!item.style.getPropertyValue('--ra-idx')) {
+                  item.style.setProperty('--ra-idx', idx);
+                }
+              });
+            });
+          }
+          function activate(sec) {
+            if (!sec || sec.classList.contains('ra-animate-in')) return;
+            setupRepeaters(sec);
+            sec.classList.add('ra-animate-in');
+          }
+          var raw = document.querySelectorAll(sectionSelectors.join(', '));
+          var sections = [];
+          raw.forEach(function(el) { if (sections.indexOf(el) === -1) sections.push(el); });
+          var vh = window.innerHeight || document.documentElement.clientHeight || 800;
+
+          sections.forEach(function(sec) {
+            setupRepeaters(sec);
+            var isBanner = sec.classList.contains('sf-main-banner') || sec.getAttribute('data-ra-section') === 'main-banner';
+            if (isBanner) {
+              activate(sec);
+              return;
+            }
+            var rect = sec.getBoundingClientRect();
+            if (rect.top < vh && rect.bottom > 0) {
+              activate(sec);
+            } else {
+              sec.classList.add('ra-anim-init');
+            }
+          });
+
+          if ('IntersectionObserver' in window) {
+            var obs = new IntersectionObserver(function(entries) {
+              entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                  activate(entry.target);
+                  obs.unobserve(entry.target);
+                }
+              });
+            }, { rootMargin: '0px 0px -30px 0px', threshold: 0.05 });
+
+            sections.forEach(function(sec) {
+              if (!sec.classList.contains('ra-animate-in')) {
+                obs.observe(sec);
+              }
+            });
+          }
+
+          function onScroll() {
+            var curVh = window.innerHeight || 800;
+            sections.forEach(function(sec) {
+              if (!sec.classList.contains('ra-animate-in')) {
+                var r = sec.getBoundingClientRect();
+                if (r.top < curVh - 20 && r.bottom > 0) {
+                  activate(sec);
+                }
+              }
+            });
+          }
+          window.addEventListener('scroll', onScroll, { passive: true });
+          setTimeout(function() {
+            sections.forEach(function(sec) { activate(sec); });
+          }, 3000);
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initRally, { once: true });
+        } else {
+          initRally();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+          if (typeof sal === 'function') {
+            sal({ once: false });
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

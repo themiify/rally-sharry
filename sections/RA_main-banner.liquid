@@ -12,17 +12,17 @@
 
 {% assign button_text_color = c.button_text_colors | default: '#ffffff' %}
 
-<section class="sf-main-banner sf-{{ section.id }} {% if c.margin_switch %}sf-main-banner--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="main-banner" class="sf-main-banner sf-{{ section.id }} {% if c.margin_switch %}sf-main-banner--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   <div class="sf__container">
     {% if c.transition_buttons %}
       <div class="sf__buttons">
-        <div class="sf__button-wrapper" style="border: 1px solid {{ button_text_color }} !important;">
+        <div class="sf__button-wrapper" style="border: 1px solid {{ button_text_color }} !important; --ra-idx: 0;">
           <a href="{{ c.first_button }}" class="sf__button-first" style="color: {{ button_text_color }};">
             {{ first_btn_text }}
           </a>
           <i class="sicon-arrow-left sf__icon" style="color: {{ button_text_color }};"></i>
         </div>
-        <div class="sf__button-wrapper sf__button-wrapper--secondary" style="border: 1px solid {{ button_text_color }} !important;">
+        <div class="sf__button-wrapper sf__button-wrapper--secondary" style="border: 1px solid {{ button_text_color }} !important; --ra-idx: 1;">
           <a href="{{ c.second_butto }}" class="sf__button-second" style="color: {{ button_text_color }};">
             {{ second_btn_text }}
           </a>
@@ -34,7 +34,7 @@
     <div class="sf__slider-wrap">
       <div class="sf__tabs">
         {% for image in c.images_collection %}
-          <span class="sf__tab-item {% if forloop.first %}sf__tab-item--active{% endif %}" data-index="{{ forloop.index0 }}">
+          <span class="sf__tab-item {% if forloop.first %}sf__tab-item--active{% endif %}" data-index="{{ forloop.index0 }}" style="--ra-idx: {{ forloop.index0 }};">
             {{ image.category_name }}
           </span>
         {% endfor %}

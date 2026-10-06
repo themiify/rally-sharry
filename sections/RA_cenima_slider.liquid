@@ -8,7 +8,7 @@
   {% assign btn_txt = c.btn_txt_en | default: c.btn_txt_ar %}
 {% endif %}
 
-<section class="rac-cinema rac-{{ section.id }} {% if c.margin_switch %}rac-cinema--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
+<section data-ra-section="cinema-slider" class="rac-cinema rac-{{ section.id }} {% if c.margin_switch %}rac-cinema--no-margin{% endif %}" style="{% if c.margin_switch %}margin-bottom: 0px !important;{% else %}margin-bottom: 30px !important;{% endif %}">
   <div class="rac__content {% if c.is_switch %}rac__content--reverse{% endif %}" data-mask="{{ c.is_mask | default: false }}">
     <div class="rac__title-box" style="color: {{ c.text_color | default: '#ffffff' }};">
       <div id="active-card-title-container" class="rac__active-title"></div>
@@ -40,7 +40,7 @@
               {% assign card_name = card.card_name_en | default: card.card_name_ar %}
             {% endif %}
             {% if card.add_video_url != blank or card.card_img != blank %}
-              <div class="swiper-slide rac__slide" tabindex="0" data-card-name="{{ card_name | escape }}" data-btn-url="{{ card.btn_url | default: '#' }}">
+              <div class="swiper-slide rac__slide" tabindex="0" data-card-name="{{ card_name | escape }}" data-btn-url="{{ card.btn_url | default: '#' }}" style="--ra-idx: {{ forloop.index0 }};">
                 <a href="{{ card.btn_url | default: '#' }}" class="rac__card-link">
                   <div class="rac__card-inner">
                     {% if card.add_video_instead_of_image and card.add_video_url != blank %}
