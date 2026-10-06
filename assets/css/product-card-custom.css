@@ -260,7 +260,7 @@
 .gl-quick-view-gallery {
     display: flex !important;
     gap: 16px !important;
-    flex-direction:column !important;
+   
     align-items: flex-start !important;
 }
 

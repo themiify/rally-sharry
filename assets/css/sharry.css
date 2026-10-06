@@ -4113,7 +4113,7 @@ html {
 .gl-quick-view-gallery {
   display: flex;
   gap: 16px;
-  flex-direction: column;
+ 
   align-items: flex-start;
   height: 100%;
 }
