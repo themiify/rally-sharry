@@ -1,0 +1,64 @@
+{% comment %}
+  Service Categories — Glamour Theme
+  Uses the `service_category_picker` setting type: the picked categories (with a capped list of
+  their published services) are server-resolved into `section.resolved.selected_categories`.
+  Each item has: id, name, slug, description, image, url, services, services_total.
+{% endcomment %}
+
+{% assign is_rtl = request.is_rtl %}
+{% assign categories = section.resolved.selected_categories %}
+{% assign per_category = section.settings.services_per_category | default: 6 %}
+
+{% if categories.size > 0 %}
+<section class="gl-section service-catalog-section service-catalog-category-services" data-service-catalog-surface="category-services">
+  <div class="gl-container">
+    {% if section.settings.heading != blank or section.settings.heading_ar != blank %}
+      <header class="service-catalog-heading">
+        <h2>{% if is_rtl %}{{ section.settings.heading_ar | default: section.settings.heading }}{% else %}{{ section.settings.heading | default: section.settings.heading_ar }}{% endif %}</h2>
+      </header>
+    {% endif %}
+
+    {% for category in categories %}
+      {% assign shown = category.services.size %}
+      {% if shown > per_category %}{% assign shown = per_category %}{% endif %}
+
+      <section class="service-catalog-category-block">
+        <header class="service-catalog-category-block__header">
+          <h3><a href="{{ category.url }}">{{ category.name }}</a></h3>
+          {% if section.settings.show_description != false and category.description != blank %}<p>{{ category.description }}</p>{% endif %}
+        </header>
+
+        {% if shown > 0 %}
+          <div class="service-catalog-grid service-catalog-grid--{{ section.settings.columns }}">
+            {% for service in category.services limit: per_category %}
+              {% render 'service-catalog-service-card', service: service, show_images: section.settings.show_images, heading_level: 4 %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% if category.services_total > shown %}
+          <p class="service-catalog-more"><a class="service-catalog-link" href="{{ category.url }}">{{ 'service_catalog.category.view_all' | t }}</a></p>
+        {% endif %}
+      </section>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% schema %}
+{
+  "name": { "en": "Service Categories", "ar": "تصنيفات الخدمات" },
+  "category": "service-catalog",
+  "reusable": true,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Section Heading", "label_ar": "عنوان القسم", "default": "Our service categories" },
+    { "type": "text", "id": "heading_ar", "label": "Section Heading (Arabic)", "label_ar": "عنوان القسم (بالعربية)", "default": "تصنيفات خدماتنا" },
+    { "type": "service_category_picker", "id": "selected_categories", "label": "Select Service Categories", "label_ar": "اختر تصنيفات الخدمات", "multiple": true },
+    { "type": "range", "id": "services_per_category", "label": "Services per category", "label_ar": "عدد الخدمات لكل تصنيف", "min": 1, "max": 24, "default": 6 },
+    { "type": "checkbox", "id": "show_description", "label": "Show category descriptions", "label_ar": "إظهار وصف التصنيفات", "default": true },
+    { "type": "checkbox", "id": "show_images", "label": "Show service images", "label_ar": "إظهار صور الخدمات", "default": true },
+    { "type": "select", "id": "columns", "label": "Columns", "label_ar": "الأعمدة", "default": "3", "options": [{ "value": "2", "label": "Two", "label_ar": "اثنان" }, { "value": "3", "label": "Three", "label_ar": "ثلاثة" }, { "value": "4", "label": "Four", "label_ar": "أربعة" }] }
+  ],
+  "defaults": { "heading": "Our service categories", "heading_ar": "تصنيفات خدماتنا", "services_per_category": 6, "show_description": true, "show_images": true, "columns": "3" }
+}
+{% endschema %}

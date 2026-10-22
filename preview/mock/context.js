@@ -738,6 +738,62 @@ function buildSearchContext(locale) {
  * @param {string|null} slug  for service/team-member detail pages
  * @param {string} themeRoot  absolute path to the theme directory
  */
+/**
+ * Mock service categories (mirrors ServiceCatalogContextService::categoryCard).
+ * The second category reports more published services than it lists, so the
+ * "view all" state of the theme sections is visible in the preview.
+ */
+function buildMockServiceCategories(locale) {
+    const isRtl = locale === 'ar';
+    const serviceCard = (id, slug, en, ar, excerptEn, excerptAr) => ({
+        id,
+        name: isRtl ? ar : en,
+        slug,
+        excerpt: isRtl ? excerptAr : excerptEn,
+        image: `https://picsum.photos/seed/service-${slug}/1000/700`,
+        url: `/services/${slug}`,
+    });
+
+    return [
+        {
+            id: 1,
+            name: isRtl ? 'الاستشارات' : 'Consulting',
+            slug: 'consulting',
+            description: isRtl ? 'جلسات استشارية متخصصة تساعدك على اتخاذ القرار الصحيح.' : 'Specialized advisory sessions that help you decide with confidence.',
+            image: 'https://picsum.photos/seed/service-category-consulting/1200/600',
+            url: '/service-categories/consulting',
+            services: [
+                serviceCard(1, 'expert-consultation', 'Expert Consultation', 'استشارة متخصصة', 'Practical advice backed by experience.', 'استشارة عملية مبنية على خبرة.'),
+                serviceCard(2, 'strategy-workshop', 'Strategy Workshop', 'ورشة استراتيجية', 'A focused session to shape your next steps.', 'جلسة مركزة لرسم خطواتك القادمة.'),
+            ],
+            services_total: 2,
+        },
+        {
+            id: 2,
+            name: isRtl ? 'التدريب' : 'Training',
+            slug: 'training',
+            description: isRtl ? 'برامج تدريبية عملية لفريقك.' : 'Practical training programmes for your team.',
+            image: 'https://picsum.photos/seed/service-category-training/1200/600',
+            url: '/service-categories/training',
+            services: [
+                serviceCard(3, 'team-training', 'Team Training', 'تدريب الفريق', 'Hands-on training tailored to your team.', 'تدريب عملي مصمم لفريقك.'),
+            ],
+            services_total: 9,
+        },
+    ];
+}
+
+/**
+ * Resolve service category ids to category cards in the merchant's order,
+ * dropping unknown ids (mirrors ServiceCatalogContextService::resolveServiceCategories).
+ */
+function mockResolveServiceCategories(ids, locale) {
+    const all = buildMockServiceCategories(locale);
+    const wanted = (Array.isArray(ids) ? ids : [ids]).map(Number).filter(Boolean);
+
+    return wanted.map(id => all.find(category => category.id === id)).filter(Boolean);
+}
+
 function buildServiceCatalogContext(locale) {
     const isRtl = locale === 'ar';
     const profile = {
@@ -750,6 +806,9 @@ function buildServiceCatalogContext(locale) {
         services_intro: isRtl ? 'اكتشف خدماتنا المتخصصة.' : 'Discover our specialized services.',
         team_title: isRtl ? 'فريقنا' : 'Our team',
         team_intro: isRtl ? 'تعرف على فريق الخبراء.' : 'Meet our expert team.',
+        team_story_title: isRtl ? 'فريق يجمع الخبرة والشغف' : 'A team built on expertise and care',
+        team_story_body: isRtl ? 'يعمل متخصصونا معاً لتقديم تجربة موثوقة لكل عميل.' : 'Our specialists work together to deliver a trusted experience for every client.',
+        team_story_image: 'https://picsum.photos/seed/team-story/817/383',
         image: 'https://picsum.photos/seed/service-profile/900/700',
         url: '/about-us',
         services_url: '/services',
@@ -785,6 +844,15 @@ function buildServiceCatalogContext(locale) {
         bio: isRtl ? '<p>أحمد مستشار بخبرة واسعة في مساعدة العملاء.</p>' : '<p>Ahmed is an experienced consultant who helps clients move forward with confidence.</p>',
         bio_text: isRtl ? 'أحمد مستشار بخبرة واسعة في مساعدة العملاء.' : 'Ahmed is an experienced consultant who helps clients move forward with confidence.',
         image: 'https://picsum.photos/seed/team-member-1/700/700',
+        email: 'ahmed@qualitypro.sa',
+        phone: '+966 55 111 1111',
+        phone_tel: '+966551111111',
+        social_links: {
+            linkedin: 'https://linkedin.com/in/ahmed-consultant',
+            whatsapp: 'https://wa.me/966551111111',
+            snapchat: 'https://snapchat.com/add/ahmed-consultant',
+            website: 'https://example.com/ahmed',
+        },
         highlights: isRtl ? ['خبرة واسعة', 'استشارات عملية'] : ['Extensive experience', 'Practical advice'],
         resume: {
             experience: [{ role: isRtl ? 'مستشار أول' : 'Senior Consultant', company: isRtl ? 'مكتب الخبراء' : 'Experts Office', location: isRtl ? 'الرياض' : 'Riyadh', description: isRtl ? '<p>قيادة مشاريع استشارية متنوعة.</p>' : '<p>Leading a range of consulting projects.</p>' }],
@@ -796,13 +864,37 @@ function buildServiceCatalogContext(locale) {
     };
     service.team_members = [{ id: member.id, name: member.name, slug: member.slug, title: member.title, image: member.image, url: member.url }];
 
+    const categories = buildMockServiceCategories(locale);
+    const portfolio = [
+        {
+            id: 1,
+            title: isRtl ? 'تجديد هوية متجر' : 'Boutique rebrand',
+            description: isRtl ? '<p>أعدنا بناء الهوية البصرية وتجربة العميل لمتجر محلي.</p>' : '<p>We rebuilt the visual identity and customer journey for a local boutique.</p>',
+            description_text: isRtl ? 'أعدنا بناء الهوية البصرية وتجربة العميل لمتجر محلي.' : 'We rebuilt the visual identity and customer journey for a local boutique.',
+            image: 'https://picsum.photos/seed/portfolio-1/1000/700',
+            gallery: [1, 2, 3].map(n => `https://picsum.photos/seed/portfolio-1-${n}/640/400`),
+            services: [{ id: service.id, name: service.name, slug: service.slug, url: service.url }],
+        },
+        {
+            id: 2,
+            title: isRtl ? 'برنامج تدريب الفريق' : 'Team training programme',
+            description: isRtl ? '<p>صممنا برنامجاً تدريبياً عملياً لفريق المبيعات.</p>' : '<p>We designed a hands-on training programme for a sales team.</p>',
+            description_text: isRtl ? 'صممنا برنامجاً تدريبياً عملياً لفريق المبيعات.' : 'We designed a hands-on training programme for a sales team.',
+            image: 'https://picsum.photos/seed/portfolio-2/1000/700',
+            gallery: [1, 2].map(n => `https://picsum.photos/seed/portfolio-2-${n}/640/400`),
+            services: [],
+        },
+    ];
+
     return {
         profile,
         services: [service].map(({ description, sections, gallery, team_members, meta_title, meta_description, ...card }) => card),
         service,
+        portfolio,
+        category: Object.assign({}, categories[0], { meta_title: categories[0].name, meta_description: categories[0].description }),
         team: [member].map(({ resume, highlights, services, bio, bio_text, ...card }) => card),
         team_member: member,
-        selection: { service_id: null, team_member_id: null },
+        selection: { service_id: null, team_member_id: null, category_id: null },
     };
 }
 
@@ -826,19 +918,21 @@ const DEFAULT_PAGE_SECTIONS = {
         'RA_product_taps'
     ],
 
-    product: ['product-detail'],
-    category: ['G-index-banner', 'product-grid', 'category-carousel'],
-    search: ['search-results'],
-    cart: ['cart-page'],
+    product: ['product-detail', 'service-catalog-services'],
+    category: ['G-index-banner', 'product-grid', 'category-carousel', 'service-catalog-services'],
+    search: ['search-results', 'service-catalog-services'],
+    cart: ['cart-page', 'service-catalog-services'],
     services: ['service-catalog-services', 'contact-form'],
-    service: ['service-catalog-service', 'contact-form'],
-    team: ['service-catalog-team', 'contact-form'],
-    'team-member': ['service-catalog-team-member', 'contact-form'],
-    'contact-us': ['contact-form'],
-    'about-us': ['service-catalog-about', 'contact-form'],
-    cms: ['cms-page'],
-    custom: ['custom-page'],
-    '404': ['page-not-found'],
+    service: ['service-catalog-service', 'service-catalog-services', 'contact-form'],
+    'service-portfolio': ['service-catalog-portfolio', 'contact-form'],
+    'service-category': ['service-catalog-category', 'contact-form'],
+    team: ['service-catalog-team', 'service-catalog-services', 'contact-form'],
+    'team-member': ['service-catalog-team-member', 'service-catalog-services', 'contact-form'],
+    'contact-us': ['service-catalog-services', 'contact-form'],
+    'about-us': ['service-catalog-about', 'service-catalog-services', 'contact-form'],
+    cms: ['cms-page', 'service-catalog-services'],
+    custom: ['custom-page', 'service-catalog-services'],
+    '404': ['page-not-found', 'service-catalog-services'],
 };
 
 function buildContext(pageType, locale, slug, themeRoot) {
@@ -881,8 +975,7 @@ function buildContext(pageType, locale, slug, themeRoot) {
             currency: 'SAR',
             currency_meta: JSON.stringify({
                 code: 'SAR',
-                symbol: '\u00EA',
-                currency_position: 'left_with_space',
+                symbol: 'ر.س',
             }),
             rtl: isRtl,
             locales: [
@@ -890,7 +983,7 @@ function buildContext(pageType, locale, slug, themeRoot) {
                 { code: 'ar', name: 'العربية', direction: 'rtl', logo_url: null },
             ],
             currencies: [
-                { code: 'SAR', name: locale === 'ar' ? 'الريال السعودي' : 'Saudi Riyal', symbol: '\u00EA' },
+                { code: 'SAR', name: locale === 'ar' ? 'الريال السعودي' : 'Saudi Riyal', symbol: 'ر.س' },
                 { code: 'USD', name: 'US Dollar', symbol: '$' },
             ],
         },
@@ -1018,23 +1111,28 @@ function buildContext(pageType, locale, slug, themeRoot) {
         _css_tokens: themeJson.css_tokens || {},
     };
 
-    // ServiceCatalog surface context
-    if (['services', 'service', 'team', 'team-member', 'contact-us', 'about-us'].includes(pageType)) {
-        context.service_catalog = buildServiceCatalogContext(locale);
-        if (pageType === 'service') {
-            context.service_catalog.selection.service_id = context.service_catalog.service?.id || null;
-        }
-        if (pageType === 'team-member') {
-            context.service_catalog.selection.team_member_id = context.service_catalog.team_member?.id || null;
-        }
-        context.contact_form.selected_service_id = context.service_catalog.selection.service_id;
-        context.contact_form.selected_team_member_id = context.service_catalog.selection.team_member_id;
-        context.page.title = pageType === 'service'
-            ? context.service_catalog.service?.name || context.page.title
-            : pageType === 'team-member'
-                ? context.service_catalog.team_member?.name || context.page.title
-                : context.page.title;
+    // ServiceCatalog is global context so reusable service sections can render
+    // on home, product, CMS, custom, and every other storefront surface.
+    context.service_catalog = buildServiceCatalogContext(locale);
+    if (pageType === 'service') {
+        context.service_catalog.selection.service_id = context.service_catalog.service?.id || null;
     }
+    if (pageType === 'team-member') {
+        context.service_catalog.selection.team_member_id = context.service_catalog.team_member?.id || null;
+    }
+    if (pageType === 'service-category') {
+        const category = context.service_catalog.category;
+        context.service_catalog.selection.category_id = category?.id || null;
+        // Reusable service sections on this surface list the category's own services.
+        context.service_catalog.services = category?.services || [];
+    }
+    context.contact_form.selected_service_id = context.service_catalog.selection.service_id;
+    context.contact_form.selected_team_member_id = context.service_catalog.selection.team_member_id;
+    context.page.title = pageType === 'service'
+        ? context.service_catalog.service?.name || context.page.title
+        : pageType === 'team-member'
+            ? context.service_catalog.team_member?.name || context.page.title
+            : context.page.title;
 
     // Surface-specific additions
     if (pageType === 'product') Object.assign(context, buildProductContext(locale, slug || 'simple'));
@@ -1044,4 +1142,4 @@ function buildContext(pageType, locale, slug, themeRoot) {
     return context;
 }
 
-module.exports = { buildContext, makeProductCard, makeCategoryCard, resolveCategoryCards, MOCK_BLOGS, makeBlogCard, mockResolveBlogCards, MOCK_CATEGORIES, PRODUCT_TYPE_BUILDERS, DEFAULT_PAGE_SECTIONS, formatMoney };
+module.exports = { buildContext, makeProductCard, makeCategoryCard, resolveCategoryCards, MOCK_BLOGS, makeBlogCard, mockResolveBlogCards, mockResolveServiceCategories, MOCK_CATEGORIES, PRODUCT_TYPE_BUILDERS, DEFAULT_PAGE_SECTIONS, formatMoney };

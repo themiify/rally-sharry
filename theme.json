@@ -24,7 +24,15 @@
         "cart",
         "cms",
         "custom",
-        "404"
+        "404",
+        "services",
+        "service",
+        "service-category",
+        "service-portfolio",
+        "team",
+        "team-member",
+        "contact-us",
+        "about-us"
     ],
     "layout_slots": [
         "header",
@@ -1910,7 +1918,6 @@
                 "empty_cart_message": "Your cart is empty",
                 "empty_cart_message_ar": "سلة التسوق فارغة"
             }
-           
         },
         {
             "slug": "cart-cross-sell",
@@ -2949,7 +2956,7 @@
                 "en": "About Us - Rally",
                 "ar": "من نحن - رالي"
             },
-           "category": "promotional",
+            "category": "promotional",
             "template": "sections/RA_about_us.liquid",
             "sort_order": 2,
             "reusable": true,
@@ -3527,7 +3534,7 @@
                 "en": "Statistics - Rally",
                 "ar": "احصائيات - رالي"
             },
-           "category": "promotional",
+            "category": "promotional",
             "template": "sections/RA_statistics.liquid",
             "sort_order": 6,
             "reusable": true,
@@ -3667,7 +3674,7 @@
                 "en": "Product Features - Rally",
                 "ar": "مميزات المنتج - رالي"
             },
-           "category": "promotional",
+            "category": "promotional",
             "template": "sections/RA_feature.liquid",
             "sort_order": 7,
             "reusable": true,
@@ -3805,7 +3812,7 @@
                 "en": "Maps - Rally",
                 "ar": "خرائط - رالـــى"
             },
-           "category": "promotional",
+            "category": "promotional",
             "template": "sections/RA_locations.liquid",
             "sort_order": 8,
             "reusable": true,
@@ -3968,7 +3975,7 @@
                 "en": "FAQ - Rally",
                 "ar": "الاسئلة الشائعة - رالي"
             },
-           "category": "promotional",
+            "category": "promotional",
             "template": "sections/RA_faq.liquid",
             "sort_order": 9,
             "reusable": true,
@@ -4144,7 +4151,7 @@
                 "en": "Customer Reviews - Rally",
                 "ar": "آراء العملاء - رالي"
             },
-          "category": "promotional",
+            "category": "promotional",
             "template": "sections/RA_reviews.liquid",
             "sort_order": 10,
             "reusable": true,
@@ -4412,7 +4419,7 @@
                 "en": "Limited Offers - Rally",
                 "ar": "عروض تنتهي قريبا - رالي"
             },
- "category": "promotional",
+            "category": "promotional",
             "template": "sections/RA_limited_offers.liquid",
             "sort_order": 11,
             "reusable": true,
@@ -4650,6 +4657,447 @@
                 "all_category_fix": []
             },
             "preview": "https://cdn.salla.sa/form-builder/OgDNqmZoxTuUkH2GrlPlpVSaIF7igEAhNxNAX6a7.png"
+        },
+        {
+            "slug": "service-catalog-services",
+            "name": {
+                "en": "Services Listing",
+                "ar": "قائمة الخدمات"
+            },
+            "category": "service-catalog",
+            "template": "sections/service-catalog-services.liquid",
+            "sort_order": 30,
+            "reusable": true,
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "show_profile",
+                    "label": "Show provider intro",
+                    "label_ar": "إظهار مقدمة مقدم الخدمة",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_story",
+                    "label": "Show services story",
+                    "label_ar": "إظهار قصة الخدمات",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_images",
+                    "label": "Show service images",
+                    "label_ar": "إظهار صور الخدمات",
+                    "default": true
+                },
+                {
+                    "type": "select",
+                    "id": "columns",
+                    "label": "Columns",
+                    "label_ar": "الأعمدة",
+                    "default": "3",
+                    "options": [
+                        {
+                            "value": "2",
+                            "label": "Two",
+                            "label_ar": "اثنان"
+                        },
+                        {
+                            "value": "3",
+                            "label": "Three",
+                            "label_ar": "ثلاثة"
+                        },
+                        {
+                            "value": "4",
+                            "label": "Four",
+                            "label_ar": "أربعة"
+                        }
+                    ]
+                }
+            ],
+            "defaults": {
+                "show_profile": true,
+                "show_images": true,
+                "columns": "3",
+                "show_story": true
+            }
+        },
+        {
+            "slug": "service-catalog-service",
+            "name": {
+                "en": "Service Detail",
+                "ar": "تفاصيل الخدمة"
+            },
+            "category": "service-catalog",
+            "template": "sections/service-catalog-service.liquid",
+            "sort_order": 31,
+            "reusable": false,
+            "page_types": [
+                "service"
+            ],
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "show_image",
+                    "label": "Show service image",
+                    "label_ar": "إظهار صورة الخدمة",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_gallery",
+                    "label": "Show gallery",
+                    "label_ar": "إظهار المعرض",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_sections",
+                    "label": "Show service sections",
+                    "label_ar": "إظهار أقسام الخدمة",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_team",
+                    "label": "Show team members",
+                    "label_ar": "إظهار أعضاء الفريق",
+                    "default": true
+                }
+            ],
+            "defaults": {
+                "show_image": true,
+                "show_gallery": true,
+                "show_sections": true,
+                "show_team": true
+            }
+        },
+        {
+            "slug": "service-catalog-team",
+            "name": {
+                "en": "Team Listing",
+                "ar": "قائمة الفريق"
+            },
+            "category": "service-catalog",
+            "template": "sections/service-catalog-team.liquid",
+            "sort_order": 32,
+            "reusable": false,
+            "page_types": [
+                "team"
+            ],
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "show_images",
+                    "label": "Show member images",
+                    "label_ar": "إظهار صور الأعضاء",
+                    "default": true
+                },
+                {
+                    "type": "select",
+                    "id": "columns",
+                    "label": "Columns",
+                    "label_ar": "الأعمدة",
+                    "default": "3",
+                    "options": [
+                        {
+                            "value": "2",
+                            "label": "Two",
+                            "label_ar": "اثنان"
+                        },
+                        {
+                            "value": "3",
+                            "label": "Three",
+                            "label_ar": "ثلاثة"
+                        },
+                        {
+                            "value": "4",
+                            "label": "Four",
+                            "label_ar": "أربعة"
+                        }
+                    ]
+                }
+            ],
+            "defaults": {
+                "show_images": true,
+                "columns": "3"
+            }
+        },
+        {
+            "slug": "service-catalog-team-member",
+            "name": {
+                "en": "Team Member",
+                "ar": "عضو الفريق"
+            },
+            "category": "service-catalog",
+            "template": "sections/service-catalog-team-member.liquid",
+            "sort_order": 33,
+            "reusable": false,
+            "page_types": [
+                "team-member"
+            ],
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "show_image",
+                    "label": "Show member image",
+                    "label_ar": "إظهار صورة العضو",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_resume",
+                    "label": "Show resume",
+                    "label_ar": "إظهار السيرة الذاتية",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_services",
+                    "label": "Show services",
+                    "label_ar": "إظهار الخدمات",
+                    "default": true
+                }
+            ],
+            "defaults": {
+                "show_image": true,
+                "show_resume": true,
+                "show_services": true
+            }
+        },
+        {
+            "slug": "service-catalog-about",
+            "name": {
+                "en": "About Provider",
+                "ar": "نبذة عن مقدم الخدمة"
+            },
+            "category": "service-catalog",
+            "template": "sections/service-catalog-about.liquid",
+            "sort_order": 34,
+            "reusable": false,
+            "page_types": [
+                "about-us"
+            ],
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "show_image",
+                    "label": "Show provider image",
+                    "label_ar": "إظهار صورة مقدم الخدمة",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_headline",
+                    "label": "Show headline",
+                    "label_ar": "إظهار العنوان الفرعي",
+                    "default": true
+                }
+            ],
+            "defaults": {
+                "show_image": true,
+                "show_headline": true
+            }
+        },
+        {
+            "slug": "service-catalog-portfolio",
+            "name": {
+                "en": "Portfolio Listing",
+                "ar": "قائمة معرض الأعمال"
+            },
+            "category": "service-catalog",
+            "template": "sections/service-catalog-portfolio.liquid",
+            "sort_order": 35,
+            "reusable": false,
+            "page_types": [
+                "service-portfolio"
+            ],
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "show_heading",
+                    "label": "Show page heading",
+                    "label_ar": "إظهار عنوان الصفحة",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_description",
+                    "label": "Show project descriptions",
+                    "label_ar": "إظهار وصف المشاريع",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_services",
+                    "label": "Show linked services",
+                    "label_ar": "إظهار الخدمات المرتبطة",
+                    "default": true
+                },
+                {
+                    "type": "range",
+                    "id": "images_per_item",
+                    "label": "Images per project",
+                    "label_ar": "عدد الصور لكل مشروع",
+                    "min": 1,
+                    "max": 24,
+                    "default": 12
+                }
+            ],
+            "defaults": {
+                "show_heading": true,
+                "show_description": true,
+                "show_services": true,
+                "images_per_item": 12
+            }
+        },
+        {
+            "slug": "service-catalog-category",
+            "name": {
+                "en": "Service Category",
+                "ar": "تصنيف الخدمة"
+            },
+            "category": "service-catalog",
+            "template": "sections/service-catalog-category.liquid",
+            "sort_order": 36,
+            "reusable": false,
+            "page_types": [
+                "service-category"
+            ],
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "show_image",
+                    "label": "Show category image",
+                    "label_ar": "إظهار صورة التصنيف",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_images",
+                    "label": "Show service images",
+                    "label_ar": "إظهار صور الخدمات",
+                    "default": true
+                },
+                {
+                    "type": "select",
+                    "id": "columns",
+                    "label": "Columns",
+                    "label_ar": "الأعمدة",
+                    "default": "3",
+                    "options": [
+                        {
+                            "value": "2",
+                            "label": "Two",
+                            "label_ar": "اثنان"
+                        },
+                        {
+                            "value": "3",
+                            "label": "Three",
+                            "label_ar": "ثلاثة"
+                        },
+                        {
+                            "value": "4",
+                            "label": "Four",
+                            "label_ar": "أربعة"
+                        }
+                    ]
+                }
+            ],
+            "defaults": {
+                "show_image": true,
+                "show_images": true,
+                "columns": "3"
+            }
+        },
+        {
+            "slug": "service-catalog-category-services",
+            "name": {
+                "en": "Service Categories",
+                "ar": "تصنيفات الخدمات"
+            },
+            "category": "service-catalog",
+            "template": "sections/service-catalog-category-services.liquid",
+            "sort_order": 37,
+            "reusable": true,
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "heading",
+                    "label": "Section Heading",
+                    "label_ar": "عنوان القسم",
+                    "default": "Our service categories"
+                },
+                {
+                    "type": "text",
+                    "id": "heading_ar",
+                    "label": "Section Heading (Arabic)",
+                    "label_ar": "عنوان القسم (بالعربية)",
+                    "default": "تصنيفات خدماتنا"
+                },
+                {
+                    "type": "service_category_picker",
+                    "id": "selected_categories",
+                    "label": "Select Service Categories",
+                    "label_ar": "اختر تصنيفات الخدمات",
+                    "multiple": true
+                },
+                {
+                    "type": "range",
+                    "id": "services_per_category",
+                    "label": "Services per category",
+                    "label_ar": "عدد الخدمات لكل تصنيف",
+                    "min": 1,
+                    "max": 24,
+                    "default": 6
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_description",
+                    "label": "Show category descriptions",
+                    "label_ar": "إظهار وصف التصنيفات",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_images",
+                    "label": "Show service images",
+                    "label_ar": "إظهار صور الخدمات",
+                    "default": true
+                },
+                {
+                    "type": "select",
+                    "id": "columns",
+                    "label": "Columns",
+                    "label_ar": "الأعمدة",
+                    "default": "3",
+                    "options": [
+                        {
+                            "value": "2",
+                            "label": "Two",
+                            "label_ar": "اثنان"
+                        },
+                        {
+                            "value": "3",
+                            "label": "Three",
+                            "label_ar": "ثلاثة"
+                        },
+                        {
+                            "value": "4",
+                            "label": "Four",
+                            "label_ar": "أربعة"
+                        }
+                    ]
+                }
+            ],
+            "defaults": {
+                "heading": "Our service categories",
+                "heading_ar": "تصنيفات خدماتنا",
+                "services_per_category": 6,
+                "show_description": true,
+                "show_images": true,
+                "columns": "3"
+            }
         }
     ]
 }

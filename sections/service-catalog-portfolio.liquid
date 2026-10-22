@@ -1,0 +1,55 @@
+<section class="gl-section service-catalog-section service-catalog-portfolio" data-service-catalog-surface="service-portfolio">
+  <div class="gl-container">
+    {% if section.settings.show_heading != false %}
+      <header class="service-catalog-heading">
+        <p class="service-catalog-eyebrow">{{ 'service_catalog.portfolio.eyebrow' | t }}</p>
+        <h1>{{ 'service_catalog.portfolio.title' | t }}</h1>
+        <p>{{ 'service_catalog.portfolio.intro' | t }}</p>
+      </header>
+    {% endif %}
+
+    {% if service_catalog.portfolio.size > 0 %}
+      <div class="service-catalog-portfolio__list">
+        {% for item in service_catalog.portfolio %}
+          <article class="service-catalog-portfolio__item" id="portfolio-{{ item.id }}">
+            <div class="service-catalog-portfolio__content">
+              <h2>{{ item.title }}</h2>
+              {% if section.settings.show_description != false and item.description != blank %}<div class="service-catalog-richtext">{{ item.description }}</div>{% endif %}
+              {% if section.settings.show_services != false and item.services.size > 0 %}
+                <ul class="service-catalog-inline-links" aria-label="{{ 'service_catalog.portfolio.services' | t }}">
+                  {% for service in item.services %}<li><a href="{{ service.url }}">{{ service.name }}</a></li>{% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+
+            {% if item.gallery.size > 0 %}
+              <div class="service-catalog-portfolio__gallery" data-service-catalog-gallery>
+                {% for image in item.gallery limit: section.settings.images_per_item %}
+                  <img src="{{ image }}" alt="{{ item.title }}" width="640" height="400" loading="lazy" decoding="async" tabindex="0" role="button" data-service-catalog-gallery-image>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="service-catalog-empty">{{ 'service_catalog.portfolio.empty' | t }}</p>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": { "en": "Portfolio Listing", "ar": "قائمة معرض الأعمال" },
+  "category": "service-catalog",
+  "reusable": false,
+  "page_types": ["service-portfolio"],
+  "settings": [
+    { "type": "checkbox", "id": "show_heading", "label": "Show page heading", "label_ar": "إظهار عنوان الصفحة", "default": true },
+    { "type": "checkbox", "id": "show_description", "label": "Show project descriptions", "label_ar": "إظهار وصف المشاريع", "default": true },
+    { "type": "checkbox", "id": "show_services", "label": "Show linked services", "label_ar": "إظهار الخدمات المرتبطة", "default": true },
+    { "type": "range", "id": "images_per_item", "label": "Images per project", "label_ar": "عدد الصور لكل مشروع", "min": 1, "max": 24, "default": 12 }
+  ],
+  "defaults": { "show_heading": true, "show_description": true, "show_services": true, "images_per_item": 12 }
+}
+{% endschema %}

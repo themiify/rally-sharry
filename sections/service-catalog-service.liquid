@@ -39,16 +39,50 @@
 
 {% schema %}
 {
-  "name": { "en": "Service Detail", "ar": "تفاصيل الخدمة" },
-  "category": "service-catalog",
-  "reusable": false,
-  "page_types": ["service"],
-  "settings": [
-    { "type": "checkbox", "id": "show_image", "label": "Show service image", "label_ar": "إظهار صورة الخدمة", "default": true },
-    { "type": "checkbox", "id": "show_gallery", "label": "Show gallery", "label_ar": "إظهار المعرض", "default": true },
-    { "type": "checkbox", "id": "show_sections", "label": "Show service sections", "label_ar": "إظهار أقسام الخدمة", "default": true },
-    { "type": "checkbox", "id": "show_team", "label": "Show team members", "label_ar": "إظهار أعضاء الفريق", "default": true }
-  ],
-  "defaults": { "show_image": true, "show_gallery": true, "show_sections": true, "show_team": true }
+    "name": {
+        "en": "Service Detail",
+        "ar": "تفاصيل الخدمة"
+    },
+    "category": "service-catalog",
+    "reusable": false,
+    "page_types": [
+        "service"
+    ],
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "show_image",
+            "label": "Show service image",
+            "label_ar": "إظهار صورة الخدمة",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_gallery",
+            "label": "Show gallery",
+            "label_ar": "إظهار المعرض",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_sections",
+            "label": "Show service sections",
+            "label_ar": "إظهار أقسام الخدمة",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_team",
+            "label": "Show team members",
+            "label_ar": "إظهار أعضاء الفريق",
+            "default": true
+        }
+    ],
+    "defaults": {
+        "show_image": true,
+        "show_gallery": true,
+        "show_sections": true,
+        "show_team": true
+    }
 }
 {% endschema %}

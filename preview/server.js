@@ -9,7 +9,7 @@ const { Liquid } = require('liquidjs');
 const chokidar = require('chokidar');
 const { WebSocketServer } = require('ws');
 
-const { buildContext, resolveCategoryCards, mockResolveBlogCards, MOCK_CATEGORIES, makeBlogCard, makeProductCard, DEFAULT_PAGE_SECTIONS } = require('./mock/context');
+const { buildContext, resolveCategoryCards, mockResolveBlogCards, mockResolveServiceCategories, MOCK_CATEGORIES, makeBlogCard, makeProductCard, DEFAULT_PAGE_SECTIONS } = require('./mock/context');
 const { registerMockApis } = require('./mock/api');
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
@@ -354,6 +354,12 @@ async function renderPage(ctx, sectionSettingsMap, pageSections, layoutSlots, cs
                                 itemResolved[subField.id] = IS_API_MODE && subIds.length
                                     ? await resolvePickerData('blogs/resolve', { ids: subIds })
                                     : mockResolveBlogCards(subIds, locale);
+                            } else if (subField.type === 'service_picker' || subField.type === 'team_picker') {
+                                const catalogKey = subField.type === 'service_picker' ? 'services' : 'team';
+                                itemResolved[subField.id] = (ctx.service_catalog?.[catalogKey] || [])
+                                    .filter(card => subIds.includes(Number(card.id)));
+                            } else if (subField.type === 'service_category_picker') {
+                                itemResolved[subField.id] = mockResolveServiceCategories(subIds, locale);
                             } else if (subField.type === 'product' && subField.resolved === true) {
                                 itemResolved[subField.id] = IS_API_MODE && subIds.length
                                     ? await fetchStorefrontApiData('products/resolve', { ids: subIds })
@@ -517,7 +523,7 @@ function getFieldDefault(field) {
     if (Object.prototype.hasOwnProperty.call(field, 'default')) return field.default;
     if (field.type === 'checkbox') return false;
     if (field.type === 'repeater') return [];
-    if (['product', 'category', 'category_picker', 'blog_picker'].includes(field.type)) return field.multiple === true ? [] : null;
+    if (['product', 'category', 'category_picker', 'blog_picker', 'service_picker', 'team_picker', 'service_category_picker'].includes(field.type)) return field.multiple === true ? [] : null;
     if (field.type === 'spacing') return { top: 0, right: 0, bottom: 0, left: 0 };
     return '';
 }
@@ -787,7 +793,7 @@ app.get('/customizer', (req, res) => {
     const previewUrl = `/?page=${encodeURIComponent(page)}&locale=${encodeURIComponent(locale)}${slug ? '&slug=' + encodeURIComponent(slug) : ''}`;
     ejs.renderFile(
         path.join(__dirname, 'views', 'customizer.ejs'),
-        { page, locale, slug, previewUrl, dataMode: PREVIEW_DATA_MODE, apiBase: PREVIEW_API_BASE || 'mock/local only', surfaces: ['home', 'product', 'category', 'search', 'cart', 'services', 'service', 'team', 'team-member', 'contact-us', 'about-us', 'cms', 'custom', '404'] },
+        { page, locale, slug, previewUrl, dataMode: PREVIEW_DATA_MODE, apiBase: PREVIEW_API_BASE || 'mock/local only', surfaces: ['home', 'product', 'category', 'search', 'cart', 'services', 'service', 'service-portfolio', 'service-category', 'team', 'team-member', 'contact-us', 'about-us', 'cms', 'custom', '404'] },
         (err, html) => {
             if (err) { res.status(500).send('<pre>' + err.message + '</pre>'); return; }
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -800,7 +806,7 @@ app.get('/__preview/api/demo/*', proxyDeveloperPreview);
 
 // ─── Picker APIs ──────────────────────────────────────────────────────────────
 
-const PICKER_TYPES = ['products', 'categories', 'blogs'];
+const PICKER_TYPES = ['products', 'categories', 'blogs', 'services', 'service-categories', 'team', 'pages'];
 
 function mockPickerProducts(query, excludeIds) {
     const results = [];
@@ -829,6 +835,41 @@ function mockPickerBlogs(query, excludeIds) {
         .slice(0, 20);
 }
 
+function mockPickerPages(query, excludeIds) {
+    return Array.from({ length: 5 }, (_, i) => ({
+        id: i + 1,
+        name: `Custom page ${i + 1}`,
+        slug: `custom-page-${i + 1}`,
+        image: null,
+    }))
+        .filter(item => !excludeIds.includes(item.id))
+        .filter(item => !query || item.name.toLowerCase().includes(query.toLowerCase()) || item.slug.includes(query.toLowerCase()))
+        .slice(0, 20);
+}
+
+function mockPickerServiceCategories(query, excludeIds) {
+    return mockResolveServiceCategories([1, 2], 'en')
+        .map(({ id, name, slug }) => ({ id, name, slug, image: `https://picsum.photos/seed/service-category${id}/120/120` }))
+        .filter(item => !excludeIds.includes(item.id))
+        .filter(item => !query || item.name.toLowerCase().includes(query.toLowerCase()) || item.slug.includes(query.toLowerCase()));
+}
+
+function mockPickerCatalog(type, query, excludeIds) {
+    const items = Array.from({ length: 8 }, (_, i) => {
+        const id = i + 1;
+        const isService = type === 'services';
+        return {
+            id,
+            name: `${isService ? 'Service' : 'Team member'} ${id}`,
+            slug: `${isService ? 'service' : 'team-member'}-${id}`,
+            image: `https://picsum.photos/seed/${isService ? 'service' : 'team'}${id}/120/120`,
+        };
+    });
+    return items.filter(item => !excludeIds.includes(item.id))
+        .filter(item => !query || item.name.toLowerCase().includes(query.toLowerCase()) || item.slug.includes(query.toLowerCase()))
+        .slice(0, 20);
+}
+
 async function resolvePickerData(endpoint, query) {
     if (IS_API_MODE) return fetchDeveloperPreviewData(`picker/${endpoint}`, query);
     const q = (query.query || '').trim();
@@ -840,6 +881,14 @@ async function resolvePickerData(endpoint, query) {
     if (endpoint === 'categories/resolve') return resolveCategoryCards(ids, 'en');
     if (endpoint === 'blogs') return mockPickerBlogs(q, excludeIds);
     if (endpoint === 'blogs/resolve') return mockResolveBlogCards(ids, 'en').map(b => ({ id: b.id, name: b.title, slug: b.slug, image: b.image }));
+    if (endpoint === 'pages') return mockPickerPages(q, excludeIds);
+    if (endpoint === 'pages/resolve') return mockPickerPages('', []).filter(item => ids.includes(item.id));
+    if (endpoint === 'services') return mockPickerCatalog('services', q, excludeIds);
+    if (endpoint === 'services/resolve') return mockPickerCatalog('services', '', []).filter(item => ids.includes(item.id));
+    if (endpoint === 'team') return mockPickerCatalog('team', q, excludeIds);
+    if (endpoint === 'team/resolve') return mockPickerCatalog('team', '', []).filter(item => ids.includes(item.id));
+    if (endpoint === 'service-categories') return mockPickerServiceCategories(q, excludeIds);
+    if (endpoint === 'service-categories/resolve') return mockPickerServiceCategories('', []).filter(item => ids.includes(item.id));
     return [];
 }
 
@@ -857,8 +906,13 @@ app.get('/__preview/api/picker/link/resolve', async (req, res) => {
         if (IS_API_MODE) { const data = await fetchDeveloperPreviewData('picker/link/resolve', req.query); res.json({ url: typeof data === 'string' ? data : (data?.url || '') }); return; }
         const type = req.query.type || 'custom', id = parseInt(req.query.id || 0, 10), url = req.query.url || '';
         if (type === 'custom') { res.json({ url }); return; }
+        if (type === 'surface') {
+            const surfaces = { home: '/', search: '/search', cart: '/checkout/cart', services: '/services', team: '/team', 'about-us': '/about-us' };
+            res.json({ url: surfaces[req.query.value] || '' });
+            return;
+        }
         if (!id) { res.json({ url: '' }); return; }
-        const mockUrls = { category: `/categories/${id}`, product: `/products/beauty-product-${id}`, blog: `/blogs/article-${id}` };
+        const mockUrls = { category: `/categories/${id}`, product: `/products/beauty-product-${id}`, blog: `/blogs/article-${id}`, page: `/page/page-${id}` };
         res.json({ url: mockUrls[type] || '' });
     } catch (err) { res.status(502).json({ error: err.message }); }
 });

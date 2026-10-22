@@ -25,6 +25,7 @@
 {%- endif %}
 {% assign related_count = section.settings.related_count | default: 4 %}
 {% assign primary_image = product.base_image.url | default: product.image %}
+{% assign primary_image_alt = product.images[0].alt | default: product.base_image.alt | default: product.name %}
 {% assign related_items = product.related_products | default: related_products %}
 {% assign up_sell_items = product.up_sell_products | default: up_sell_products %}
 {% assign sold_out_label = translations.product.sold_out | default: 'Sold Out' %}
@@ -110,7 +111,7 @@
       <div class="gl-product-gallery {% if product.images.size > 1 %}has-multiple-images{% endif %}">
         <div class="gl-product-gallery-main">
           {% if primary_image != blank %}
-            <img src="{{ primary_image }}" alt="{{ product.name }}" id="glMainProductImage">
+            <img src="{{ primary_image }}" alt="{{ primary_image_alt }}" id="glMainProductImage">
             <button type="button" class="gl-gallery-zoom-btn" id="glZoomBtn" aria-label="zoom">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M13 8C13.2652 7.99994 13.5195 7.89455 13.707 7.707L18 3.414V6C18 6.26522 18.1054 6.51957 18.2929 6.70711C18.4804 6.89464 18.7348 7 19 7C19.2652 7 19.5196 6.89464 19.7071 6.70711C19.8946 6.51957 20 6.26522 20 6V1C20 0.734784 19.8946 0.48043 19.7071 0.292893C19.5196 0.105357 19.2652 0 19 0H14C13.7348 0 13.4804 0.105357 13.2929 0.292893C13.1054 0.48043 13 0.734784 13 1C13 1.26522 13.1054 1.51957 13.2929 1.70711C13.4804 1.89464 13.7348 2 14 2H16.586L12.293 6.293C12.1532 6.43285 12.058 6.61102 12.0194 6.80497C11.9808 6.99892 12.0007 7.19995 12.0763 7.38265C12.152 7.56535 12.2801 7.72152 12.4445 7.8314C12.609 7.94129 12.8022 7.99996 13 8ZM1 20H6C6.26522 20 6.51957 19.8946 6.70711 19.7071C6.89464 19.5196 7 19.2652 7 19C7 18.7348 6.89464 18.4804 6.70711 18.2929C6.51957 18.1054 6.26522 18 6 18H3.414L7.707 13.707C7.88916 13.5184 7.98995 13.2658 7.98767 13.0036C7.9854 12.7414 7.88023 12.4906 7.69482 12.3052C7.50941 12.1198 7.2586 12.0146 6.9964 12.0123C6.7342 12.01 6.4816 12.1108 6.293 12.293L2 16.586V14C2 13.7348 1.89464 13.4804 1.70711 13.2929C1.51957 13.1054 1.26522 13 1 13C0.734784 13 0.48043 13.1054 0.292893 13.2929C0.105357 13.4804 0 13.7348 0 14V19C0 19.2652 0.105357 19.5196 0.292893 19.7071C0.48043 19.8946 0.734784 20 1 20Z" fill="var(--gl-primary)"/>
@@ -157,18 +158,28 @@
           {% endif %}
         </div>
 
-        {% if product.images.size > 1 %}
+        {% if product.images.size > 1 or product.videos.size > 0 %}
           <div class="gl-product-gallery-thumbs">
             {% for img in product.images %}
               <img
+                data-gl-gallery-media
+                data-media-type="image"
                 src="{{ img.small_url }}"
-                alt="{{ product.name }}"
+                alt="{{ img.alt | default: product.name }}"
                 loading="lazy"
                 data-full="{{ img.url }}"
+                data-alt="{{ img.alt | default: product.name }}"
                 {% if forloop.first %}
                   class="active"
                 {% endif %}
               >
+            {% endfor %}
+            {% for video in product.videos %}
+              <button type="button" data-gl-gallery-media data-media-type="video" data-full="{{ video.url }}" data-alt="{{ product.name }}" aria-label="{{ product.name }}">
+                <video muted playsinline preload="metadata">
+                  <source src="{{ video.url }}" type="video/mp4">
+                </video>
+              </button>
             {% endfor %}
           </div>
         {% endif %}
@@ -1297,6 +1308,45 @@
           dropdown.classList.add('active');
           this.classList.add('active');
         }
+      });
+    });
+
+    const galleryMain = document.querySelector('.gl-product-gallery-main');
+    const galleryMedia = document.querySelectorAll('[data-gl-gallery-media]');
+
+    galleryMedia.forEach(function (media) {
+      media.addEventListener('click', function () {
+        const type = this.dataset.mediaType;
+        const url = this.dataset.full || '';
+        const alt = this.dataset.alt || '{{ product.name }}';
+        const image = document.getElementById('glMainProductImage');
+        let video = document.getElementById('glMainProductVideo');
+
+        galleryMedia.forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+
+        if (type === 'video') {
+          if (!video) {
+            video = document.createElement('video');
+            video.id = 'glMainProductVideo';
+            video.controls = true;
+            video.style.width = '100%';
+            galleryMain.appendChild(video);
+          }
+
+          image.style.display = 'none';
+          video.style.display = 'block';
+          video.setAttribute('alt', alt);
+          video.setAttribute('aria-label', alt);
+          video.src = url;
+          video.load();
+          return;
+        }
+
+        image.style.display = '';
+        image.src = url;
+        image.alt = alt;
+        if (video) video.style.display = 'none';
       });
     });
 

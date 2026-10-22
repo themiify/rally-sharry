@@ -198,6 +198,20 @@
             "empty": "No team members are available yet.",
             "unavailable": "This team member is not available."
         },
+        "portfolio": {
+            "eyebrow": "Our work",
+            "title": "Portfolio",
+            "intro": "Selected work from our recent projects",
+            "services": "Services related to this work",
+            "empty": "No portfolio items are published yet."
+        },
+        "category": {
+            "eyebrow": "Service category",
+            "services": "Services in this category",
+            "view_all": "View all services",
+            "empty": "No services are published in this category yet.",
+            "unavailable": "This service category is not available."
+        },
         "resume": {
             "experience": "Experience",
             "education": "Education",

@@ -12,6 +12,41 @@
       </div>
     </div>
 
+    {% if section.settings.show_contact != false %}
+      {% if service_catalog.team_member.phone != blank or service_catalog.team_member.email != blank %}
+        <div class="service-catalog-contact">
+          {% if service_catalog.team_member.phone != blank %}
+            <a href="tel:{{ service_catalog.team_member.phone_tel | default: service_catalog.team_member.phone }}">
+              <span>{{ 'service_catalog.contact.phone' | t }}</span>
+              <strong dir="ltr">{{ service_catalog.team_member.phone }}</strong>
+            </a>
+          {% endif %}
+          {% if service_catalog.team_member.email != blank %}
+            <a href="mailto:{{ service_catalog.team_member.email }}">
+              <span>{{ 'service_catalog.contact.email' | t }}</span>
+              <strong>{{ service_catalog.team_member.email }}</strong>
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    {% if section.settings.show_social != false and service_catalog.team_member.social_links.size > 0 %}
+      {% assign social_platforms = 'website,linkedin,twitter,facebook,instagram,whatsapp,snapchat,youtube,tiktok' | split: ',' %}
+      <div class="service-catalog-social">
+        <h2>{{ 'service_catalog.contact.social' | t }}</h2>
+        <div class="service-catalog-social__links">
+          {% for platform in social_platforms %}
+            {% assign social_url = service_catalog.team_member.social_links[platform] %}
+            {% if social_url != blank %}
+              {% assign social_label = 'service_catalog.social.' | append: platform %}
+              <a href="{{ social_url }}" target="_blank" rel="noopener noreferrer">{{ social_label | t }}</a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
     {% if section.settings.show_resume != false and service_catalog.team_member.resume %}
       {% for resume_type in 'experience,education,certificates' | split: ',' %}
         {% assign entries = service_catalog.team_member.resume[resume_type] %}
@@ -33,15 +68,58 @@
 
 {% schema %}
 {
-  "name": { "en": "Team Member", "ar": "عضو الفريق" },
-  "category": "service-catalog",
-  "reusable": false,
-  "page_types": ["team-member"],
-  "settings": [
-    { "type": "checkbox", "id": "show_image", "label": "Show member image", "label_ar": "إظهار صورة العضو", "default": true },
-    { "type": "checkbox", "id": "show_resume", "label": "Show resume", "label_ar": "إظهار السيرة الذاتية", "default": true },
-    { "type": "checkbox", "id": "show_services", "label": "Show services", "label_ar": "إظهار الخدمات", "default": true }
-  ],
-  "defaults": { "show_image": true, "show_resume": true, "show_services": true }
+    "name": {
+        "en": "Team Member",
+        "ar": "عضو الفريق"
+    },
+    "category": "service-catalog",
+    "reusable": false,
+    "page_types": [
+        "team-member"
+    ],
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "show_image",
+            "label": "Show member image",
+            "label_ar": "إظهار صورة العضو",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_contact",
+            "label": "Show contact details",
+            "label_ar": "إظهار بيانات التواصل",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_social",
+            "label": "Show social links",
+            "label_ar": "إظهار روابط التواصل الاجتماعي",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_resume",
+            "label": "Show resume",
+            "label_ar": "إظهار السيرة الذاتية",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_services",
+            "label": "Show services",
+            "label_ar": "إظهار الخدمات",
+            "default": true
+        }
+    ],
+    "defaults": {
+        "show_image": true,
+        "show_contact": true,
+        "show_social": true,
+        "show_resume": true,
+        "show_services": true
+    }
 }
 {% endschema %}

@@ -6,6 +6,19 @@
       <h1>{{ service_catalog.profile.team_title | default: service_catalog.profile.name }}</h1>
       {% if service_catalog.profile.team_intro != blank %}<p>{{ service_catalog.profile.team_intro }}</p>{% endif %}
     </header>
+
+    {% if section.settings.show_story != false %}
+      {% if service_catalog.profile.team_story_title != blank or service_catalog.profile.team_story_body != blank or service_catalog.profile.team_story_image != blank %}
+        <div class="service-catalog-story">
+          <div class="service-catalog-story__content">
+            {% if service_catalog.profile.team_story_title != blank %}<h2>{{ service_catalog.profile.team_story_title }}</h2>{% endif %}
+            {% if service_catalog.profile.team_story_body != blank %}<div class="service-catalog-story__body">{{ service_catalog.profile.team_story_body | newline_to_br }}</div>{% endif %}
+          </div>
+          {% if service_catalog.profile.team_story_image != blank %}<img src="{{ service_catalog.profile.team_story_image }}" alt="{{ service_catalog.profile.team_story_title | default: service_catalog.profile.team_title }}" loading="lazy">{% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
+
     {% if service_catalog.team.size > 0 %}
       <div class="service-catalog-grid service-catalog-grid--{{ section.settings.columns }}">
         {% for member in service_catalog.team %}
@@ -29,14 +42,59 @@
 
 {% schema %}
 {
-  "name": { "en": "Team Listing", "ar": "قائمة الفريق" },
-  "category": "service-catalog",
-  "reusable": false,
-  "page_types": ["team"],
-  "settings": [
-    { "type": "checkbox", "id": "show_images", "label": "Show member images", "label_ar": "إظهار صور الأعضاء", "default": true },
-    { "type": "select", "id": "columns", "label": "Columns", "label_ar": "الأعمدة", "default": "3", "options": [{ "value": "2", "label": "Two", "label_ar": "اثنان" }, { "value": "3", "label": "Three", "label_ar": "ثلاثة" }, { "value": "4", "label": "Four", "label_ar": "أربعة" }] }
-  ],
-  "defaults": { "show_images": true, "columns": "3" }
+    "name": {
+        "en": "Team Listing",
+        "ar": "قائمة الفريق"
+    },
+    "category": "service-catalog",
+    "reusable": false,
+    "page_types": [
+        "team"
+    ],
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "show_story",
+            "label": "Show team story",
+            "label_ar": "إظهار قصة الفريق",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_images",
+            "label": "Show member images",
+            "label_ar": "إظهار صور الأعضاء",
+            "default": true
+        },
+        {
+            "type": "select",
+            "id": "columns",
+            "label": "Columns",
+            "label_ar": "الأعمدة",
+            "default": "3",
+            "options": [
+                {
+                    "value": "2",
+                    "label": "Two",
+                    "label_ar": "اثنان"
+                },
+                {
+                    "value": "3",
+                    "label": "Three",
+                    "label_ar": "ثلاثة"
+                },
+                {
+                    "value": "4",
+                    "label": "Four",
+                    "label_ar": "أربعة"
+                }
+            ]
+        }
+    ],
+    "defaults": {
+        "show_story": true,
+        "show_images": true,
+        "columns": "3"
+    }
 }
 {% endschema %}

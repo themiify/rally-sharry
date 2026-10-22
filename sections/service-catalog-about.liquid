@@ -18,14 +18,34 @@
 
 {% schema %}
 {
-  "name": { "en": "About Provider", "ar": "نبذة عن مقدم الخدمة" },
-  "category": "service-catalog",
-  "reusable": false,
-  "page_types": ["about-us"],
-  "settings": [
-    { "type": "checkbox", "id": "show_image", "label": "Show provider image", "label_ar": "إظهار صورة مقدم الخدمة", "default": true },
-    { "type": "checkbox", "id": "show_headline", "label": "Show headline", "label_ar": "إظهار العنوان الفرعي", "default": true }
-  ],
-  "defaults": { "show_image": true, "show_headline": true }
+    "name": {
+        "en": "About Provider",
+        "ar": "نبذة عن مقدم الخدمة"
+    },
+    "category": "service-catalog",
+    "reusable": false,
+    "page_types": [
+        "about-us"
+    ],
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "show_image",
+            "label": "Show provider image",
+            "label_ar": "إظهار صورة مقدم الخدمة",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_headline",
+            "label": "Show headline",
+            "label_ar": "إظهار العنوان الفرعي",
+            "default": true
+        }
+    ],
+    "defaults": {
+        "show_image": true,
+        "show_headline": true
+    }
 }
 {% endschema %}

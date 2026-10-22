@@ -18,6 +18,11 @@
   {% endif %}
 {% endfor %}
 
+{% assign current_path = request.path | default: '/' %}
+{% unless current_path == '/' %}
+  {% assign current_path = '/' | append: current_path %}
+{% endunless %}
+
 <div class="gl-channel-switchers">
   {% if shop.currencies.size > 1 %}
     <div class="gl-lang-dropdown gl-currency-dropdown">
@@ -34,19 +39,25 @@
         </svg>
       </button>
       <div class="gl-lang-dropdown-menu">
-        {% for currency in shop.currencies %}
-          <a
-            href="?currency={{ currency.code }}"
-            class="gl-lang-dropdown-item gs-price {% if currency.code == shop.currency %}active{% endif %}"
-          >
-            <span>{{ currency.symbol }} {{ currency.code }}</span>
-            {% if currency.code == shop.currency %}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            {% endif %}
-          </a>
-        {% endfor %}
+        <form method="POST" action="/storefront/preferences">
+          <input type="hidden" name="_token" value="{{ csrf_token }}">
+          <input type="hidden" name="redirect_to" value="{{ current_path }}">
+          {% for currency in shop.currencies %}
+            <button
+              type="submit"
+              name="currency"
+              value="{{ currency.code }}"
+              class="gl-lang-dropdown-item gs-price {% if currency.code == shop.currency %}active{% endif %}"
+            >
+              <span>{{ currency.symbol }} {{ currency.code }}</span>
+              {% if currency.code == shop.currency %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              {% endif %}
+            </button>
+          {% endfor %}
+        </form>
       </div>
     </div>
   {% endif %}
@@ -68,7 +79,8 @@
       <div class="gl-lang-dropdown-menu">
         {% for locale in shop.locales %}
           <a
-            href="?locale={{ locale.code }}"
+            href="{{ current_path }}?locale={{ locale.code }}"
+            rel="nofollow"
             class="gl-lang-dropdown-item {% if locale.code == shop.locale %}active{% endif %}"
           >
             <span>{{ locale.name }}</span>

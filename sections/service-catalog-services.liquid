@@ -1,4 +1,3 @@
-{% if service_catalog.profile.name != blank or service_catalog.services.size > 0 %}
 <section class="gl-section service-catalog-section service-catalog-services" data-service-catalog-surface="services">
   <div class="gl-container">
     {% if section.settings.show_profile != false and service_catalog.profile.name != blank %}
@@ -9,17 +8,22 @@
       </header>
     {% endif %}
 
+    {% if section.settings.show_story != false %}
+      {% if service_catalog.profile.services_story_title != blank or service_catalog.profile.services_story_body != blank or service_catalog.profile.services_story_image != blank %}
+        <div class="service-catalog-story">
+          <div class="service-catalog-story__content">
+            {% if service_catalog.profile.services_story_title != blank %}<h2>{{ service_catalog.profile.services_story_title }}</h2>{% endif %}
+            {% if service_catalog.profile.services_story_body != blank %}<div class="service-catalog-story__body">{{ service_catalog.profile.services_story_body | newline_to_br }}</div>{% endif %}
+          </div>
+          {% if service_catalog.profile.services_story_image != blank %}<img src="{{ service_catalog.profile.services_story_image }}" alt="{{ service_catalog.profile.services_story_title | default: service_catalog.profile.services_title }}" loading="lazy">{% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
+
     {% if service_catalog.services.size > 0 %}
       <div class="service-catalog-grid service-catalog-grid--{{ section.settings.columns }}">
         {% for service in service_catalog.services %}
-          <article class="service-catalog-card">
-            {% if section.settings.show_images != false and service.image != blank %}<img src="{{ service.image }}" alt="{{ service.name }}" loading="lazy">{% endif %}
-            <div class="service-catalog-card__body">
-              <h2><a href="{{ service.url }}">{{ service.name }}</a></h2>
-              {% if service.excerpt != blank %}<p>{{ service.excerpt }}</p>{% endif %}
-              <a class="service-catalog-link" href="{{ service.url }}">{{ 'service_catalog.services.view' | t }}</a>
-            </div>
-          </article>
+          {% render 'service-catalog-service-card', service: service, show_images: section.settings.show_images %}
         {% endfor %}
       </div>
     {% else %}
@@ -27,19 +31,67 @@
     {% endif %}
   </div>
 </section>
-{% endif %}
 
 {% schema %}
 {
-  "name": { "en": "Services Listing", "ar": "قائمة الخدمات" },
-  "category": "service-catalog",
-  "reusable": false,
-  "page_types": ["services"],
-  "settings": [
-    { "type": "checkbox", "id": "show_profile", "label": "Show provider intro", "label_ar": "إظهار مقدمة مقدم الخدمة", "default": true },
-    { "type": "checkbox", "id": "show_images", "label": "Show service images", "label_ar": "إظهار صور الخدمات", "default": true },
-    { "type": "select", "id": "columns", "label": "Columns", "label_ar": "الأعمدة", "default": "3", "options": [{ "value": "2", "label": "Two", "label_ar": "اثنان" }, { "value": "3", "label": "Three", "label_ar": "ثلاثة" }, { "value": "4", "label": "Four", "label_ar": "أربعة" }] }
-  ],
-  "defaults": { "show_profile": true, "show_images": true, "columns": "3" }
+    "name": {
+        "en": "Services Listing",
+        "ar": "قائمة الخدمات"
+    },
+    "category": "service-catalog",
+    "reusable": true,
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "show_profile",
+            "label": "Show provider intro",
+            "label_ar": "إظهار مقدمة مقدم الخدمة",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_story",
+            "label": "Show services story",
+            "label_ar": "إظهار قصة الخدمات",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_images",
+            "label": "Show service images",
+            "label_ar": "إظهار صور الخدمات",
+            "default": true
+        },
+        {
+            "type": "select",
+            "id": "columns",
+            "label": "Columns",
+            "label_ar": "الأعمدة",
+            "default": "3",
+            "options": [
+                {
+                    "value": "2",
+                    "label": "Two",
+                    "label_ar": "اثنان"
+                },
+                {
+                    "value": "3",
+                    "label": "Three",
+                    "label_ar": "ثلاثة"
+                },
+                {
+                    "value": "4",
+                    "label": "Four",
+                    "label_ar": "أربعة"
+                }
+            ]
+        }
+    ],
+    "defaults": {
+        "show_profile": true,
+        "show_story": true,
+        "show_images": true,
+        "columns": "3"
+    }
 }
 {% endschema %}

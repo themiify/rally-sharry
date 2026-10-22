@@ -1,0 +1,51 @@
+{% if service_catalog.category %}
+{% assign category = service_catalog.category %}
+<section class="gl-section service-catalog-section service-catalog-category" data-service-catalog-surface="service-category">
+  <div class="gl-container">
+    {% if service_catalog.profile.services_url != blank %}<a class="service-catalog-link" href="{{ service_catalog.profile.services_url }}">{{ 'service_catalog.services.back' | t }}</a>{% endif %}
+
+    <header class="service-catalog-heading">
+      <p class="service-catalog-eyebrow">{{ 'service_catalog.category.eyebrow' | t }}</p>
+      <h1>{{ category.name }}</h1>
+      {% if category.description != blank %}<p>{{ category.description }}</p>{% endif %}
+    </header>
+
+    {% if section.settings.show_image != false and category.image != blank %}
+      <img class="service-catalog-category__image" src="{{ category.image }}" alt="{{ category.name }}" width="1200" height="600" loading="eager" fetchpriority="high" decoding="async">
+    {% endif %}
+
+    {% if category.services.size > 0 %}
+      <h2 class="service-catalog-category__services-title">{{ 'service_catalog.category.services' | t }}</h2>
+      <div class="service-catalog-grid service-catalog-grid--{{ section.settings.columns }}">
+        {% for service in category.services %}
+          {% render 'service-catalog-service-card', service: service, show_images: section.settings.show_images, heading_level: 3 %}
+        {% endfor %}
+      </div>
+
+      {% comment %}The context caps the listed services; offer the full catalog when more are published.{% endcomment %}
+      {% if category.services_total > category.services.size and service_catalog.profile.services_url != blank %}
+        <p class="service-catalog-more"><a class="service-catalog-link" href="{{ service_catalog.profile.services_url }}">{{ 'service_catalog.category.view_all' | t }}</a></p>
+      {% endif %}
+    {% else %}
+      <p class="service-catalog-empty">{{ 'service_catalog.category.empty' | t }}</p>
+    {% endif %}
+  </div>
+</section>
+{% else %}
+<section class="gl-section service-catalog-section"><div class="gl-container"><p class="service-catalog-empty">{{ 'service_catalog.category.unavailable' | t }}</p></div></section>
+{% endif %}
+
+{% schema %}
+{
+  "name": { "en": "Service Category", "ar": "تصنيف الخدمة" },
+  "category": "service-catalog",
+  "reusable": false,
+  "page_types": ["service-category"],
+  "settings": [
+    { "type": "checkbox", "id": "show_image", "label": "Show category image", "label_ar": "إظهار صورة التصنيف", "default": true },
+    { "type": "checkbox", "id": "show_images", "label": "Show service images", "label_ar": "إظهار صور الخدمات", "default": true },
+    { "type": "select", "id": "columns", "label": "Columns", "label_ar": "الأعمدة", "default": "3", "options": [{ "value": "2", "label": "Two", "label_ar": "اثنان" }, { "value": "3", "label": "Three", "label_ar": "ثلاثة" }, { "value": "4", "label": "Four", "label_ar": "أربعة" }] }
+  ],
+  "defaults": { "show_image": true, "show_images": true, "columns": "3" }
+}
+{% endschema %}

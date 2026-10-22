@@ -65,7 +65,7 @@
           </span>
     </div>
     <div class="">
-        {% render 'channel-switchers', shop: shop, request: request %}
+        {% render 'channel-switchers', shop: shop, request: request, csrf_token: csrf_token %}
     </div>
   </div>
 </div>
@@ -313,7 +313,7 @@
   </nav>
   <!-- Language / currency switchers in mobile -->
   <div class="">
-    {% render 'channel-switchers', shop: shop, request: request %}
+    {% render 'channel-switchers', shop: shop, request: request, csrf_token: csrf_token %}
   </div>
 </div>
 

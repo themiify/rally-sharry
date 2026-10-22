@@ -213,7 +213,7 @@
       </span>
 
       <div class="gl-footer-utilities">
-        {% render 'channel-switchers', shop: shop, request: request %}
+        {% render 'channel-switchers', shop: shop, request: request, csrf_token: csrf_token %}
 
         {% if show_payments and shop.footer_payments.size > 0 %}
           <ul class="gl-footer-payment" aria-label="{% if is_rtl %}طرق الدفع المقبولة{% else %}Accepted payment methods{% endif %}">

@@ -61,6 +61,7 @@
 .service-catalog-card > img {
     display: block;
     width: 100%;
+    height: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
 }
@@ -124,11 +125,62 @@
 .service-catalog-resume__item { padding: 1.25rem; border: 1px solid var(--gl-border, #e5e7eb); border-radius: var(--gl-radius-sm, .5rem); background: var(--gl-bg, #fff); }
 .service-catalog-resume__item h3 { margin: 0; color: var(--gl-heading, #111827); }
 .service-catalog-resume__item p { margin-block: .35rem 0; color: var(--gl-subheading, #6b7280); }
+.service-catalog-story { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: center; gap: clamp(1.5rem, 5vw, 4rem); margin-block: 2.5rem 3rem; }
+.service-catalog-story__content { display: grid; gap: 1.25rem; }
+.service-catalog-story h2,
+.service-catalog-social h2 { margin: 0; color: var(--gl-heading, #111827); font-family: var(--gl-font-heading, inherit); font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1.2; }
+.service-catalog-story__body { color: var(--gl-subheading, #6b7280); font-size: 1.05rem; line-height: 1.8; }
+.service-catalog-story > img { display: block; width: 100%; aspect-ratio: 817 / 383; border-radius: var(--gl-radius-lg, 1rem); object-fit: cover; }
+.service-catalog-contact { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-block-start: 2rem; }
+.service-catalog-contact > a { display: grid; gap: .35rem; min-width: 0; padding: 1rem 1.25rem; border: 1px solid var(--gl-border, #e5e7eb); border-radius: var(--gl-radius-sm, .5rem); background: var(--gl-bg, #fff); color: var(--gl-heading, #111827); }
+.service-catalog-contact span { color: var(--gl-subheading, #6b7280); font-size: .85rem; }
+.service-catalog-contact strong { overflow-wrap: anywhere; }
+.service-catalog-social { display: grid; gap: 1rem; margin-block-start: 2rem; }
+.service-catalog-social h2 { font-size: 1.35rem; }
+.service-catalog-social__links { display: flex; flex-wrap: wrap; gap: .75rem; }
+.service-catalog-social__links a { padding: .65rem 1rem; border: 1px solid var(--gl-border, #e5e7eb); border-radius: 999px; background: var(--gl-bg, #fff); color: var(--gl-primary, #16a34a); font-weight: 700; }
+
+/* Service cards (shared partial) — title size is independent of the semantic heading level. */
+.service-catalog-card .service-catalog-card__title { margin: 0; color: var(--gl-heading, #111827); font-family: var(--gl-font-heading, inherit); font-size: 1.35rem; font-weight: 700; line-height: 1.3; }
+.service-catalog-card__title a { color: inherit; text-decoration: none; }
+.service-catalog-card__title a:hover,
+.service-catalog-card__title a:focus-visible { color: var(--gl-primary, #16a34a); }
+.service-catalog-card .service-catalog-card__excerpt { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; }
+
+/* Portfolio page */
+.service-catalog-portfolio__list { display: grid; gap: clamp(2rem, 5vw, 4rem); }
+.service-catalog-portfolio__item { display: grid; gap: 1.5rem; padding-block-end: clamp(2rem, 5vw, 4rem); border-block-end: 1px solid var(--gl-border, #e5e7eb); scroll-margin-block-start: 6rem; }
+.service-catalog-portfolio__item:last-child { padding-block-end: 0; border-block-end: 0; }
+.service-catalog-portfolio__content { display: grid; gap: 1rem; max-width: 56rem; }
+.service-catalog-portfolio__content h2 { margin: 0; color: var(--gl-heading, #111827); font-family: var(--gl-font-heading, inherit); font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 700; line-height: 1.2; }
+.service-catalog-portfolio__content .service-catalog-inline-links { margin: 0; padding: 0; list-style: none; }
+.service-catalog-portfolio__gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr)); gap: 1rem; }
+.service-catalog-portfolio__gallery img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; border-radius: var(--gl-radius-sm, .5rem); object-fit: cover; cursor: zoom-in; }
+.service-catalog-portfolio__gallery img:focus-visible { outline: 2px solid var(--gl-primary, #16a34a); outline-offset: 2px; }
+
+/* Service category page and category blocks */
+.service-catalog-category .gl-container > .service-catalog-link { display: inline-block; margin-block-end: 1.5rem; }
+.service-catalog-category__image { display: block; width: 100%; height: auto; max-height: 30rem; margin-block-end: 2.5rem; border-radius: var(--gl-radius-lg, 1rem); aspect-ratio: 2 / 1; object-fit: cover; }
+.service-catalog-heading h2,
+.service-catalog-category__services-title { margin: 0; color: var(--gl-heading, #111827); font-family: var(--gl-font-heading, inherit); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.2; }
+.service-catalog-category__services-title { margin-block-end: 1.5rem; font-size: clamp(1.5rem, 3.5vw, 2rem); }
+.service-catalog-category-block + .service-catalog-category-block { margin-block-start: 3rem; }
+.service-catalog-category-block__header { display: grid; gap: .5rem; max-width: 48rem; margin-block-end: 1.5rem; }
+.service-catalog-category-block__header h3 { margin: 0; color: var(--gl-heading, #111827); font-family: var(--gl-font-heading, inherit); font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 700; line-height: 1.25; }
+.service-catalog-category-block__header h3 a { color: inherit; text-decoration: none; }
+.service-catalog-category-block__header p { margin: 0; color: var(--gl-subheading, #6b7280); line-height: 1.7; }
+.service-catalog-more { margin-block: 1.5rem 0; }
 
 @media (max-width: 767px) {
     .service-catalog-grid--2,
     .service-catalog-grid--3,
     .service-catalog-grid--4,
     .service-catalog-detail-hero,
-    .service-catalog-about__layout { grid-template-columns: 1fr; }
+    .service-catalog-about__layout,
+    .service-catalog-story,
+    .service-catalog-contact { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+    .service-catalog-portfolio__gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

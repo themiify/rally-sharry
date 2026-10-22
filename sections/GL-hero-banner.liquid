@@ -1,0 +1,974 @@
+{% assign slug = 'hero-section' %}
+{% assign section_id = section.id | handle %}
+
+{% assign margin_class = '' %}
+{% if section.settings.rm_bottom_margin %}
+  {% assign margin_class = 'no-margin' %}
+{% endif %}
+
+{% assign radius_class = '' %}
+{% if section.settings.apply_container and section.settings.banner_border_radius == 'smooth' %}
+  {% assign radius_class = 'rounded-lg' %}
+{% endif %}
+
+{% assign btn_radius_class = '' %}
+{% if section.settings.button_border_radius == 'oblong' %}
+  {% assign btn_radius_class = 'btn-oblong' %}
+{% elsif section.settings.button_border_radius == 'smooth' %}
+  {% assign btn_radius_class = 'btn-smooth' %}
+{% endif %}
+
+{% assign subtext_position = section.settings.subtext_position | default: false %}
+{% if subtext_position %}
+  {% assign subtext_mode = 'under_title' %}
+{% else %}
+  {% assign subtext_mode = 'bottom_bar' %}
+{% endif %}
+
+{% assign first_subtext = '' %}
+{% if section.settings.banner.size > 0 %}
+  {% assign first_item = section.settings.banner.first %}
+  {% if request.is_rtl %}
+    {% assign first_subtext = first_item.subtext_ar | default: first_item.subtext %}
+  {% else %}
+    {% assign first_subtext = first_item.subtext | default: first_item.subtext_ar %}
+  {% endif %}
+{% endif %}
+
+{% assign has_multiple = false %}
+{% if section.settings.banner.size > 1 %}
+  {% assign has_multiple = true %}
+{% endif %}
+
+{% assign show_thumbs = false %}
+{% if has_multiple and section.settings.hide_thumbs != true %}
+  {% assign show_thumbs = true %}
+{% endif %}
+{% assign addtocart = translations.product.add_to_cart | default: 'Add to Cart' %}
+
+<section
+  id="{{ slug }}-{{ section_id }}"
+  class="hs-section hs-{{ section_id }} {{ margin_class }}"
+  data-section-selector="{{ slug }}"
+  data-section-id="{{ section_id }}"
+>
+  <div class="hs-wrapper {{ radius_class }}">
+    {% if has_multiple %}
+      <div class="swiper hs-swiper" data-slider-id="hero-{{ section_id }}">
+        <div class="swiper-wrapper">
+    {% endif %}
+
+    {% for item in section.settings.banner %}
+      {% assign item_index = forloop.index %}
+      {% assign item_index0 = forloop.index0 %}
+
+      {% assign title = item.block_title %}
+      {% if request.is_rtl and item.block_title_ar != blank %}
+        {% assign title = item.block_title_ar %}
+      {% elsif title == blank and item.block_title_ar != blank %}
+        {% assign title = item.block_title_ar %}
+      {% endif %}
+
+      {% assign subtext = item.subtext %}
+      {% if request.is_rtl and item.subtext_ar != blank %}
+        {% assign subtext = item.subtext_ar %}
+      {% elsif subtext == blank and item.subtext_ar != blank %}
+        {% assign subtext = item.subtext_ar %}
+      {% endif %}
+
+      {% assign btn_text = item.button_text %}
+      {% if request.is_rtl and item.button_text_ar != blank %}
+        {% assign btn_text = item.button_text_ar %}
+      {% elsif btn_text == blank and item.button_text_ar != blank %}
+        {% assign btn_text = item.button_text_ar %}
+      {% endif %}
+
+      <div
+        class="swiper-slide hs-slide hs-slide-{{ item_index }}"
+        data-index="{{ item_index0 }}"
+        data-bg-type="{{ item.bg_type }}"
+        data-bg="{{ item.bg }}"
+        data-mobile-bg="{{ item.mobile_bg }}"
+        data-bg-color="{{ item.bg_color }}"
+        data-video="{{ item.video_url }}"
+        data-remove-overlay="{{ item.remove_overlay }}"
+      >
+        <!-- Background -->
+        <div class="hs-bg">
+          {% if item.bg_type == 'image' and item.bg != blank %}
+            <picture>
+              {% if item.mobile_bg != blank %}
+                <source media="(max-width: 767px)" srcset="{{ item.mobile_bg }}">
+              {% endif %}
+              <img
+                class="hs-bg-image"
+                src="{{ item.bg }}"
+                alt=""
+                {% if forloop.first %}
+                  fetchpriority="high" loading="eager"
+                {% else %}
+                  loading="lazy"
+                {% endif %}
+              >
+            </picture>
+          {% elsif item.bg_type == 'video' and item.video_url != blank %}
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              class="hs-bg-video"
+              src="{{ item.video_url }}"
+            ></video>
+          {% endif %}
+        </div>
+
+        <!-- Banner Link (Applied to entire banner) -->
+        {% assign slide_url = '' %}
+        {% if item.url.url != blank %}
+          {% assign slide_url = item.url.url %}
+        {% elsif item.url != blank and item.url != '[object Object]' %}
+          {% assign slide_url = item.url %}
+        {% endif %}
+        {% if slide_url == blank and btn_text != blank %}
+          {% assign slide_url = '#' %}
+        {% endif %}
+
+        {% if slide_url != blank %}
+          <a
+            href="{{ slide_url }}"
+            class="hs-overlay-link {% if item.remove_overlay != true %}has-overlay{% endif %}"
+            aria-label="{{ title | default: 'Banner' }}"
+          ></a>
+        {% elsif item.remove_overlay != true %}
+          <div class="hs-overlay-link has-overlay"></div>
+        {% endif %}
+
+        <!-- Main Inner Layout Container -->
+        <div class="hs-inner-layout gl-container">
+          <!-- Top Row: Title, Subtext & Button -->
+          <div class="hs-top-row">
+            <div class="hs-text-group">
+              <h1 class="hs-title">{{ title }}</h1>
+
+              {% if subtext_mode == 'under_title' and subtext != blank %}
+                <p class="hs-subtext hs-subtext--under-title">{{ subtext }}</p>
+              {% endif %}
+            </div>
+
+            {% if btn_text != blank %}
+              <a href="{{ slide_url }}" class="hs-btn {{ btn_radius_class }}">
+                {{ btn_text }}
+              </a>
+            {% endif %}
+          </div>
+
+          <!-- Middle Space (Flex spacer) -->
+          <div class="hs-flex-spacer"></div>
+        </div>
+
+        <div
+          class="hs-thumb-data"
+          data-thumb-type="{{ item.thumb_type }}"
+          data-thumb-img="{{ item.thumb_img }}"
+          data-product-id="{{ item.product }}"
+          data-category-id="{{ item.category }}"
+          data-bg-type="{{ item.bg_type }}"
+          data-video-url="{{ item.video_url }}"
+          data-title="{{ title }}"
+          data-slide-subtext="{{ subtext | escape }}"
+        ></div>
+      </div>
+    {% endfor %}
+
+    {% if has_multiple %}
+      </div>
+      </div>
+    {% endif %}
+
+    <!-- Bottom Layout Section (Subtext bottom & Thumbs) -->
+    {% if subtext_mode == 'bottom_bar' or show_thumbs %}
+      <div class="hs-bottom-bar-wrapper {% if subtext_mode != 'bottom_bar' %}justify-end{% endif %}">
+        {% if subtext_mode == 'bottom_bar' %}
+          <div class="hs-subtext-bottom-side">
+            <p class="hs-subtext-nav-style">{{ first_subtext }}</p>
+          </div>
+        {% endif %}
+        <!-- Thumbnails Swiper Container -->
+        {% if show_thumbs %}
+          {% assign resolved_banners = section.resolved.banner %}
+          <div class="hs-thumbs swiper" data-slider-id="hero-thumbs-{{ section_id }}">
+            <div class="swiper-wrapper">
+              {% for item in section.settings.banner %}
+                {% assign r = resolved_banners[forloop.index0] %}
+
+                <div class="swiper-slide hs-thumb-slide" data-index="{{ forloop.index0 }}">
+                  <div class="hs-thumb-item">
+                    {% if item.thumb_type == 'image' and item.thumb_img != blank %}
+                      <!-- حالة اختيار صورة مخصصة -->
+                      <img class="hs-thumb-img" src="{{ item.thumb_img }}" alt="Thumbnail" loading="lazy">
+
+                    {% elsif item.thumb_type == 'product' %}
+                      {% assign thumb_prod = r.product[0] %}
+                      {% if thumb_prod %}
+                        <div class="hs-thumb-info">
+                          <span class="hs-thumb-title">{{ thumb_prod.name }}</span>
+                          <span class="hs-thumb-price">
+                            {{- thumb_prod.formatted_price | default: thumb_prod.price -}}
+                          </span>
+                          {% if thumb_prod.special_price %}
+                            <span class="compare-price">{{ thumb_prod.formatted_regular_price }}</span>
+                          {% endif %}
+                          <button
+                            type="button"
+                            class="btn-add-to-cart add-btn-hero-thumb"
+                            data-gl-action="quick-add"
+                            data-product-id="{{ thumb_prod.id }}"
+                            data-add-to-cart-url="{{ thumb_prod.actions.add_to_cart_url }}"
+                          >
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                            >
+                              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                              <line x1="3" y1="6" x2="21" y2="6"></line>
+                              <path d="M16 10a4 4 0 0 1-8 0"></path>
+                            </svg>
+                          </button>
+                        </div>
+                      {% endif %}
+
+                    {% elsif item.thumb_type == 'category' %}
+                      {% assign thumb_cat = r.category[0] %}
+                      {% if thumb_cat %}
+                        <div class="hs-thumb-item hs-thumb-item-category">
+                          {% if thumb_cat.image %}
+                            <img
+                              class="hs-thumb-cat-bg"
+                              src="{{ thumb_cat.image }}"
+                              alt="{{ thumb_cat.name }}"
+                              loading="lazy"
+                            >
+                          {% endif %}
+                          <div class="hs-thumb-cat-info">
+                            <a href="{{ thumb_cat.url }}" class="hs-thumb-title">
+                              {{- thumb_cat.name | default: thumb_cat.title -}}
+                            </a>
+                          </div>
+                        </div>
+                      {% endif %}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  @media (min-width: 768px) {
+    .hs-slide { height: {{ section.settings.max_height | default: 90 }}vh; }
+  }
+  @media (max-width: 767px) {
+    .hs-slide { height: {{ section.settings.min_height | default: 70 }}svh; }
+  }
+
+  {% if section.settings.use_custom_colors %}
+    .hs-{{ section_id }} .hs-title { color: {{ section.settings.blocktitle_color | default: '#ffffff' }}; }
+    .hs-{{ section_id }} .hs-subtext,
+    .hs-{{ section_id }} .hs-subtext-nav-style,
+    .hs-{{ section_id }} .hs-subtext--under-title { color: {{ section.settings.subtext_color | default: '#ffffff' }}; }
+    .hs-{{ section_id }} .hs-btn {
+      color: {{ section.settings.button_text_color | default: '#ffffff' }};
+      background-color: {{ section.settings.button_bg | default: '#CE5A67' }};
+    }
+  {% endif %}
+  .hs-{{ section_id }} .swiper {
+    margin-inline:0px !important ;
+  }
+</style>
+
+<script>
+  (function() {
+    'use strict';
+
+    let sectionId = '{{ section_id }}';
+    let sectionSelector = '.hs-' + sectionId;
+    let hasMultiple = {{ has_multiple | json }};
+    let autoplay = {{ section.settings.enable_autoplay | default: true }};
+    let delay = {{ section.settings.delay_time | default: 3 }} * 1000;
+    let effect = '{{ section.settings.slider_effect | default: "slide" }}';
+    let subtextMode = '{{ subtext_mode }}';
+    let hideThumbs = {{ section.settings.hide_thumbs | default: false }};
+
+    function initSwiper() {
+      if (typeof Swiper === 'undefined') {
+        loadSwiper();
+        return;
+      }
+
+      let mainSlider = document.querySelector(sectionSelector + ' .hs-swiper');
+      let thumbsSlider = document.querySelector(sectionSelector + ' .hs-thumbs');
+
+      if (!mainSlider) {
+        updateAllSlideHeights();
+        return;
+      }
+
+      let thumbsSwiper = null;
+      if (thumbsSlider && !hideThumbs && hasMultiple) {
+        thumbsSwiper = new Swiper(thumbsSlider, {
+          slidesPerView: 2,
+          spaceBetween: 12,
+          speed: 800,
+          freeMode: true,
+          watchSlidesProgress: true,
+          breakpoints: {
+            480: { slidesPerView: 3, spaceBetween: 12 },
+            768: { slidesPerView: 3, spaceBetween: 16 }
+          }
+        });
+      }
+
+      let config = {
+        slidesPerView: 1,
+        speed: 1000,
+        spaceBetween: 0,
+        effect: effect,
+        fadeEffect: { crossFade: true },
+        allowTouchMove: true,
+        // Loop creates and measures cloned slides after first paint. Rewind keeps
+        // autoplay continuous without moving the initial content during setup.
+        loop: false,
+        rewind: hasMultiple && autoplay,
+        thumbs: {
+          swiper: thumbsSwiper
+        }
+      };
+
+      if (autoplay && hasMultiple) {
+        config.autoplay = {
+          delay: delay,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: false,
+        };
+      }
+
+      let mainSwiper = new Swiper(mainSlider, config);
+
+      function syncBottomSubtext() {
+        if (subtextMode !== 'bottom_bar') return;
+
+        let activeSlide = mainSwiper.slides[mainSwiper.activeIndex];
+        if (!activeSlide) return;
+
+        let thumbData = activeSlide.querySelector('.hs-thumb-data');
+        let subtextBottomElement = document.querySelector(sectionSelector + ' .hs-subtext-nav-style');
+
+        if (subtextBottomElement && thumbData) {
+          let currentText = thumbData.dataset.slideSubtext || '';
+          subtextBottomElement.textContent = currentText;
+        }
+      }
+
+      mainSwiper.on('slideChange', function() {
+        updateSlideHeights(mainSwiper);
+        syncBottomSubtext();
+      });
+
+      updateSlideHeights(mainSwiper);
+      syncBottomSubtext();
+    }
+
+    function updateSlideHeights(swiper) {
+      let slides = swiper.slides;
+      if(!slides) return;
+      slides.forEach(function(slide) {
+        applySlideBg(slide);
+      });
+    }
+
+    function updateAllSlideHeights() {
+      let slides = document.querySelectorAll(sectionSelector + ' .hs-slide');
+      slides.forEach(function(slide) {
+        applySlideBg(slide);
+      });
+    }
+
+    function applySlideBg(slide) {
+      let bgType = slide.dataset.bgType;
+      let bg = slide.dataset.bg;
+      let mobileBg = slide.dataset.mobileBg;
+      let bgColor = slide.dataset.bgColor;
+      let video = slide.dataset.video;
+
+      if (bgType === 'color' && bgColor) {
+        slide.style.backgroundColor = bgColor;
+        slide.style.backgroundImage = 'none';
+      }
+
+      if (bgType === 'video' && video) {
+        let existingVideo = slide.querySelector('.hs-bg-video');
+        if (existingVideo && !existingVideo.src) {
+          existingVideo.src = video;
+          existingVideo.load();
+          existingVideo.play().catch(function(){});
+        }
+      }
+    }
+
+    function loadSwiper() {
+      if (document.getElementById('swiper-css')) {
+        setTimeout(initSwiper, 300);
+        return;
+      }
+      let link = document.createElement('link');
+      link.id = 'swiper-css';
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css';
+      document.head.appendChild(link);
+
+      let script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js';
+      script.async = true;
+      script.onload = function() {
+        initSwiper();
+      };
+      document.head.appendChild(script);
+    }
+
+    function loadThumbnails() {
+      let thumbSlides = document.querySelectorAll(sectionSelector + ' .hs-thumb-slide');
+      thumbSlides.forEach(function(slide) {
+        let index = parseInt(slide.dataset.index);
+        let parentSlide = document.querySelector(sectionSelector + ' .hs-slide[data-index="' + index + '"]');
+        if (!parentSlide) return;
+
+        let thumbData = parentSlide.querySelector('.hs-thumb-data');
+        if (!thumbData) return;
+
+        let thumbType = thumbData.dataset.thumbType;
+        let thumbImg = thumbData.dataset.thumbImg;
+        let productId = thumbData.dataset.productId;
+        let categoryId = thumbData.dataset.categoryId;
+        let item = slide.querySelector('.hs-thumb-item');
+        if (!item) return;
+
+        if (thumbType === 'image' && thumbImg) {
+          item.innerHTML = '<img class="hs-thumb-img" src="' + thumbImg + '" alt="Thumbnail" loading="lazy">';
+        } else if (thumbType === 'product' && productId) {
+          loadProductThumb(productId, item);
+        } else if (thumbType === 'category' && categoryId) {
+          loadCategoryThumb(categoryId, item);
+        }
+      });
+    }
+
+    function loadProductThumb(productId, container) {
+      if (typeof salla !== 'undefined' && salla.api) {
+        salla.api.product.getDetails(productId).then(function(response) {
+          let product = response.data;
+          if (product && product.image) {
+            container.innerHTML = '<img class="hs-thumb-img" src="' + product.image.url + '" alt="' + (product.name || 'Product') + '" loading="lazy">';
+          }
+        }).catch(function() {});
+      }
+    }
+
+    function loadCategoryThumb(categoryId, container) {
+      if (typeof salla !== 'undefined' && salla.api) {
+        salla.api.component.getMenus().then(function(response) {
+          let categories = response.data || [];
+          let findCategory = function(cats, id) {
+            for (let i = 0; i < cats.length; i++) {
+              if (cats[i].id == id) return cats[i];
+              if (cats[i].children) {
+                let found = findCategory(cats[i].children, id);
+                if (found) return found;
+              }
+            }
+            return null;
+          };
+          let category = findCategory(categories, categoryId);
+          if (category && category.image) {
+            container.innerHTML = '<img class="hs-thumb-img" src="' + category.image + '" alt="' + (category.title || category.name || 'Category') + '" loading="lazy">';
+          }
+        }).catch(function() {});
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        initSwiper();
+        loadThumbnails();
+      });
+    } else {
+      initSwiper();
+      loadThumbnails();
+    }
+
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+        let swiper = document.querySelector(sectionSelector + ' .hs-swiper')?.swiper;
+        if (swiper) {
+          swiper.update();
+          updateSlideHeights(swiper);
+        } else {
+          updateAllSlideHeights();
+        }
+      }, 250);
+    });
+
+    document.addEventListener('shopify:section:load', function(event) {
+      if (event.target.classList.contains('hs-section') || event.target.querySelector('.hs-section')) {
+        setTimeout(function() {
+          initSwiper();
+          loadThumbnails();
+        }, 300);
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+    "slug": "GL-hero-banner",
+    "name": {
+        "en": "Glowy - Hero Banner",
+        "ar": "  بانر رئيسي - جلوي "
+    },
+    "category": "social-proof",
+    "template": "sections/GL-hero-banner.liquid",
+    "sort_order": 3,
+    "reusable": true,
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "use_custom_colors",
+            "label": "Use Custom Colors",
+            "label_ar": "استخدام ألوان مخصّصة",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "rm_bottom_margin",
+            "label": "Remove Bottom Margin",
+            "label_ar": "حذف المسافة السفلية",
+            "default": true
+        },
+        {
+            "type": "range",
+            "id": "max_height",
+            "label": "Banner Height (Desktop)",
+            "label_ar": "ارتفاع البانر في الشاشات الكبيرة",
+            "min": 20,
+            "max": 200,
+            "default": 90,
+            "unit": "%"
+        },
+        {
+            "type": "range",
+            "id": "min_height",
+            "label": "Banner Height (Mobile)",
+            "label_ar": "ارتفاع البانر في الشاشات الصغيرة",
+            "min": 20,
+            "max": 200,
+            "default": 70,
+            "unit": "%"
+        },
+        {
+            "type": "checkbox",
+            "id": "enable_autoplay",
+            "label": "Enable Autoplay",
+            "label_ar": "تفعيل التمرير التلقائي",
+            "default": true
+        },
+        {
+            "type": "range",
+            "id": "delay_time",
+            "label": "Autoplay Delay (seconds)",
+            "label_ar": "مدة الانتقال بين البانرات",
+            "min": 0,
+            "max": 20,
+            "default": 3,
+            "visible_if": "{{ section.settings.enable_autoplay == true }}"
+        },
+        {
+            "type": "select",
+            "id": "slider_effect",
+            "label": "Slider Effect",
+            "label_ar": "تأثير السلايدر",
+            "default": "slide",
+            "options": [
+                {
+                    "value": "slide",
+                    "label": "Slide"
+                },
+                {
+                    "value": "fade",
+                    "label": "Fade"
+                }
+            ]
+        },
+        {
+            "type": "checkbox",
+            "id": "hide_thumbs",
+            "label": "Hide Thumbnails",
+            "label_ar": "إخفاء الأقسام المصغّرة",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "apply_container",
+            "label": "Apply Container",
+            "label_ar": "تطبيق الحاوية",
+            "default": true
+        },
+        {
+            "type": "color",
+            "id": "blocktitle_color",
+            "label": "Main Title Color",
+            "label_ar": "لون العنوان الرئيسي",
+            "default": "#ffffff",
+            "visible_if": "{{ section.settings.use_custom_colors == true }}"
+        },
+        {
+            "type": "color",
+            "id": "subtext_color",
+            "label": "Subtext Color",
+            "label_ar": "لون النص الفرعي",
+            "default": "#ffffff",
+            "visible_if": "{{ section.settings.use_custom_colors == true }}"
+        },
+        {
+            "type": "color",
+            "id": "button_text_color",
+            "label": "Button Text & Border Color",
+            "label_ar": "لون نص وحدود الزر",
+            "default": "#ffffff",
+            "visible_if": "{{ section.settings.use_custom_colors == true }}"
+        },
+        {
+            "type": "color",
+            "id": "button_bg",
+            "label": "Button Background Color",
+            "label_ar": "لون خلفية الزر",
+            "default": "#CE5A67",
+            "visible_if": "{{ section.settings.use_custom_colors == true }}"
+        },
+        {
+            "type": "checkbox",
+            "id": "subtext_position",
+            "label": "Subtext at Bottom",
+            "label_ar": "العنوان الفرعي اسفل العنوان الرئيسي",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "transparent_button",
+            "label": "Transparent Button",
+            "label_ar": "إضافة طبقة شفافة",
+            "default": true
+        },
+        {
+            "type": "select",
+            "id": "banner_border_radius",
+            "label": "Banner Border Radius",
+            "label_ar": "شكل حواف البانر",
+            "default": "smooth",
+            "options": [
+                {
+                    "value": "smooth",
+                    "label": "Smooth"
+                },
+                {
+                    "value": "sharp",
+                    "label": "Sharp"
+                }
+            ],
+            "visible_if": "{{ section.settings.apply_container == true }}"
+        },
+        {
+            "type": "select",
+            "id": "button_border_radius",
+            "label": "Button Border Radius",
+            "label_ar": "شكل حواف الزر",
+            "default": "oblong",
+            "options": [
+                {
+                    "value": "oblong",
+                    "label": "Oblong"
+                },
+                {
+                    "value": "smooth",
+                    "label": "Smooth"
+                },
+                {
+                    "value": "sharp",
+                    "label": "Sharp"
+                }
+            ]
+        },
+        {
+            "type": "repeater",
+            "id": "banner",
+            "label": "Banner Slides",
+            "label_ar": "البانر",
+            "min": 1,
+            "max": 10,
+            "fields": [
+                {
+                    "type": "select",
+                    "id": "bg_type",
+                    "label": "Background Type",
+                    "label_ar": "خيارات خلفية البانر",
+                    "default": "image",
+                    "options": [
+                        {
+                            "value": "video",
+                            "label": "Video"
+                        },
+                        {
+                            "value": "image",
+                            "label": "Image"
+                        },
+                        {
+                            "value": "color",
+                            "label": "Color"
+                        }
+                    ]
+                },
+                {
+                    "type": "color",
+                    "id": "bg_color",
+                    "label": "Background Color",
+                    "label_ar": "لون خلفية البانر",
+                    "default": "#CE5A67",
+                    "visible_if": "{{ item.bg_type == 'color' and section.settings.use_custom_colors == true }}"
+                },
+                {
+                    "type": "checkbox",
+                    "id": "remove_overlay",
+                    "label": "Remove Overlay",
+                    "label_ar": "حذف الطبقة الشفافة",
+                    "default": false
+                },
+                {
+                    "type": "image",
+                    "id": "bg",
+                    "label": "Desktop Background Image",
+                    "label_ar": "صورة الخلفية للشاشات الكبيرة",
+                    "visible_if": "{{ item.bg_type == 'image' }}"
+                },
+                {
+                    "type": "image",
+                    "id": "mobile_bg",
+                    "label": "Mobile Background Image",
+                    "label_ar": "صورة الخلفية للجوال",
+                    "visible_if": "{{ item.bg_type == 'image' }}"
+                },
+                {
+                    "type": "url",
+                    "id": "video_url",
+                    "label": "Video URL",
+                    "label_ar": "رابط الفيديو",
+                    "default": "https://files.catbox.moe/6xjzi1.webm",
+                    "visible_if": "{{ item.bg_type == 'video' }}"
+                },
+                {
+                    "type": "select",
+                    "id": "thumb_type",
+                    "label": "Thumbnail Type",
+                    "label_ar": "الأقسام المصغرة",
+                    "default": "product",
+                    "options": [
+                        {
+                            "value": "product",
+                            "label": "Product"
+                        },
+                        {
+                            "value": "category",
+                            "label": "Category"
+                        },
+                        {
+                            "value": "image",
+                            "label": "Image"
+                        }
+                    ]
+                },
+                {
+                    "type": "image",
+                    "id": "thumb_img",
+                    "label": "Thumbnail Image",
+                    "label_ar": "صورة الأقسام المصغرة",
+                    "visible_if": "{{ item.thumb_type == 'image' }}"
+                },
+                {
+                    "type": "product",
+                    "id": "product",
+                    "label": "Select Product",
+                    "label_ar": "اختر المنتج",
+                    "multiple": false,
+                    "resolved": true,
+                    "visible_if": "{{ item.thumb_type == 'product' }}"
+                },
+                {
+                    "type": "category_picker",
+                    "id": "category",
+                    "label": "Select Category",
+                    "label_ar": "حدد التصنيف",
+                    "multiple": false,
+                    "resolved": true,
+                    "visible_if": "{{ item.thumb_type == 'category' }}"
+                },
+                {
+                    "type": "text",
+                    "id": "block_title",
+                    "label": "Main Title",
+                    "label_ar": "العنوان الرئيسي",
+                    "default": "Your Complete Beauty Routine for All Skin Types"
+                },
+                {
+                    "type": "text",
+                    "id": "block_title_ar",
+                    "label": "Main Title (Arabic)",
+                    "label_ar": "العنوان الرئيسي (عربي)",
+                    "default": "روتيـــن جمــــالك لجميـــع أنـــــــواع البشــــــرة"
+                },
+                {
+                    "type": "text",
+                    "id": "subtext",
+                    "label": "Subtext",
+                    "label_ar": "العنوان الفرعي",
+                    "default": "Choose the perfect skincare routine for natural radiance"
+                },
+                {
+                    "type": "text",
+                    "id": "subtext_ar",
+                    "label": "Subtext (Arabic)",
+                    "label_ar": "العنوان الفرعي (عربي)",
+                    "default": "اختاري العناية المثالية لبشرتك لإشراقة طبيعية"
+                },
+                {
+                    "type": "text",
+                    "id": "button_text",
+                    "label": "Button Text",
+                    "label_ar": "نص الزر",
+                    "default": "Shop Now"
+                },
+                {
+                    "type": "text",
+                    "id": "button_text_ar",
+                    "label": "Button Text (Arabic)",
+                    "label_ar": "نص الزر (عربي)",
+                    "default": "تسوقِ الآن"
+                },
+                {
+                    "type": "link",
+                    "id": "url",
+                    "label": "Button URL",
+                    "label_ar": "رابط الزر"
+                }
+            ]
+        }
+    ],
+    "defaults": {
+        "use_custom_colors": false,
+        "rm_bottom_margin": false,
+        "max_height": 82,
+        "min_height": 70,
+        "enable_autoplay": true,
+        "delay_time": 3,
+        "slider_effect": "fade",
+        "hide_thumbs": false,
+        "apply_container": true,
+        "subtext_position": false,
+        "blocktitle_color": "#ffffff",
+        "subtext_color": "#ffffff",
+        "button_text_color": "#ffffff",
+        "button_bg": "#ce5a67",
+        "transparent_button": true,
+        "banner_border_radius": "sharp",
+        "button_border_radius": "oblong",
+        "banner": [
+            {
+                "bg_type": "image",
+                "bg_color": "#ce5a67",
+                "remove_overlay": false,
+                "bg": "",
+                "mobile_bg": "",
+                "video_url": "",
+                "thumb_type": "product",
+                "thumb_img": "",
+                "product": null,
+                "category": null,
+                "block_title": "Your Complete Beauty Routine for All Skin Types",
+                "block_title_ar": "جمـــالك الطبيعي يتـــــألّق مـــع جلوي",
+                "subtext": "",
+                "subtext_ar": "جمـــالك الطبيعي يتـــــألّق مـــع جلوي   ",
+                "button_text": "Shop Now",
+                "button_text_ar": "تسوقِ الآن",
+                "url": {
+                    "type": "product",
+                    "id": 3
+                }
+            },
+            {
+                "bg_type": "video",
+                "bg_color": "#ce5a67",
+                "remove_overlay": false,
+                "bg": "",
+                "mobile_bg": "",
+                "video_url": "https://cdn.shopify.com/videos/c/o/v/62163ba7936b4f86ab6f21b5d2ccaddf.mp4",
+                "thumb_type": "image",
+                "thumb_img": "",
+                "product": null,
+                "category": null,
+                "block_title": "Your Complete Beauty Routine for All Skin Types",
+                "block_title_ar": "روتيـــن جمــــالك لجميـــع أنـــــــواع البشــــــرة",
+                "subtext": "Choose the perfect skincare routine for natural radiance",
+                "subtext_ar": "اختاري العناية المثالية لبشرتك لإشراقة طبيعية",
+                "button_text": "Shop Now",
+                "button_text_ar": "تسوقِ الآن",
+                "url": {
+                    "type": "category",
+                    "id": 4
+                }
+            },
+            {
+                "bg_type": "image",
+                "bg_color": "#ce5a67",
+                "remove_overlay": false,
+                "bg": "",
+                "mobile_bg": "",
+                "video_url": "",
+                "thumb_type": "category",
+                "thumb_img": "",
+                "product": null,
+                "category": null,
+                "block_title": "Your Complete Beauty Routine for All Skin Types",
+                "block_title_ar": "روتيـــن جمــــالك لجميـــع أنـــــــواع البشــــــرة",
+                "subtext": "Choose the perfect skincare routine for natural radiance",
+                "subtext_ar": "اختاري العناية المثالية لبشرتك لإشراقة طبيعية",
+                "button_text": "Shop Now",
+                "button_text_ar": "تسوقِ الآن",
+                "url": {
+                    "type": "blog",
+                    "id": 1
+                }
+            }
+        ]
+    }
+}
+{% endschema %}

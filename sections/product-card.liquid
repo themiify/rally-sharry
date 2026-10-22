@@ -19,13 +19,14 @@
   {% if product_card_image == blank and is_demo_card %}
     {% assign product_card_image = 'https://cdn.salla.sa/form-builder/oUpcRrUsoIlorJH4wtZG5cUmG6sp5rkER7bBEcVn.png' %}
   {% endif %}
+  {% assign product_card_image_alt = product_card.images[0].alt | default: product_card.base_image.alt | default: product_card.name | default: 'سيارة بورش 911' | escape %}
 
   <div class="gl-product-card gl-product-card-custom {% if product_card_orientation == 'horizontal' %}gl-product-card-horizontal-custom{% else %}gl-product-card-vertical-custom{% endif %}">
     <!-- Product Image -->
     <div class="gl-product-card-image">
       <a href="{{ product_card.url | default: '#' }}">
         {% if product_card_image != blank %}
-          <img src="{{ product_card_image }}" alt="{{ product_card.name | default: 'سيارة بورش 911' | escape }}" loading="lazy">
+          <img src="{{ product_card_image }}" alt="{{ product_card_image_alt }}" loading="lazy">
         {% else %}
           <div class="gl-product-placeholder"></div>
         {% endif %}

@@ -69,7 +69,7 @@ function getDefault(f) {
     if (Object.prototype.hasOwnProperty.call(f, 'default')) return f.default;
     if (f.type === 'checkbox') return false;
     if (f.type === 'repeater') return [];
-    if (['product','category','category_picker','blog_picker'].indexOf(f.type) >= 0) return f.multiple ? [] : '';
+    if (['product','category','category_picker','blog_picker','service_picker','team_picker','service_category_picker'].indexOf(f.type) >= 0) return f.multiple ? [] : '';
     if (f.type === 'spacing') return { top:0, right:0, bottom:0, left:0 };
     return '';
 }
@@ -90,18 +90,19 @@ function inputLimitAttrs(f) {
     return a;
 }
 
-function normalizeValue(f, input) {
+function normalizeValue(f, input, root) {
+    var scope = root || (input && input.closest('.repeater-row')) || drawerFields;
+    var fieldWrap = input && input.closest('[data-field-wrap]');
+
     if (f.type === 'image') {
-        var wrap = document.querySelector('[data-field-wrap="'+f.id+'"]');
-        if (wrap) {
-            var hidden = wrap.querySelector('input[type="hidden"][data-field-id="'+f.id+'"]');
-            return hidden ? hidden.value : '';
-        }
-        return input ? input.value : '';
+        if (input && input.type === 'hidden') return input.value || '';
+        var imageWrap = fieldWrap || scope.querySelector('[data-field-wrap="'+f.id+'"]');
+        var hidden = imageWrap && imageWrap.querySelector('input[type="hidden"][data-field-id="'+f.id+'"]');
+        return hidden ? hidden.value : (input ? input.value : '');
     }
-    if (f.type === 'checkbox') return Boolean(input.checked);
-    if (['number','range'].indexOf(f.type) >= 0) return input.value === '' ? '' : Number(input.value);
-    if (['product','category','category_picker','blog_picker'].indexOf(f.type) >= 0) {
+    if (f.type === 'checkbox') return Boolean(input && input.checked);
+    if (['number','range'].indexOf(f.type) >= 0) return input && input.value === '' ? '' : Number(input && input.value);
+    if (['product','category','category_picker','blog_picker','service_picker','team_picker','service_category_picker'].indexOf(f.type) >= 0) {
         var h = input;
         if (h) {
             var ids = h.value ? h.value.split(',').map(function(v){return parseInt(v.trim(),10);}).filter(Boolean) : [];
@@ -110,36 +111,52 @@ function normalizeValue(f, input) {
         return f.multiple === false ? null : [];
     }
     if (f.type === 'spacing') {
+        var spacingWrap = fieldWrap || scope.querySelector('[data-field-wrap="'+f.id+'"]');
+        var readSide = function(side) {
+            var sideInput = spacingWrap && spacingWrap.querySelector('[data-field-id="'+f.id+'"][data-side="'+side+'"]');
+            return Number(sideInput && sideInput.value || 0);
+        };
         return {
-            top:    Number(document.querySelector('[data-field-id="'+f.id+'"][data-side="top"]').value||0),
-            right:  Number(document.querySelector('[data-field-id="'+f.id+'"][data-side="right"]').value||0),
-            bottom: Number(document.querySelector('[data-field-id="'+f.id+'"][data-side="bottom"]').value||0),
-            left:   Number(document.querySelector('[data-field-id="'+f.id+'"][data-side="left"]').value||0),
+            top: readSide('top'),
+            right: readSide('right'),
+            bottom: readSide('bottom'),
+            left: readSide('left'),
         };
     }
     if (f.type === 'link') {
-        var lt  = document.querySelector('[data-field-id="'+f.id+'"][data-link-part="type"]').value;
-        var lu  = document.querySelector('[data-field-id="'+f.id+'"][data-link-part="url"]').value;
-        var lid = parseInt(document.querySelector('[data-field-id="'+f.id+'"][data-link-part="id"]').value||0,10);
-        return lt === 'custom' ? { type:'custom', url:lu } : { type:lt, id:lid||null };
+        var linkWrap = fieldWrap || scope.querySelector('[data-field-wrap="'+f.id+'"]');
+        var linkPart = function(part) {
+            return linkWrap && linkWrap.querySelector('[data-field-id="'+f.id+'"][data-link-part="'+part+'"]');
+        };
+        var typeInput = linkPart('type');
+        var urlInput = linkPart('url');
+        var idInput = linkPart('id');
+        var valueInput = linkPart('value');
+        var lt = typeInput ? typeInput.value : 'custom';
+        var lu = urlInput ? urlInput.value : '';
+        var lid = parseInt(idInput && idInput.value || 0, 10);
+        var lv = valueInput ? valueInput.value : 'home';
+        return lt === 'custom' ? { type:'custom', url:lu } : (lt === 'surface' ? { type:'surface', value:lv } : { type:lt, id:lid||null });
     }
     if (f.type === 'repeater') {
+        var repeater = fieldWrap || scope.querySelector('[data-field-wrap="'+f.id+'"]');
         var rows = [];
-        document.querySelectorAll('[data-repeater-id="'+f.id+'"] .repeater-row').forEach(function(row){
+        if (!repeater) return rows;
+        repeater.querySelectorAll('[data-repeater-id="'+f.id+'"] .repeater-row').forEach(function(row){
             var item = {};
             (f.fields||[]).forEach(function(nf){
                 var ni = row.querySelector('[data-nested-field-id="'+nf.id+'"]');
-                if (ni) item[nf.id] = normalizeValue(nf, ni);
+                if (ni) item[nf.id] = normalizeValue(nf, ni, row);
             });
             rows.push(item);
         });
         return rows;
     }
-    return input.value;
+    return input ? input.value : '';
 }
 
 // ── Pickers ───────────────────────────────────────────────────────────────────
-var PEM = { product:'products', category:'categories', category_picker:'categories', blog_picker:'blogs' };
+var PEM = { product:'products', category:'categories', category_picker:'categories', blog_picker:'blogs', service_picker:'services', team_picker:'team', service_category_picker:'service-categories' };
 function pe(t) { return PEM[t] || 'products'; }
 
 function mountPicker(wrap, f, items0) {
@@ -242,17 +259,19 @@ function initPickerFields(fields, vals, root) {
 }
 
 function bindLinkPickers(root) {
-    var LE={category:'categories',product:'products',blog:'blogs'};
+    var LE={category:'categories',product:'products',blog:'blogs',page:'pages',service:'services',team:'team'};
     root.querySelectorAll('[data-link-field]').forEach(function(sel){
         var wrap=sel.closest('[data-field-wrap]'); if(!wrap) return;
         var uInp=wrap.querySelector('[data-link-url-wrap] input');
+        var vInp=wrap.querySelector('[data-link-part="value"]');
+        var sw=wrap.querySelector('[data-link-surface-wrap]');
         var ew=wrap.querySelector('[data-link-entity-wrap]');
         var hid=wrap.querySelector('[data-link-part="id"]');
         var tEl=ew&&ew.querySelector('.picker-tags');
         var sEl=ew&&ew.querySelector('.picker-search');
         var dEl=ew&&ew.querySelector('.picker-dropdown');
-        if(!ew||!tEl||!sEl||!dEl||!hid) return;
-        function sv(t){if(uInp)uInp.style.display=t==='custom'?'':'none';ew.style.display=t!=='custom'?'':'none';}
+        if(!ew||!tEl||!sEl||!dEl||!hid||!sw) return;
+        function sv(t){if(uInp)uInp.style.display=t==='custom'?'':'none';if(sw)sw.style.display=t==='surface'?'':'none';ew.style.display=t!=='custom'&&t!=='surface'?'':'none';}
         function rt(name){tEl.querySelectorAll('.picker-tag').forEach(function(t){t.remove();});if(!name)return;var tag=document.createElement('span');tag.className='picker-tag';tag.innerHTML=eh(name)+(!isReadOnly?' <button type="button" class="rm" data-rm-id="0">×</button>':'');tEl.insertBefore(tag,sEl);}
         function cd(){dEl.innerHTML='';dEl.style.display='none';}
         function od(results,onSel){dEl.innerHTML='';if(!results.length){dEl.innerHTML='<div class="picker-empty">لا توجد نتائج</div>';}else results.forEach(function(item){var opt=document.createElement('div');opt.className='picker-option';var img=item.image?'<img src="'+ea(item.image)+'" alt="">':'<span style="width:32px;height:32px;background:#e5e7eb;border-radius:6px;display:inline-block;flex-shrink:0"></span>';opt.innerHTML=img+'<span class="opt-name">'+eh(item.name)+'</span>';opt.addEventListener('mousedown',function(e){e.preventDefault();onSel(item);});dEl.appendChild(opt);});dEl.style.display='block';}
@@ -324,7 +343,7 @@ function renderField(f, vals) {
             ['top','right','bottom','left'].map(function(side){return'<input type="number" data-field-id="'+f.id+'" data-side="'+side+'" placeholder="'+side+'" value="'+(s[side]??0)+'"'+dis+'>';}).join('')+
             '</div></div>';
     }
-    if(['product','category','category_picker','blog_picker'].indexOf(f.type)>=0){
+    if(['product','category','category_picker','blog_picker','service_picker','team_picker','service_category_picker'].indexOf(f.type)>=0){
         var am=f.multiple!==false;
         return '<div class="field" data-field-wrap="'+f.id+'"><label>'+lbl+'</label>'+
             '<input type="hidden" data-picker-hidden="'+f.id+'" data-field-id="'+f.id+'">'+
@@ -333,11 +352,14 @@ function renderField(f, vals) {
     }
     if(f.type==='link'){
         var lnk=val&&typeof val==='object'?val:{}, lt=lnk.type||'custom';
+        var surfaceValue = lnk.value || 'home';
+        var surfaces = ['home','search','cart','services','team','about-us'];
         return '<div class="field" data-field-wrap="'+f.id+'"><label>'+lbl+'</label>'+
             '<select data-field-id="'+f.id+'" data-link-part="type" data-link-field'+dis+'>'+
-            ['custom','category','product','blog'].map(function(t){return'<option value="'+t+'"'+(t===lt?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+            ['custom','category','product','blog','page','surface'].map(function(t){return'<option value="'+t+'"'+(t===lt?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
             '<div style="margin-top:8px" data-link-url-wrap><input type="url" data-field-id="'+f.id+'" data-link-part="url" placeholder="رابط مخصص" value="'+(lnk.url||'')+'"'+dis+(lt!=='custom'?' style="display:none"':'')+' ></div>'+
-            '<div style="margin-top:8px" data-link-entity-wrap'+(lt==='custom'?' style="display:none"':'')+'>'+
+            '<div style="margin-top:8px" data-link-surface-wrap'+(lt==='surface'?'':' style="display:none"')+'><select data-field-id="'+f.id+'" data-link-part="value"'+dis+'>'+surfaces.map(function(surface){return'<option value="'+surface+'"'+(surface===surfaceValue?' selected':'')+'>'+surface+'</option>';}).join('')+'</select></div>'+
+            '<div style="margin-top:8px" data-link-entity-wrap'+(lt==='custom'||lt==='surface'?' style="display:none"':'')+'>'+
             '<div class="picker-wrap"><div class="picker-tags" data-link-picker-tags>'+(isReadOnly?''  :'<input class="picker-search" type="text" placeholder="ابحث…" data-picker-single>')+'</div>'+
             '<div class="picker-dropdown" style="display:none"></div></div>'+
             '<input type="hidden" data-field-id="'+f.id+'" data-link-part="id" value="'+(lnk.id||'')+'" ></div></div>';
@@ -365,9 +387,9 @@ function collectValues(fields, root) {
     var vals={};
     fields.forEach(function(f){
         if(!f.id) return;
-        if(f.type==='repeater'){vals[f.id]=normalizeValue(f,null);return;}
+        if(f.type==='repeater'){vals[f.id]=normalizeValue(f,null,root);return;}
         var inp=root.querySelector('[data-field-id="'+f.id+'"]');
-        if(inp) vals[f.id]=normalizeValue(f,inp);
+        if(inp) vals[f.id]=normalizeValue(f,inp,root);
     });
     return vals;
 }
@@ -424,7 +446,7 @@ function bindImageUploads(root){
         fileInput.onchange=function(){
             if(!fileInput.files||!fileInput.files[0]) return;
             var fieldId=fileInput.dataset.imageUpload;
-            var wrap=root.querySelector('[data-field-wrap="'+fieldId+'"]');
+            var wrap=fileInput.closest('[data-field-wrap]') || root.querySelector('[data-field-wrap="'+fieldId+'"]');
             if(!wrap) return;
             var preview=wrap.querySelector('.image-preview');
             var hidden=wrap.querySelector('input[type="hidden"][data-field-id="'+fieldId+'"]');
@@ -457,7 +479,7 @@ function bindImageUploads(root){
                             clr.type='button';clr.dataset.imageClear=fieldId;
                             clr.style.cssText='padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;cursor:pointer;font-size:12px;color:#ef4444';
                             clr.textContent='✕';
-                            clr.onclick=function(){clearImageField(fieldId,root);};
+                            clr.onclick=function(){clearImageField(fieldId,root,clr);};
                             btnWrap.appendChild(clr);
                         }
                         status('تم رفع الصورة ✓');
@@ -483,13 +505,13 @@ function bindImageUploads(root){
         };
     });
     root.querySelectorAll('[data-image-clear]').forEach(function(btn){
-        btn.onclick=function(){clearImageField(btn.dataset.imageClear,root);};
+        btn.onclick=function(){clearImageField(btn.dataset.imageClear,root,btn);};
     });
 }
 
-function clearImageField(fieldId,root){
+function clearImageField(fieldId,root,source){
     root=root||drawerFields;
-    var wrap=root.querySelector('[data-field-wrap="'+fieldId+'"]');
+    var wrap=(source && source.closest('[data-field-wrap]')) || root.querySelector('[data-field-wrap="'+fieldId+'"]');
     if(!wrap) return;
     var hidden=wrap.querySelector('input[type="hidden"][data-field-id="'+fieldId+'"]');
     if(hidden) hidden.value='';
@@ -781,7 +803,7 @@ function renderAddList(list, items){
 
     list.innerHTML = items.map(function(sec){
         var name    = resolveName(sec.name, sec.slug);
-        var onPage  = existingSlugs.indexOf(sec.slug) >= 0;
+        var onPage  = sec.reusable === false && existingSlugs.indexOf(sec.slug) >= 0;
         var opacity = onPage ? 'opacity:.45;' : '';
         var cursor  = onPage ? 'cursor:default;' : 'cursor:pointer;';
         return '<div class="add-sec-card" data-slug="'+ea(sec.slug)+'" data-on-page="'+(onPage?'1':'0')+'" style="'+
@@ -841,7 +863,7 @@ function openAddModal(){
             var existingSlugs=sectionRegistry.map(function(s){return s.slug;});
             grid.innerHTML=items.map(function(sec){
                 var name=resolveName(sec.name,sec.slug);
-                var onPage=existingSlugs.indexOf(sec.slug)>=0;
+                var onPage=sec.reusable===false&&existingSlugs.indexOf(sec.slug)>=0;
                 return '<div class="add-section-option'+(onPage?' on-page':'')+
                     '" data-slug="'+ea(sec.slug)+'" data-on-page="'+(onPage?'1':'0')+
                     '" style="'+(onPage?'opacity:.45;cursor:default;':'')+

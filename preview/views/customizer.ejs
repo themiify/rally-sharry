@@ -302,11 +302,13 @@ a:hover{text-decoration:underline}
       <div class="surfaces">
         <div class="surfaces-label">الصفحات</div>
         <div class="surfaces-list" id="previewBar">
-          <% ['home','product&slug=simple','category','cart'].forEach(function(p) { %>
-            <a class="pill<%= p === page ? ' active' : '' %>" href="/customizer?page=<%= p %>&locale=<%= locale %>">
-              <%= p.split('&')[0] %>
+          <% ['home','product&slug=simple','category','cart', 'services', 'service', 'service-portfolio', 'service-category', 'team', 'team-member', 'about-us', 'contact-us'].forEach(function(surface) {
+            var surfaceQuery = surface === 'product' ? 'product&slug=simple' : surface;
+          %>
+            <a class="pill<%= surface === page ? ' active' : '' %>" href="/customizer?page=<%= surfaceQuery %>&locale=<%= locale %>">
+              <%= surface.split('&')[0] %>
             </a>
-            <% }); %>
+          <% }); %>
         </div>
       </div>
 
