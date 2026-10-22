@@ -122,6 +122,42 @@
   height: auto;
 }
 
+/* Pre-initialization layout: prevent layout shift and 100% width slide blowout */
+.sfc__swiper:not(.swiper-initialized) .swiper-wrapper {
+  display: flex;
+  gap: 15px;
+  overflow: hidden;
+}
+
+.sfc__swiper:not(.swiper-initialized) .sfc__slide {
+  flex: 0 0 calc((100% - 15px) / 2);
+  width: calc((100% - 15px) / 2) !important;
+  max-width: calc((100% - 15px) / 2);
+}
+
+@media (min-width: 768px) {
+  .sfc__swiper:not(.swiper-initialized) .swiper-wrapper {
+    gap: 20px;
+  }
+  .sfc__swiper:not(.swiper-initialized) .sfc__slide {
+    flex: 0 0 calc((100% - 40px) / 3);
+    width: calc((100% - 40px) / 3) !important;
+    max-width: calc((100% - 40px) / 3);
+  }
+}
+
+@media (min-width: 1125px) {
+  .sfc__swiper:not(.swiper-initialized) .sfc__slide {
+    flex: 0 0 calc((100% - 60px) / 4);
+    width: calc((100% - 60px) / 4) !important;
+    max-width: calc((100% - 60px) / 4);
+  }
+}
+
+.sfc__swiper:not(.swiper-initialized) .sfc__pagination {
+  opacity: 0;
+}
+
 .sfc__pagination {
   position: relative !important;
   bottom: 0 !important;

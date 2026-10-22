@@ -59,12 +59,28 @@
 
 {% if c.slider_option %}
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const sectionEl = document.querySelector('.sf-{{ section.id }}');
-      if (!sectionEl) return;
-      const swiperContainer = sectionEl.querySelector('.sfc__swiper');
+    (function () {
+      function initCategorySwiper() {
+        const sectionEl = document.querySelector('.sf-{{ section.id }}');
+        if (!sectionEl) return;
+        const swiperContainer = sectionEl.querySelector('.sfc__swiper');
+        if (!swiperContainer) return;
+        if (swiperContainer.swiper) return;
 
-      if (swiperContainer && typeof Swiper !== 'undefined') {
+        if (typeof Swiper === 'undefined') {
+          let attempts = 0;
+          const interval = setInterval(function () {
+            attempts++;
+            if (typeof Swiper !== 'undefined') {
+              clearInterval(interval);
+              initCategorySwiper();
+            } else if (attempts > 60) {
+              clearInterval(interval);
+            }
+          }, 50);
+          return;
+        }
+
         new Swiper(swiperContainer, {
           slidesPerView: 2,
           spaceBetween: 15,
@@ -85,6 +101,13 @@
           }
         });
       }
-    });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCategorySwiper);
+      } else {
+        initCategorySwiper();
+      }
+      window.addEventListener('load', initCategorySwiper);
+    })();
   </script>
 {% endif %}
