@@ -192,6 +192,7 @@ export function buildProductCardHtml(p, opts) {
                 + ' data-compare-url="' + compareUrl + '"'
                 + ' data-compare-index-url="' + compareIndexUrl + '"'
                 + ' data-compare-destroy-url="' + (compareDestroyUrl || compareUrl) + '"'
+                + ' data-login-url="' + loginUrl + '"'
                 + ' data-added-message="' + addToCompareLabel + '"'
                 + ' data-removed-message="' + removeFromCompareLabel + '"'
                 + ' aria-pressed="false"'
@@ -235,6 +236,7 @@ export function buildProductCardHtml(p, opts) {
         + ' data-compare-url="' + compareUrl + '"'
         + ' data-compare-index-url="' + compareIndexUrl + '"'
         + ' data-compare-destroy-url="' + (compareDestroyUrl || compareUrl) + '"'
+        + ' data-login-url="' + loginUrl + '"'
         + ' data-added-message="' + addToCompareLabel + '"'
         + ' data-removed-message="' + removeFromCompareLabel + '"'
         + ' aria-label="' + addToCompareLabel + '">' + SVG_COMPARE + '</button>' : '')

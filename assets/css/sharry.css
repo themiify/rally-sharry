@@ -2530,6 +2530,32 @@ html {
   flex-shrink: 0;
 }
 
+.gl-footer-apps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-block-start: 16px;
+}
+
+.gl-footer-app-badge {
+  display: inline-flex;
+  line-height: 0;
+  text-decoration: none;
+  border-radius: 7px;
+  transition: opacity var(--gl-transition-fast, 200ms ease);
+}
+
+.gl-footer-app-badge:hover {
+  opacity: .88;
+}
+
+.gl-footer-app-svg {
+  display: block;
+  height: 34px;
+  width: auto;
+}
+
 .gl-footer .menus_title {
   font-size: 16px;
   font-weight: bold;

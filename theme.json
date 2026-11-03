@@ -1,7 +1,7 @@
 {
     "name": "rally",
     "slug": "rally",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "A luxurious makeup & cosmetics theme with pink and white palette, RTL support, and bilingual Arabic/English design.",
     "author": "GoSharry",
     "supports_rtl": true,
@@ -792,6 +792,39 @@
                     "id": "code_text_bg",
                     "label": "لون خلفية الكود",
                     "default": "#F6FFE6"
+                }
+            ]
+        },
+        {
+            "name": "Apps",
+            "name_ar": "التطبيقات",
+            "settings": [
+                {
+                    "type": "url",
+                    "id": "app_apple_store",
+                    "label": "App Store",
+                    "label_ar": "رابط تطبيق App Store",
+                    "info": "Full link to your app page",
+                    "info_ar": "رابط صفحة التطبيق على المتجر (https://…)",
+                    "default": ""
+                },
+                {
+                    "type": "url",
+                    "id": "app_google_play",
+                    "label": "Google Play",
+                    "label_ar": "رابط تطبيق Google Play",
+                    "info": "Full link to your app page",
+                    "info_ar": "رابط صفحة التطبيق على المتجر (https://…)",
+                    "default": ""
+                },
+                {
+                    "type": "url",
+                    "id": "app_huawei_gallery",
+                    "label": "AppGallery",
+                    "label_ar": "رابط تطبيق AppGallery",
+                    "info": "Full link to your app page",
+                    "info_ar": "رابط صفحة التطبيق على المتجر (https://…)",
+                    "default": ""
                 }
             ]
         },
